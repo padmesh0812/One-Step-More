@@ -1,19 +1,20 @@
 :root {
 
-    /* ========= COLORS ========= */
+   /* ========= COLORS ========= */
 
-    --primary: #E67E73;
-    --primary-hover: #D96A5D;
+--primary: #2E7D32;
+--primary-hover: #256628;
 
-    --secondary: #9CBF9C;
+--accent: #F57C00;
+--accent-hover: #DD6D00;
 
-    --background: #FFFCF8;
-    --surface: #FFFFFF;
+--background: #FFFCF8;
+--surface: #FFFFFF;
 
-    --heading: #2D2D2D;
-    --text: #666666;
+--heading: #2D2D2D;
+--text: #666666;
 
-    --border: #EFE8E4;
+--border: #EFE8E4;
 
     /* ========= FONTS ========= */
 
