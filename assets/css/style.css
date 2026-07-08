@@ -877,3 +877,750 @@ font-size:.85rem;
     }
 
 }
+
+/*=========================================
+            HOW IT WORKS
+=========================================*/
+
+.how-it-works{
+
+    padding:100px 0;
+
+    background:#FCFAF8;
+
+}
+
+.steps-wrapper{
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:30px;
+
+    margin-top:60px;
+
+}
+
+.step-card{
+
+    position:relative;
+
+    background:#fff;
+
+    border-radius:24px;
+
+    padding:40px 30px;
+
+    text-align:center;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.06);
+
+    transition:.4s;
+
+}
+
+.step-card:hover{
+
+    transform:translateY(-10px);
+
+    box-shadow:0 25px 50px rgba(0,0,0,.10);
+
+}
+
+.step-number{
+
+    width:70px;
+
+    height:70px;
+
+    margin:auto;
+
+    margin-bottom:25px;
+
+    border-radius:50%;
+
+    background:var(--primary);
+
+    color:#fff;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:1.3rem;
+
+    font-weight:700;
+
+}
+
+.step-card h3{
+
+    font-size:1.45rem;
+
+    color:var(--heading);
+
+    margin-bottom:16px;
+
+}
+
+.step-card p{
+
+    color:var(--text);
+
+    line-height:1.8;
+
+}
+
+/*=========================================
+        OUR WELLNESS PROGRAMS
+=========================================*/
+
+.programs{
+    padding:100px 0;
+    background:#FCFAF8;
+}
+
+/*=========================================
+        PROGRAM GRID
+=========================================*/
+
+.program-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:30px;
+    margin-top:60px;
+}
+
+/*=========================================
+        PROGRAM CARD
+=========================================*/
+
+.program-card{
+
+    position:relative;
+
+    height:380px;
+
+    border-radius:28px;
+
+    overflow:hidden;
+
+    display:flex;
+
+    align-items:flex-end;
+
+    text-decoration:none;
+
+    background-size:cover;
+
+    background-position:center;
+
+    background-repeat:no-repeat;
+
+    cursor:pointer;
+
+    transition:
+        transform .45s ease,
+        background-size .6s ease,
+        box-shadow .45s ease;
+
+    box-shadow:
+        0 18px 45px rgba(0,0,0,.08);
+
+}
+
+/* Hover */
+
+.program-card:hover{
+
+    transform:
+        translateY(-10px)
+        scale(1.02);
+
+    background-size:110%;
+
+    box-shadow:
+        0 30px 60px rgba(0,0,0,.15);
+
+}
+
+/*=========================================
+        BACKGROUND IMAGES
+=========================================*/
+
+.program-card.diet{
+
+    background-image:url("../images/programs/diet.jpg");
+
+}
+
+.program-card.yoga{
+
+    background-image:url("../images/programs/yoga.jpg");
+
+}
+
+.program-card.weight{
+
+    background-image:url("../images/programs/weight.jpg");
+
+}
+
+.program-card.postpartum{
+
+    background-image:url("../images/programs/postpartum.jpg");
+
+}
+
+.program-card.lifestyle{
+
+    background-image:url("../images/programs/lifestyle.jpg");
+
+}
+
+.program-card.consultation{
+
+    background-image:url("../images/programs/consultation.jpg");
+
+}
+
+/*=========================================
+            OVERLAY
+=========================================*/
+
+.program-overlay{
+
+    position:absolute;
+
+    inset:0;
+
+    background:linear-gradient(
+
+        to top,
+
+        rgba(0,0,0,.82) 5%,
+
+        rgba(0,0,0,.45) 45%,
+
+        rgba(0,0,0,.15) 70%,
+
+        transparent 100%
+
+    );
+
+    transition:.45s;
+
+}
+
+.program-card:hover .program-overlay{
+
+    background:linear-gradient(
+
+        to top,
+
+        rgba(46,125,50,.88),
+
+        rgba(46,125,50,.35),
+
+        rgba(0,0,0,.08),
+
+        transparent
+
+    );
+
+}
+
+/*=========================================
+            CONTENT
+=========================================*/
+
+.program-content{
+
+    position:relative;
+
+    z-index:2;
+
+    width:100%;
+
+    padding:30px;
+
+    color:#fff;
+
+    transition:.4s;
+
+}
+
+.program-card:hover .program-content{
+
+    transform:translateY(-6px);
+
+}
+
+/*=========================================
+        CATEGORY
+=========================================*/
+
+.program-category{
+
+    display:inline-block;
+
+    padding:6px 14px;
+
+    border-radius:30px;
+
+    background:rgba(255,255,255,.18);
+
+    backdrop-filter:blur(12px);
+
+    font-size:.78rem;
+
+    font-weight:500;
+
+    letter-spacing:.5px;
+
+    margin-bottom:15px;
+
+}
+
+/*=========================================
+            TITLE
+=========================================*/
+
+.program-content h3{
+
+    font-size:1.6rem;
+
+    font-weight:700;
+
+    line-height:1.25;
+
+    margin-bottom:14px;
+
+    color:#fff;
+
+}
+
+/*=========================================
+        DESCRIPTION
+=========================================*/
+
+.program-content p{
+
+    font-size:.95rem;
+
+    line-height:1.7;
+
+    color:rgba(255,255,255,.92);
+
+}
+
+/*=========================================
+        ARROW BUTTON
+=========================================*/
+
+.program-arrow{
+
+    width:48px;
+
+    height:48px;
+
+    margin-top:24px;
+
+    border-radius:50%;
+
+    background:#fff;
+
+    color:var(--primary);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:1.3rem;
+
+    transition:.35s;
+
+}
+
+.program-card:hover .program-arrow{
+
+    background:var(--primary);
+
+    color:#fff;
+
+    transform:translateX(8px);
+
+}
+
+/*=========================================
+        RESPONSIVE
+=========================================*/
+
+@media(max-width:1100px){
+
+.program-grid{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:768px){
+
+.programs{
+
+padding:80px 0;
+
+}
+
+.program-grid{
+
+grid-template-columns:1fr;
+
+gap:25px;
+
+}
+
+.program-card{
+
+height:330px;
+
+}
+
+.program-content{
+
+padding:25px;
+
+}
+
+.program-content h3{
+
+font-size:1.4rem;
+
+}
+
+}
+
+/*=========================================
+      THE HEART BEHIND ONE STEP MORE
+=========================================*/
+
+.founder{
+
+    padding:90px 0;
+
+    background:#fff;
+
+}
+
+/*=========================================
+            LAYOUT
+=========================================*/
+
+.founder-wrapper{
+
+    display:grid;
+
+    grid-template-columns:45% 55%;
+
+    gap:55px;
+
+    align-items:center;
+
+}
+
+/*=========================================
+            IMAGE
+=========================================*/
+
+.founder-image{
+
+    position:relative;
+
+}
+
+.founder-image img{
+
+    width:100%;
+
+    height:580px;
+
+    object-fit:cover;
+
+    object-position:center;
+
+    display:block;
+
+    border-radius:30px;
+
+    box-shadow:
+    0 25px 60px rgba(0,0,0,.12);
+
+}
+
+/*=========================================
+        EXPERIENCE CARD
+=========================================*/
+
+.experience-card{
+
+    position:absolute;
+
+    bottom:30px;
+
+    right:-25px;
+
+    width:180px;
+
+    background:rgba(255,255,255,.92);
+
+    backdrop-filter:blur(15px);
+
+    -webkit-backdrop-filter:blur(15px);
+
+    padding:22px;
+
+    border-radius:22px;
+
+    text-align:center;
+
+    box-shadow:
+    0 15px 35px rgba(0,0,0,.12);
+
+}
+
+.experience-card h3{
+
+    font-size:2.4rem;
+
+    color:var(--primary);
+
+    margin-bottom:6px;
+
+    font-weight:700;
+
+}
+
+.experience-card p{
+
+    font-size:.95rem;
+
+    color:#666;
+
+    font-weight:600;
+
+}
+
+/*=========================================
+            CONTENT
+=========================================*/
+
+.founder-content .section-title{
+
+    margin:20px 0;
+
+}
+
+.founder-intro{
+
+    font-size:1.05rem;
+
+    line-height:1.9;
+
+    color:var(--text);
+
+    margin-bottom:22px;
+
+}
+
+/*=========================================
+            QUOTE
+=========================================*/
+
+.founder-content blockquote{
+
+    font-size:1.25rem;
+
+    font-style:italic;
+
+    color:var(--primary);
+
+    border-left:4px solid var(--primary);
+
+    padding-left:22px;
+
+    margin-bottom:25px;
+
+    line-height:1.7;
+
+}
+
+/*=========================================
+        FOUNDER NAME
+=========================================*/
+
+.founder-name{
+
+    margin-bottom:35px;
+
+}
+
+.founder-name h4{
+
+    font-size:1.5rem;
+
+    color:var(--heading);
+
+    margin-bottom:6px;
+
+}
+
+.founder-name span{
+
+    color:var(--primary);
+
+    font-weight:600;
+
+}
+
+/*=========================================
+            FEATURES
+=========================================*/
+
+.founder-features{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:16px;
+
+    margin-bottom:40px;
+
+}
+
+.feature{
+
+    background:#F7FBF7;
+
+    padding:18px 20px;
+
+    border-radius:16px;
+
+    font-weight:600;
+
+    color:var(--heading);
+
+    transition:.35s ease;
+
+}
+
+.feature:hover{
+
+    transform:translateY(-5px);
+
+    background:#EEF8EE;
+
+}
+
+/*=========================================
+            BUTTONS
+=========================================*/
+
+.founder-buttons{
+
+    display:flex;
+
+    gap:18px;
+
+    flex-wrap:wrap;
+
+}
+
+/*=========================================
+        RESPONSIVE
+=========================================*/
+
+@media(max-width:992px){
+
+.founder-wrapper{
+
+grid-template-columns:1fr;
+
+gap:45px;
+
+}
+
+.founder-image{
+
+max-width:500px;
+
+margin:auto;
+
+}
+
+.experience-card{
+
+right:20px;
+
+bottom:20px;
+
+}
+
+}
+
+@media(max-width:768px){
+
+.founder{
+
+padding:80px 0;
+
+}
+
+.founder-image img{
+
+height:420px;
+
+}
+
+.founder-features{
+
+grid-template-columns:1fr;
+
+}
+
+.founder-buttons{
+
+flex-direction:column;
+
+}
+
+.founder-buttons .btn{
+
+width:100%;
+
+text-align:center;
+
+}
+
+.experience-card{
+
+width:150px;
+
+padding:18px;
+
+}
+
+.experience-card h3{
+
+font-size:2rem;
+
+}
+
+}
