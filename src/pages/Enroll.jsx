@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Check, AlertCircle, ArrowLeft, Heart, Shield, CreditCard, Smartphone, CheckCircle, RefreshCw } from 'lucide-react';
+import './Enroll.css';
 
 const PROGRAMS_LIST = [
   {
@@ -316,144 +317,65 @@ const Enroll = () => {
     };
 
     return (
-      <main style={{ backgroundColor: '#FAF8F5', minHeight: '80vh', padding: '40px 0' }}>
+      <main className="enroll-main">
         <div className="container">
           
           {/* Back Trigger */}
-          <div style={{ marginBottom: '24px' }}>
+          <div className="enroll-back-wrapper">
             <button 
               onClick={() => step > 1 ? setStep(step - 1) : navigate(-1)} 
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--primary)',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontSize: '0.95rem',
-                fontWeight: 600
-              }}
+              className="enroll-back-btn"
             >
               <ArrowLeft size={16} /> Back {step > 1 ? 'to Stats' : 'to Programs'}
             </button>
           </div>
 
-          <div className="section-header" style={{ marginBottom: '40px' }}>
+          <div className="section-header enroll-header">
             <h1>Complete Your <span>Enrollment</span></h1>
             <p>Provide your biology parameters and secure checkout to lock in your personalized roadmap call.</p>
           </div>
 
           {/* Stepper Progress Indicator */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            maxWidth: '600px',
-            margin: '0 auto 40px auto',
-            gap: '15px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{
-                width: '30px',
-                height: '30px',
-                borderRadius: '50%',
-                backgroundColor: step >= 1 ? 'var(--primary)' : '#ccc',
-                color: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 700,
-                fontSize: '0.85rem'
-              }}>1</div>
-              <span style={{ fontSize: '0.9rem', fontWeight: step === 1 ? 700 : 500, color: step === 1 ? 'var(--heading)' : 'var(--text-muted)' }}>Biological Stats</span>
+          <div className="enroll-stepper-wrapper">
+            <div className="enroll-step-container">
+              <div className={`enroll-step-number ${step >= 1 ? 'active' : ''}`}>1</div>
+              <span className={`enroll-step-label ${step === 1 ? 'active' : ''}`}>Biological Stats</span>
             </div>
-            <div style={{ height: '2px', width: '50px', backgroundColor: step >= 2 ? 'var(--primary)' : '#ccc' }}></div>
+            <div className={`enroll-step-line ${step >= 2 ? 'active' : ''}`}></div>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{
-                width: '30px',
-                height: '30px',
-                borderRadius: '50%',
-                backgroundColor: step >= 2 ? 'var(--primary)' : '#ccc',
-                color: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 700,
-                fontSize: '0.85rem'
-              }}>2</div>
-              <span style={{ fontSize: '0.9rem', fontWeight: step === 2 ? 700 : 500, color: step === 2 ? 'var(--heading)' : 'var(--text-muted)' }}>Secure Payment</span>
+            <div className="enroll-step-container">
+              <div className={`enroll-step-number ${step >= 2 ? 'active' : ''}`}>2</div>
+              <span className={`enroll-step-label ${step === 2 ? 'active' : ''}`}>Secure Payment</span>
             </div>
-            <div style={{ height: '2px', width: '50px', backgroundColor: step === 3 ? 'var(--primary)' : '#ccc' }}></div>
+            <div className={`enroll-step-line ${step === 3 ? 'active' : ''}`}></div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{
-                width: '30px',
-                height: '30px',
-                borderRadius: '50%',
-                backgroundColor: step === 3 ? 'var(--primary)' : '#ccc',
-                color: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 700,
-                fontSize: '0.85rem'
-              }}><Check size={14} /></div>
-              <span style={{ fontSize: '0.9rem', fontWeight: step === 3 ? 700 : 500, color: step === 3 ? 'var(--heading)' : 'var(--text-muted)' }}>Success</span>
+            <div className="enroll-step-container">
+              <div className={`enroll-step-number ${step === 3 ? 'active' : ''}`}><Check size={14} /></div>
+              <span className={`enroll-step-label ${step === 3 ? 'active' : ''}`}>Success</span>
             </div>
           </div>
 
           {/* STEP 3: SUCCESS */}
           {step === 3 && (
-            <div style={{
-              maxWidth: '650px',
-              margin: '0 auto',
-              backgroundColor: '#fff',
-              borderRadius: '24px',
-              padding: '40px',
-              textAlign: 'center',
-              boxShadow: 'var(--shadow-lg)',
-              border: '1px solid var(--border)'
-            }}>
-              <div style={{
-                width: '70px',
-                height: '70px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(74, 117, 89, 0.1)',
-                color: 'var(--primary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 24px auto'
-              }}>
+            <div className="enroll-success-box">
+              <div className="enroll-success-icon-circle">
                 <CheckCircle size={40} />
               </div>
-              <h2 style={{ color: 'var(--heading)', marginBottom: '16px' }}>Enrollment Confirmed!</h2>
-              <p style={{ color: 'var(--text)', marginBottom: '24px', lineHeight: 1.7 }}>
+              <h2 className="enroll-success-title">Enrollment Confirmed!</h2>
+              <p className="enroll-success-desc">
                 Thank you, <strong>{form.name}</strong>. Your payment was successfully processed. We have locked in your slot for the <strong>{selectedProgramData.title} ({form.duration} Weeks)</strong>.
               </p>
               
-              <div style={{
-                backgroundColor: '#FBFBFA',
-                borderRadius: '16px',
-                padding: '24px',
-                textAlign: 'left',
-                fontSize: '0.9rem',
-                marginBottom: '30px',
-                border: '1px solid var(--border)',
-                display: 'grid',
-                gap: '10px'
-              }}>
+              <div className="enroll-success-summary">
                 <div><strong>Biological Configuration:</strong> {form.age} Years &bull; Blood group {form.bloodGroup} &bull; Weight {form.weight} kg &bull; Height {form.height}</div>
                 <div><strong>Delivery Address:</strong> {form.address}</div>
                 <div><strong>Secured Gateway:</strong> Razorpay Secure Payment (Verified API Node)</div>
-                <div style={{ borderTop: '1px solid var(--border)', paddingTop: '10px', color: 'var(--primary)', fontWeight: 700 }}>
+                <div className="enroll-success-total">
                   Active Transaction Value: ₹{activePricing.offer.toLocaleString('en-IN')}/-
                 </div>
               </div>
 
-              <button onClick={() => navigate('/services')} className="btn btn-primary" style={{ minWidth: '220px' }}>
+              <button onClick={() => navigate('/services')} className="btn btn-primary enroll-success-btn">
                 Return to Services
               </button>
             </div>
@@ -461,30 +383,19 @@ const Enroll = () => {
 
           {/* STEP 1 & 2 CONTENT WRAPPER */}
           {step < 3 && (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1.2fr 0.8fr',
-              gap: '40px',
-              alignItems: 'start'
-            }} className="enroll-grid-layout">
+            <div className="enroll-grid-layout">
               
               {/* LEFT SIDE PANEL (Forms) */}
-              <div style={{
-                backgroundColor: '#fff',
-                borderRadius: '24px',
-                padding: '40px',
-                boxShadow: 'var(--shadow-md)',
-                border: '1px solid var(--border)'
-              }}>
+              <div className="enroll-form-panel">
                 
                 {/* STEP 1: BIOLOGICAL & PERSONAL STATS */}
                 {step === 1 && (
                   <form onSubmit={handleDetailsSubmit}>
-                    <h3 style={{ fontSize: '1.3rem', color: 'var(--heading)', marginBottom: '24px', fontWeight: 700 }}>
+                    <h3 className="enroll-form-title">
                       Biological Stats & Contact Info
                     </h3>
 
-                    <div style={{ display: 'grid', gap: '20px' }}>
+                    <div className="enroll-form-grid-vertical">
                       
                       {/* Name input */}
                       <div className="form-group">
@@ -502,7 +413,7 @@ const Enroll = () => {
                       </div>
 
                       {/* Email & Phone */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                      <div className="enroll-form-grid-half">
                         <div className="form-group">
                           <label className="form-label" htmlFor="email">Email Address</label>
                           <input
@@ -533,14 +444,13 @@ const Enroll = () => {
                       </div>
 
                       {/* Program choice override dropdowns */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '20px' }}>
+                      <div className="enroll-form-grid-asym">
                         <div className="form-group">
                           <label className="form-label" htmlFor="program">Change Program Choice</label>
                           <select
                             id="program"
                             name="program"
-                            className="form-input"
-                            style={{ cursor: 'pointer' }}
+                            className="form-input pointer-input"
                             value={form.program}
                             onChange={handleInput}
                           >
@@ -555,8 +465,7 @@ const Enroll = () => {
                           <select
                             id="duration"
                             name="duration"
-                            className="form-input"
-                            style={{ cursor: 'pointer' }}
+                            className="form-input pointer-input"
                             value={form.duration}
                             onChange={handleInput}
                           >
@@ -570,7 +479,7 @@ const Enroll = () => {
                       </div>
 
                       {/* DOB and automatic age calculation */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '20px' }}>
+                      <div className="enroll-form-grid-asym">
                         <div className="form-group">
                           <label className="form-label" htmlFor="dob">Date of Birth</label>
                           <input
@@ -590,24 +499,22 @@ const Enroll = () => {
                             type="text"
                             id="age"
                             name="age"
-                            className="form-input"
+                            className="form-input disabled-input"
                             placeholder="Automatic"
                             readOnly
                             value={form.age ? `${form.age} Years` : ''}
-                            style={{ backgroundColor: '#F9FAFB', cursor: 'not-allowed' }}
                           />
                         </div>
                       </div>
 
                       {/* Stats details: Blood Group, Weight, Height */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+                      <div className="enroll-form-grid-thirds">
                         <div className="form-group">
                           <label className="form-label" htmlFor="bloodGroup">Blood Group</label>
                           <select
                             id="bloodGroup"
                             name="bloodGroup"
-                            className="form-input"
-                            style={{ cursor: 'pointer' }}
+                            className="form-input pointer-input"
                             value={form.bloodGroup}
                             onChange={handleInput}
                           >
@@ -665,94 +572,61 @@ const Enroll = () => {
 
                     </div>
 
-                    <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '30px', padding: '16px', fontWeight: 700 }}>
-                      Proceed to Payment &rarr;
+                    <button type="submit" className="btn btn-primary enroll-submit-btn">
+                      Proceed to Payment &arr;
                     </button>
                   </form>
                 )}
 
                 {/* STEP 2: SECURE PAYMENT GATEWAY (RAZORPAY) */}
                 {step === 2 && (
-                  <form onSubmit={handlePaymentSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  <form onSubmit={handlePaymentSubmit} className="enroll-payment-form">
                     <div>
-                      <h3 style={{ fontSize: '1.4rem', color: 'var(--heading)', marginBottom: '6px', fontWeight: 700 }}>
+                      <h3 className="enroll-payment-title">
                         Review & Complete Payment
                       </h3>
-                      <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: 0 }}>
+                      <p className="enroll-payment-subtitle">
                         You will be redirected to the secure Razorpay Checkout node to complete your transaction.
                       </p>
                     </div>
 
                     {/* Summary Info Cards */}
-                    <div style={{ display: 'grid', gap: '16px' }}>
-                      <div style={{
-                        backgroundColor: '#FAF8F5',
-                        borderRadius: '16px',
-                        padding: '16px 20px',
-                        border: '1px solid var(--border)',
-                        display: 'grid',
-                        gap: '12px'
-                      }}>
-                        <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
+                    <div className="enroll-summary-grid">
+                      <div className="enroll-summary-card">
+                        <h4 className="enroll-card-label">
                           Billing Details
                         </h4>
-                        <div style={{ display: 'grid', gap: '6px', fontSize: '0.9rem', color: 'var(--text)' }}>
+                        <div className="enroll-card-details">
                           <div><strong>Name:</strong> {form.name}</div>
                           <div><strong>Email:</strong> {form.email}</div>
                           <div><strong>Phone:</strong> {form.phone}</div>
                         </div>
                       </div>
 
-                      <div style={{
-                        backgroundColor: '#FAF8F5',
-                        borderRadius: '16px',
-                        padding: '16px 20px',
-                        border: '1px solid var(--border)',
-                        display: 'grid',
-                        gap: '12px'
-                      }}>
-                        <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
+                      <div className="enroll-summary-card">
+                        <h4 className="enroll-card-label">
                           Biological Parameters
                         </h4>
-                        <div style={{ fontSize: '0.9rem', color: 'var(--text)' }}>
+                        <div className="enroll-card-details">
                           {form.age} Years &bull; Blood group {form.bloodGroup} &bull; Weight {form.weight} kg &bull; Height {form.height}
                         </div>
                       </div>
                     </div>
 
                     {/* Security & Badges */}
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '16px',
-                      backgroundColor: 'rgba(74, 117, 89, 0.05)',
-                      borderRadius: '16px',
-                      padding: '16px 20px',
-                      border: '1px solid rgba(74, 117, 89, 0.15)'
-                    }}>
-                      <Shield size={36} color="var(--primary)" style={{ flexShrink: 0 }} />
-                      <div style={{ fontSize: '0.825rem', color: 'var(--text)', lineHeight: 1.4 }}>
-                        <strong style={{ color: 'var(--heading)' }}>100% Encrypted Transactions</strong>
-                        <div style={{ color: 'var(--text-muted)' }}>Payments are securely routed via 128-bit SSL encrypted connection through the official Razorpay node.</div>
+                    <div className="enroll-security-card">
+                      <Shield size={36} color="var(--primary)" />
+                      <div className="enroll-security-text">
+                        <strong>100% Encrypted Transactions</strong>
+                        <div className="desc">Payments are securely routed via 128-bit SSL encrypted connection through the official Razorpay node.</div>
                       </div>
                     </div>
 
                     {/* Pay Button */}
                     <button 
                       type="submit" 
-                      className="btn btn-primary" 
+                      className={`btn btn-primary enroll-pay-btn ${isProcessingPayment ? 'loading' : ''}`}
                       disabled={isProcessingPayment}
-                      style={{ 
-                        width: '100%', 
-                        padding: '16px', 
-                        fontWeight: 700,
-                        fontSize: '1rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '10px',
-                        cursor: isProcessingPayment ? 'not-allowed' : 'pointer'
-                      }}
                     >
                       {isProcessingPayment ? (
                         <>
@@ -770,75 +644,51 @@ const Enroll = () => {
               </div>
 
               {/* RIGHT SIDE PANEL (Summary Card) */}
-              <div style={{
-                backgroundColor: '#FAF6F0',
-                borderRadius: '24px',
-                padding: '30px',
-                border: '1px solid var(--border)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '24px',
-                position: 'sticky',
-                top: '100px'
-              }}>
+              <div className="enroll-sidebar">
                 <div>
-                  <h4 style={{ color: 'var(--heading)', marginBottom: '4px', fontSize: '1.1rem', fontWeight: 700 }}>
+                  <h4 className="enroll-sidebar-title">
                     Chosen Pricing Details
                   </h4>
-                  <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', margin: 0 }}>
+                  <p className="enroll-sidebar-subtitle">
                     Calculated based on your selection.
                   </p>
                 </div>
 
                 {/* Package Details Box */}
-                <div style={{
-                  backgroundColor: '#fff',
-                  borderRadius: '16px',
-                  padding: '20px',
-                  border: '1px solid var(--border)'
-                }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                <div className="enroll-package-box">
+                  <span className="enroll-package-label">
                     Selected Program & Term
                   </span>
-                  <h4 style={{ color: 'var(--heading)', margin: '4px 0 0 0', fontSize: '1.05rem', fontWeight: 700 }}>
+                  <h4 className="enroll-package-title">
                     {selectedProgramData.title}
                   </h4>
-                  <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                  <div className="enroll-package-desc">
                     {form.duration} Weeks duration setup
                   </div>
                 </div>
 
                 {/* Pricing Box */}
-                <div style={{ display: 'grid', gap: '10px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                <div className="enroll-pricing-box">
+                  <div className="enroll-pricing-row">
                     <span>Original Price:</span>
-                    <span style={{ textDecoration: 'line-through' }}>₹{activePricing.original.toLocaleString('en-IN')}/-</span>
+                    <span>₹{activePricing.original.toLocaleString('en-IN')}/-</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem', fontWeight: 700, color: 'var(--heading)' }}>
+                  <div className="enroll-pricing-row-main">
                     <span>Offer Price:</span>
-                    <span style={{ color: 'var(--secondary)', fontSize: '1.3rem' }}>₹{activePricing.offer.toLocaleString('en-IN')}/-</span>
+                    <span className="enroll-pricing-value">₹{activePricing.offer.toLocaleString('en-IN')}/-</span>
                   </div>
-                  <div style={{
-                    backgroundColor: 'rgba(74, 117, 89, 0.08)',
-                    borderRadius: '8px',
-                    padding: '8px 12px',
-                    fontSize: '0.8rem',
-                    color: 'var(--primary)',
-                    fontWeight: 700,
-                    textAlign: 'center',
-                    marginTop: '8px'
-                  }}>
+                  <div className="enroll-savings-badge">
                     You Save: ₹{(activePricing.original - activePricing.offer).toLocaleString('en-IN')}/- ({Math.round(((activePricing.original - activePricing.offer) / activePricing.original) * 100)}% Off)
                   </div>
                 </div>
 
-                <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
-                  <div style={{ display: 'flex', gap: '10px', fontSize: '0.825rem', color: 'var(--text)', marginBottom: '10px' }}>
-                    <Shield size={16} color="var(--primary)" style={{ flexShrink: 0 }} />
+                <div className="enroll-protection-section">
+                  <div className="enroll-protection-line">
+                    <Shield size={16} color="var(--primary)" />
                     <span>14-day refund protection applies automatically.</span>
                   </div>
-                  <div style={{ display: 'flex', gap: '10px', fontSize: '0.825rem', color: 'var(--text)' }}>
-                    <Heart size={16} color="var(--secondary)" style={{ flexShrink: 0 }} />
+                  <div className="enroll-protection-line">
+                    <Heart size={16} color="var(--secondary)" />
                     <span>Personalized dietitian review every 7 days.</span>
                   </div>
                 </div>
@@ -851,14 +701,14 @@ const Enroll = () => {
     );
   } catch (err) {
     return (
-      <div style={{ padding: '80px 20px', textAlign: 'center', backgroundColor: '#FFF5F5', color: '#D32F2F', fontFamily: 'sans-serif' }}>
-        <div style={{ maxWidth: '600px', margin: '0 auto', border: '1px solid #FFCDD2', borderRadius: '12px', padding: '30px', backgroundColor: '#fff', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-          <h2 style={{ margin: '0 0 10px 0', fontSize: '1.5rem' }}>Enrollment Module Rendering Error</h2>
-          <p style={{ fontSize: '0.9rem', color: '#555', marginBottom: '20px' }}>We caught a JavaScript routing or reference error during compilation rendering. Diagnostics trace details:</p>
-          <pre style={{ textAlign: 'left', backgroundColor: '#F9F9F9', padding: '15px', borderRadius: '8px', overflowX: 'auto', fontSize: '0.8rem', color: '#333', border: '1px solid #E0E0E0', whiteSpace: 'pre-wrap' }}>
+      <div className="enroll-error-main">
+        <div className="enroll-error-box">
+          <h2>Enrollment Module Rendering Error</h2>
+          <p>We caught a JavaScript routing or reference error during compilation rendering. Diagnostics trace details:</p>
+          <pre className="enroll-error-stack">
             {err.stack || err.toString()}
           </pre>
-          <Link to="/services" style={{ display: 'inline-block', marginTop: '20px', padding: '10px 20px', backgroundColor: 'var(--primary, #4A7559)', color: '#fff', textDecoration: 'none', borderRadius: '8px', fontWeight: 600 }}>
+          <Link to="/services" className="enroll-error-link">
             Return to Services Tab
           </Link>
         </div>

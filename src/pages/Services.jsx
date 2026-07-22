@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Check, ArrowRight, Apple, Activity, Heart, Shield, Plus, Minus, X, AlertCircle } from 'lucide-react';
+import './Services.css';
 
 const PROGRAMS_DATA = [
   {
@@ -234,25 +235,24 @@ const Services = () => {
   };
 
   return (
-    <main style={{ backgroundColor: '#FCFAF8' }}>
+    <main className="services-main">
       {/* Services Hero */}
-      <section className="section container" style={{ paddingBottom: '30px' }}>
-        <div className="section-header" style={{ marginBottom: '40px' }}>
+      <section className="section container services-hero-section">
+        <div className="section-header services-header">
           <span className="section-tag">OUR STRUCTURED PROGRAMS</span>
-          <h1 style={{ fontSize: '3rem', margin: '15px 0' }}>Find the Right Program for <span>Your Journey</span></h1>
+          <h1 className="services-title">Find the Right Program for <span>Your Journey</span></h1>
           <p className="section-description">
             Choose your focus area and select a duration tier. All diet plans are clinical-nutritionist certified, and all yoga classes are live-guided.
           </p>
         </div>
 
         {/* Tab Buttons */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginBottom: '50px' }}>
+        <div className="services-tabs-container">
           {PROGRAMS_DATA.map((prog) => (
             <button
               key={prog.id}
               onClick={() => setActiveTab(prog.id)}
-              className={`filter-btn ${activeTab === prog.id ? 'active' : ''}`}
-              style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', fontSize: '0.95rem' }}
+              className={`filter-btn ${activeTab === prog.id ? 'active' : ''} services-tab-btn`}
             >
               {prog.icon}
               {prog.title}
@@ -261,88 +261,61 @@ const Services = () => {
         </div>
 
         {/* Tab Content Box */}
-        <div style={{
-          backgroundColor: '#fff',
-          borderRadius: '32px',
-          padding: '40px',
-          boxShadow: '0 20px 50px rgba(0,0,0,0.05)',
-          border: '1px solid var(--border)'
-        }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '50px' }} className="about-hero-grid">
+        <div className="services-content-card">
+          <div className="services-grid about-hero-grid">
             
             {/* Left Content Column */}
             <div>
               <span className="section-tag">{activeProgram.title}</span>
-              <h2 style={{ fontFamily: 'var(--heading-font)', fontSize: '2.2rem', color: 'var(--heading)', margin: '15px 0 10px 0' }}>
+              <h2 className="services-subtitle">
                 {activeProgram.subtitle}
               </h2>
-              <p style={{ color: 'var(--text)', lineHeight: 1.8, marginBottom: '24px', fontSize: '1.05rem' }}>
+              <p className="services-desc">
                 {activeProgram.description}
               </p>
 
-              <h3 style={{ fontFamily: 'var(--heading-font)', fontSize: '1.25rem', color: 'var(--heading)', marginBottom: '14px' }}>
+              <h3 className="services-section-title">
                 {activeTab === 'child' ? 'Best Suited For Children With:' : 'Ideal For Addressing:'}
               </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '30px' }}>
+              <div className="services-best-for-grid">
                 {activeProgram.bestFor.map((item, idx) => (
-                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', fontWeight: 500, color: 'var(--text)' }}>
-                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--primary)' }}></div>
+                  <div key={idx} className="services-best-for-item">
+                    <div className="services-bullet-dot"></div>
                     {item}
                   </div>
                 ))}
               </div>
 
-              <h3 style={{ fontFamily: 'var(--heading-font)', fontSize: '1.25rem', color: 'var(--heading)', marginBottom: '16px' }}>
+              <h3 className="services-section-title alt">
                 What's Included in the Program:
               </h3>
-              <ul className="modal-list" style={{ display: 'grid', gap: '12px' }}>
+              <ul className="modal-list services-included-list">
                 {activeProgram.keyPoints.map((point, idx) => (
-                  <li key={idx} className="modal-list-item" style={{ fontSize: '0.925rem' }}>
-                    <Check size={18} color="var(--primary)" style={{ flexShrink: 0 }} />
-                    <span style={{ color: 'var(--text)' }}>{point}</span>
+                  <li key={idx} className="modal-list-item services-included-item">
+                    <Check size={18} color="var(--primary)" className="services-check-icon" />
+                    <span>{point}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
             {/* Right Interactive Calculator Column */}
-            <div style={{
-              backgroundColor: 'var(--background)',
-              border: '1px solid var(--border)',
-              borderRadius: '24px',
-              padding: '30px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              height: 'fit-content'
-            }}>
+            <div className="services-calc-card">
               <div>
-                <h3 style={{ fontFamily: 'var(--heading-font)', fontSize: '1.4rem', color: 'var(--heading)', marginBottom: '8px' }}>
+                <h3 className="services-calc-title">
                   Choose Program Duration:
                 </h3>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '24px' }}>
+                <p className="services-calc-subtitle">
                   Longer plans include deeper metabolic resetting and better value.
                 </p>
 
                 {/* Duration Pills */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '8px', marginBottom: '30px' }}>
+                <div className="services-duration-grid">
                   {activeProgram.pricing.map((price) => (
                     <button
                       key={price.weeks}
                       onClick={() => handleDurationChange(activeTab, price.weeks)}
-                      style={{
-                        padding: '12px 6px',
-                        borderRadius: '12px',
-                        border: '2px solid',
-                        borderColor: selectedDuration === price.weeks ? 'var(--primary)' : 'var(--border)',
-                        backgroundColor: selectedDuration === price.weeks ? 'var(--primary-light)' : '#fff',
-                        color: selectedDuration === price.weeks ? 'var(--primary)' : 'var(--text)',
-                        fontWeight: 700,
-                        fontSize: '0.85rem',
-                        cursor: 'pointer',
-                        textAlign: 'center',
-                        transition: '0.2s'
-                      }}
+                      className={`services-duration-btn ${selectedDuration === price.weeks ? 'active' : ''}`}
                     >
                       {price.weeks} W
                     </button>
@@ -350,37 +323,22 @@ const Services = () => {
                 </div>
 
                 {/* Pricing Output Panel */}
-                <div style={{
-                  backgroundColor: '#fff',
-                  borderRadius: '16px',
-                  padding: '24px',
-                  border: '1px solid var(--border)',
-                  marginBottom: '30px',
-                  boxShadow: 'var(--shadow-sm)'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                    <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>Original Price:</span>
-                    <span style={{ fontSize: '1rem', textDecoration: 'line-through', color: '#9CA3AF', fontWeight: 500 }}>
+                <div className="services-pricing-panel">
+                  <div className="services-pricing-row">
+                    <span className="services-pricing-label">Original Price:</span>
+                    <span className="services-original-price">
                       ₹{activePricing.original.toLocaleString('en-IN')}/-
                     </span>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '15px' }}>
-                    <span style={{ fontSize: '1.05rem', fontWeight: 600, color: 'var(--heading)' }}>Special Offer Price:</span>
-                    <span style={{ fontSize: '2.2rem', fontWeight: 800, color: 'var(--secondary)' }}>
+                  <div className="services-pricing-row-main">
+                    <span className="services-offer-label">Special Offer Price:</span>
+                    <span className="services-offer-price">
                       ₹{activePricing.offer.toLocaleString('en-IN')}/-
                     </span>
                   </div>
 
-                  <div style={{
-                    backgroundColor: 'rgba(245, 124, 0, 0.08)',
-                    borderRadius: '8px',
-                    padding: '8px 12px',
-                    fontSize: '0.825rem',
-                    color: 'var(--secondary)',
-                    fontWeight: 700,
-                    textAlign: 'center'
-                  }}>
+                  <div className="services-savings-badge">
                     Instant Savings of ₹{calculateSavings(activePricing.original, activePricing.offer).toLocaleString('en-IN')}/- ({Math.round(((activePricing.original - activePricing.offer) / activePricing.original) * 100)}% Off)
                   </div>
                 </div>
@@ -389,8 +347,7 @@ const Services = () => {
               {/* Consultation CTA */}
               <button
                 onClick={() => navigate('/enroll', { state: { program: activeTab, weeks: selectedDuration } })}
-                className="btn btn-primary"
-                style={{ width: '100%', padding: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontSize: '1rem' }}
+                className="btn btn-primary services-enroll-btn"
               >
                 Enroll / Consult on this Plan <ArrowRight size={18} />
               </button>
@@ -401,68 +358,31 @@ const Services = () => {
       </section>
 
       {/* Program FAQs Section */}
-      <section className="section" style={{ backgroundColor: '#FAF6F0' }}>
-        <div className="container" style={{ maxWidth: '850px' }}>
+      <section className="section services-faq-section">
+        <div className="container services-faq-container">
           <div className="section-header">
             <span className="section-tag">FAQ & TRANSPARENCY</span>
             <h2>Frequently Asked Questions</h2>
             <p>We believe in sustainability and zero hidden boundaries. Read our guidelines directly.</p>
           </div>
 
-          <div style={{ display: 'grid', gap: '16px', marginTop: '30px' }}>
+          <div className="services-faq-list">
             {FAQS_DATA.map((faq, idx) => (
-              <div
-                key={idx}
-                style={{
-                  backgroundColor: '#fff',
-                  borderRadius: '16px',
-                  border: '1px solid var(--border)',
-                  overflow: 'hidden',
-                  transition: '0.3s'
-                }}
-              >
+              <div key={idx} className="services-faq-item">
                 <button
                   onClick={() => setOpenFaqIndex(openFaqIndex === idx ? null : idx)}
-                  style={{
-                    width: '100%',
-                    padding: '22px 28px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    textAlign: 'left'
-                  }}
+                  className="services-faq-trigger"
                 >
-                  <span style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--heading)', paddingRight: '20px' }}>
+                  <span className="services-faq-question">
                     {faq.q}
                   </span>
-                  <div style={{
-                    width: '28px',
-                    height: '28px',
-                    borderRadius: '50%',
-                    backgroundColor: openFaqIndex === idx ? 'var(--primary)' : 'var(--background)',
-                    color: openFaqIndex === idx ? '#fff' : 'var(--heading)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    transition: '0.2s',
-                    flexShrink: 0
-                  }}>
+                  <div className={`services-faq-icon ${openFaqIndex === idx ? 'active' : ''}`}>
                     {openFaqIndex === idx ? <Minus size={14} /> : <Plus size={14} />}
                   </div>
                 </button>
 
                 {openFaqIndex === idx && (
-                  <div style={{
-                    padding: '0 28px 28px 28px',
-                    color: 'var(--text)',
-                    lineHeight: 1.7,
-                    fontSize: '0.95rem',
-                    borderTop: '1px solid #F3F4F6',
-                    paddingTop: '20px'
-                  }}>
+                  <div className="services-faq-answer">
                     {faq.a}
                   </div>
                 )}
