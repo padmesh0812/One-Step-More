@@ -1,0 +1,69 @@
+/* Contact Page Styling */
+.contact-social-heading {
+  margin-bottom: 12px;
+  color: var(--heading);
+}
+
+.contact-success-desc {
+  max-width: 450px;
+  margin: 0 auto 24px auto;
+}
+
+.contact-form-subtitle {
+  font-size: 0.9rem;
+  color: var(--text);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.contact-select-pointer {
+  cursor: pointer;
+}
+
+.contact-mb-20 {
+  margin-bottom: 20px;
+}
+
+.contact-mb-30 {
+  margin-bottom: 30px;
+}
+
+.contact-textarea {
+  resize: vertical;
+}
+
+.contact-submit-btn {
+  width: 100%;
+}
+
+.contact-map-section {
+  background-color: #fff;
+  padding: 60px 0 0 0;
+}
+
+.contact-map-header {
+  margin-bottom: 40px;
+}
+
+.contact-map-wrapper {
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border);
+  line-height: 0;
+}
+
+.contact-map-iframe {
+  border: 0;
+}
+
+.contact-faq-section {
+  background-color: #FAF6F0;
+}
+
+.contact-faq-answer-text {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.6;
+}

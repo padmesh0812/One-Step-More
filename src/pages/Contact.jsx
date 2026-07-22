@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Mail, Phone, MapPin, Instagram, Facebook, Youtube, Check, AlertCircle, ChevronDown } from 'lucide-react';
+import './Contact.css';
 
 const FAQS = [
   {
@@ -104,8 +105,8 @@ const Contact = () => {
                   <Phone size={20} />
                 </div>
                 <div className="contact-detail-text">
-                  <h4>Call Support</h4>
-                  <p>+91 98765 43210</p>
+                  <h4>Call / WhatsApp</h4>
+                  <p>+91 91404 88383</p>
                 </div>
               </div>
 
@@ -114,13 +115,13 @@ const Contact = () => {
                   <MapPin size={20} />
                 </div>
                 <div className="contact-detail-text">
-                  <h4>Office Address</h4>
-                  <p>Gomti Nagar, Lucknow,<br />Uttar Pradesh, India</p>
+                  <h4>Visit Office</h4>
+                  <p>Gomti Nagar, Lucknow, UP, India</p>
                 </div>
               </div>
             </div>
 
-            <h4 style={{ marginBottom: '12px', color: 'var(--heading)' }}>Follow Our Community</h4>
+            <h4 className="contact-social-heading">Follow Our Community</h4>
             <div className="social-links-row">
               <a href="https://www.instagram.com/pragati8379?igsh=c3g4NHZ4bzVucjNu" target="_blank" rel="noreferrer" className="social-link-btn" aria-label="Instagram">
                 <Instagram size={18} />
@@ -142,7 +143,7 @@ const Contact = () => {
                   <Check size={40} />
                 </div>
                 <h4>Thank You!</h4>
-                <p style={{ maxWidth: '450px', margin: '0 auto 24px auto' }}>We have successfully received your inquiry. One of our dedicated wellness coaches will contact you within 24 hours to schedule your consultation call.</p>
+                <p className="contact-success-desc">We have successfully received your inquiry. One of our dedicated wellness coaches will contact you within 24 hours to schedule your consultation call.</p>
                 <button onClick={() => setSubmitted(false)} className="btn btn-outline">
                   Send Another Message
                 </button>
@@ -150,7 +151,7 @@ const Contact = () => {
             ) : (
               <form onSubmit={handleFormSubmit}>
                 <h3>Enquiry Form</h3>
-                <p style={{ fontSize: '0.9rem', color: 'var(--text)', marginBottom: '24px', textAlign: 'center' }}>Fill out this enquiry form to connect with our expert dietitian or yoga trainer for a custom roadmap call.</p>
+                <p className="contact-form-subtitle">Fill out this enquiry form to connect with our expert dietitian or yoga trainer for a custom roadmap call.</p>
 
                 <div className="form-row">
                   <div className="form-group">
@@ -202,8 +203,7 @@ const Contact = () => {
                     <select
                       id="reason"
                       name="reason"
-                      className="form-input"
-                      style={{ cursor: 'pointer' }}
+                      className="form-input contact-select-pointer"
                       value={form.reason}
                       onChange={handleInput}
                     >
@@ -219,7 +219,7 @@ const Contact = () => {
                   </div>
                 </div>
 
-                <div className="form-group" style={{ marginBottom: '20px' }}>
+                <div className="form-group contact-mb-20">
                   <label className="form-label" htmlFor="address">Your Address</label>
                   <input
                     type="text"
@@ -233,21 +233,20 @@ const Contact = () => {
                   {errors.address && <div className="form-error-msg"><AlertCircle size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />{errors.address}</div>}
                 </div>
 
-                <div className="form-group" style={{ marginBottom: '30px' }}>
+                <div className="form-group contact-mb-30">
                   <label className="form-label" htmlFor="message">Your Message (Optional)</label>
                   <textarea
                     id="message"
                     name="message"
                     rows="4"
-                    className="form-input"
+                    className="form-input contact-textarea"
                     placeholder="Tell us briefly about your fitness goals, medical history, or consultation requirements..."
-                    style={{ resize: 'vertical' }}
                     value={form.message}
                     onChange={handleInput}
                   ></textarea>
                 </div>
 
-                <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
+                <button type="submit" className="btn btn-primary contact-submit-btn">
                   Submit Inquiry
                 </button>
               </form>
@@ -257,25 +256,19 @@ const Contact = () => {
       </section>
 
       {/* Map Section */}
-      <section className="section" style={{ backgroundColor: '#fff', padding: '60px 0 0 0' }}>
+      <section className="section contact-map-section">
         <div className="container">
-          <div className="section-header" style={{ marginBottom: '40px' }}>
+          <div className="section-header contact-map-header">
             <span className="section-tag">FIND US ON THE MAP</span>
             <h2>How to Reach Us</h2>
             <p>Our office is located in Gomti Nagar, Lucknow. Drop by for a physical consultation or posture check.</p>
           </div>
-          <div style={{
-            borderRadius: '24px',
-            overflow: 'hidden',
-            boxShadow: 'var(--shadow-lg)',
-            border: '1px solid var(--border)',
-            lineHeight: 0
-          }}>
+          <div className="contact-map-wrapper">
             <iframe 
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14238.487056461947!2d80.99268805!3d26.8520336!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399be2e307df590f%3A0xe54d24177b8f2d5c!2sGomti%20Nagar%2C%20Lucknow%2C%20Uttar%20Pradesh!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" 
               width="100%" 
               height="400" 
-              style={{ border: 0 }} 
+              className="contact-map-iframe"
               allowFullScreen="" 
               loading="lazy" 
               referrerPolicy="no-referrer-when-downgrade"
@@ -286,7 +279,7 @@ const Contact = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="section" style={{ backgroundColor: '#FAF6F0' }}>
+      <section className="section contact-faq-section">
         <div className="container">
           <div className="section-header">
             <h2>Frequently Asked Questions</h2>
@@ -307,7 +300,7 @@ const Contact = () => {
                   <ChevronDown size={18} className="faq-icon-arrow" />
                 </div>
                 <div className="faq-answer">
-                  <p style={{ margin: 0, fontSize: '0.95rem', color: 'var(--text)', lineHeight: 1.6 }}>{faq.a}</p>
+                  <p className="contact-faq-answer-text">{faq.a}</p>
                 </div>
               </div>
             ))}

@@ -1,0 +1,63 @@
+/* Wellness Quiz Styles */
+.quiz-option-label {
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 6px;
+}
+
+.quiz-option-desc {
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.quiz-btn-flex {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.quiz-result-explanation {
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.quiz-result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+  .quiz-result-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.quiz-result-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--heading);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.quiz-result-val-text {
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.quiz-result-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.quiz-stat-val-flex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}

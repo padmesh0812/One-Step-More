@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Award, Compass, Droplet, Flame, RotateCcw } from 'lucide-react';
+import './WellnessQuiz.css';
 
 const QUESTIONS = [
   {
@@ -167,8 +168,8 @@ const WellnessQuiz = () => {
                   className={`quiz-option-card ${answers[QUESTIONS[currentStep].id] === opt.value ? 'selected' : ''}`}
                   onClick={() => handleSelect(opt.value)}
                 >
-                  <div style={{ fontWeight: 600, fontSize: '1.05rem', marginBottom: '6px' }}>{opt.label}</div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--text)' }}>{opt.description}</div>
+                  <div className="quiz-option-label">{opt.label}</div>
+                  <div className="quiz-option-desc">{opt.description}</div>
                 </div>
               ))}
             </div>
@@ -177,8 +178,8 @@ const WellnessQuiz = () => {
               <button
                 onClick={handleBack}
                 disabled={currentStep === 0}
-                className="btn btn-outline btn-sm"
-                style={{ opacity: currentStep === 0 ? 0.4 : 1, display: 'flex', alignItems: 'center', gap: '6px' }}
+                className="btn btn-outline btn-sm quiz-btn-flex"
+                style={{ opacity: currentStep === 0 ? 0.4 : 1 }}
               >
                 <ArrowLeft size={16} /> Back
               </button>
@@ -186,8 +187,7 @@ const WellnessQuiz = () => {
               <button
                 onClick={handleNext}
                 disabled={!isCurrentQuestionAnswered}
-                className="btn btn-primary btn-sm"
-                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                className="btn btn-primary btn-sm quiz-btn-flex"
               >
                 {currentStep === QUESTIONS.length - 1 ? 'Get My Blueprint' : 'Next'} <ArrowRight size={16} />
               </button>
@@ -207,34 +207,34 @@ const WellnessQuiz = () => {
                 <div>
                   <div className="quiz-result-rec">
                     <h5>{rec.pathName}</h5>
-                    <p style={{ marginBottom: '20px', fontSize: '0.95rem' }}>{rec.explanation}</p>
+                    <p className="quiz-result-explanation">{rec.explanation}</p>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                    <div className="quiz-result-grid">
                       <div>
-                        <strong style={{ display: 'block', fontSize: '0.85rem', color: 'var(--heading)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Recommended Movement</strong>
-                        <span style={{ fontSize: '0.9rem', color: 'var(--text)' }}>{rec.yogaFocus}</span>
+                        <strong className="quiz-result-label">Recommended Movement</strong>
+                        <span className="quiz-result-val-text">{rec.yogaFocus}</span>
                       </div>
                       <div>
-                        <strong style={{ display: 'block', fontSize: '0.85rem', color: 'var(--heading)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '4px' }}>Nutrition Strategy</strong>
-                        <span style={{ fontSize: '0.9rem', color: 'var(--text)' }}>{rec.dietFocus}</span>
+                        <strong className="quiz-result-label">Nutrition Strategy</strong>
+                        <span className="quiz-result-val-text">{rec.dietFocus}</span>
                       </div>
                     </div>
 
                     <div className="quiz-stats">
                       <div className="quiz-stat-item">
-                        <div className="quiz-stat-val" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                        <div className="quiz-stat-val quiz-stat-val-flex">
                           <Flame size={18} color="var(--primary)" /> {rec.calories}
                         </div>
                         <div className="quiz-stat-lbl">Target Calories / Day</div>
                       </div>
                       <div className="quiz-stat-item">
-                        <div className="quiz-stat-val" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                        <div className="quiz-stat-val quiz-stat-val-flex">
                           <Droplet size={18} color="#3388FF" /> {rec.water}L
                         </div>
                         <div className="quiz-stat-lbl">Daily Water Target</div>
                       </div>
                       <div className="quiz-stat-item">
-                        <div className="quiz-stat-val" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                        <div className="quiz-stat-val quiz-stat-val-flex">
                           <Award size={18} color="var(--secondary)" /> {answers.time === '15m' ? '15m' : answers.time === '30m' ? '30m' : '45m+'}
                         </div>
                         <div className="quiz-stat-lbl">Daily Commitment</div>
@@ -242,11 +242,10 @@ const WellnessQuiz = () => {
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                  <div className="quiz-result-buttons">
                     <button 
                       onClick={resetQuiz} 
-                      className="btn btn-outline"
-                      style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                      className="btn btn-outline quiz-btn-flex"
                     >
                       <RotateCcw size={16} /> Retake Quiz
                     </button>

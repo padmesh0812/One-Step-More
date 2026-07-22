@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Check, AlertCircle, ArrowLeft, Heart, Shield, CreditCard, Smartphone, CheckCircle, RefreshCw } from 'lucide-react';
+import './Enroll.css';
 
 const PROGRAMS_LIST = [
   {
@@ -130,19 +131,25 @@ const Enroll = () => {
       address: ''
     });
 
-    // Payment method states
-    const [paymentMethod, setPaymentMethod] = useState('gpay');
-    const [upiId, setUpiId] = useState('');
-    const [cardDetails, setCardDetails] = useState({
-      number: '',
-      expiry: '',
-      cvv: '',
-      name: ''
-    });
-    const [paymentErrors, setPaymentErrors] = useState({});
+    // Dynamic programs & pricing from database
+    const [programs, setPrograms] = useState(PROGRAMS_LIST);
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
     const [errors, setErrors] = useState({});
+
+    // Fetch dynamic programs on mount
+    useEffect(() => {
+      fetch('http://localhost:5000/api/plans')
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0) {
+            setPrograms(data);
+          }
+        })
+        .catch(err => {
+          console.warn('Could not fetch dynamic plans from server, using static fallback:', err.message);
+        });
+    }, []);
 
     // Auto-calculate age from DOB
     const calculateAge = (dobString) => {
@@ -158,7 +165,7 @@ const Enroll = () => {
     };
 
     // Find pricing based on program selection
-    const selectedProgramData = PROGRAMS_LIST.find(p => p.id === form.program) || PROGRAMS_LIST[0];
+    const selectedProgramData = programs.find(p => p.id === form.program) || programs[0] || PROGRAMS_LIST[0];
     const activePricing = selectedProgramData.pricing.find(pr => pr.weeks === Number(form.duration)) || selectedProgramData.pricing[2];
 
     const handleInput = (e) => {
@@ -212,185 +219,163 @@ const Enroll = () => {
       setStep(2);
     };
 
-    // Process secure checkout
-    const handlePaymentSubmit = (e) => {
+    // Process secure checkout with Razorpay
+    const handlePaymentSubmit = async (e) => {
       e.preventDefault();
-      const pErrors = {};
-
-      if (['gpay', 'phonepe', 'bhim', 'paytm'].includes(paymentMethod)) {
-        if (!upiId.trim()) {
-          pErrors.upiId = "UPI ID is required.";
-        } else if (!upiId.includes('@')) {
-          pErrors.upiId = "Please enter a valid UPI ID (e.g. username@bank).";
-        }
-      } else {
-        if (!cardDetails.number.trim() || cardDetails.number.replace(/\s/g, '').length < 16) {
-          pErrors.cardNumber = "Enter a valid 16-digit card number.";
-        }
-        if (!cardDetails.expiry.trim() || !/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(cardDetails.expiry)) {
-          pErrors.expiry = "Enter expiry date (MM/YY).";
-        }
-        if (!cardDetails.cvv.trim() || cardDetails.cvv.length < 3) {
-          pErrors.cvv = "Enter 3-digit CVV.";
-        }
-        if (!cardDetails.name.trim()) {
-          pErrors.cardName = "Enter cardholder name.";
-        }
-      }
-
-      if (Object.keys(pErrors).length > 0) {
-        setPaymentErrors(pErrors);
-        return;
-      }
-
       setIsProcessingPayment(true);
 
-      // Simulate network request to payment gateway
-      setTimeout(() => {
+      try {
+        // 1. Create order on the backend to dynamically calculate amount and key configuration securely
+        const response = await fetch('http://localhost:5000/api/create-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: form.name,
+            email: form.email,
+            phone: form.phone,
+            programId: form.program,
+            weeks: form.duration,
+            bloodGroup: form.bloodGroup,
+            weight: form.weight,
+            height: form.height,
+            dob: form.dob,
+            age: form.age,
+            address: form.address
+          })
+        });
+
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.error || 'Server rejected order creation request.');
+        }
+
+        const orderData = await response.json(); // returns orderId, amount, currency, keyId
+
+        // 2. Configure Razorpay Standard Checkout SDK popup options
+        const options = {
+          key: orderData.keyId,
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: "One Step More",
+          description: `Enrollment in ${selectedProgramData.title}`,
+          order_id: orderData.orderId,
+          prefill: {
+            name: form.name,
+            email: form.email,
+            contact: form.phone
+          },
+          theme: {
+            color: "#4A7559"
+          },
+          handler: async function (paymentResponse) {
+            try {
+              setIsProcessingPayment(true);
+              
+              // 3. Post to backend node to verify signature of payment before confirming order
+              const verifyResponse = await fetch('http://localhost:5000/api/verify-payment', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                  razorpay_order_id: paymentResponse.razorpay_order_id,
+                  razorpay_signature: paymentResponse.razorpay_signature
+                })
+              });
+
+              const verifyData = await verifyResponse.json();
+              if (verifyData.success) {
+                setStep(3); // Direct to payment success view
+              } else {
+                alert(verifyData.error || 'Razorpay Signature verification failed.');
+              }
+            } catch (err) {
+              console.error('Error verifying Razorpay transaction signature:', err);
+              alert('Network error verifying payment. Please contact Support.');
+            } finally {
+              setIsProcessingPayment(false);
+            }
+          },
+          modal: {
+            ondismiss: function () {
+              setIsProcessingPayment(false);
+            }
+          }
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+
+      } catch (err) {
+        console.error('Razorpay Order API creation failed:', err);
+        alert(err.message || 'Payment server is offline or unreachable. Please try again later.');
         setIsProcessingPayment(false);
-        setStep(3); // Success step
-      }, 2000);
+      }
     };
 
     return (
-      <main style={{ backgroundColor: '#FAF8F5', minHeight: '80vh', padding: '40px 0' }}>
+      <main className="enroll-main">
         <div className="container">
           
           {/* Back Trigger */}
-          <div style={{ marginBottom: '24px' }}>
+          <div className="enroll-back-wrapper">
             <button 
               onClick={() => step > 1 ? setStep(step - 1) : navigate(-1)} 
-              style={{
-                background: 'none',
-                border: 'none',
-                color: 'var(--primary)',
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontSize: '0.95rem',
-                fontWeight: 600
-              }}
+              className="enroll-back-btn"
             >
               <ArrowLeft size={16} /> Back {step > 1 ? 'to Stats' : 'to Programs'}
             </button>
           </div>
 
-          <div className="section-header" style={{ marginBottom: '40px' }}>
+          <div className="section-header enroll-header">
             <h1>Complete Your <span>Enrollment</span></h1>
             <p>Provide your biology parameters and secure checkout to lock in your personalized roadmap call.</p>
           </div>
 
           {/* Stepper Progress Indicator */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            maxWidth: '600px',
-            margin: '0 auto 40px auto',
-            gap: '15px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{
-                width: '30px',
-                height: '30px',
-                borderRadius: '50%',
-                backgroundColor: step >= 1 ? 'var(--primary)' : '#ccc',
-                color: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 700,
-                fontSize: '0.85rem'
-              }}>1</div>
-              <span style={{ fontSize: '0.9rem', fontWeight: step === 1 ? 700 : 500, color: step === 1 ? 'var(--heading)' : 'var(--text-muted)' }}>Biological Stats</span>
+          <div className="enroll-stepper-wrapper">
+            <div className="enroll-step-container">
+              <div className={`enroll-step-number ${step >= 1 ? 'active' : ''}`}>1</div>
+              <span className={`enroll-step-label ${step === 1 ? 'active' : ''}`}>Biological Stats</span>
             </div>
-            <div style={{ height: '2px', width: '50px', backgroundColor: step >= 2 ? 'var(--primary)' : '#ccc' }}></div>
+            <div className={`enroll-step-line ${step >= 2 ? 'active' : ''}`}></div>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{
-                width: '30px',
-                height: '30px',
-                borderRadius: '50%',
-                backgroundColor: step >= 2 ? 'var(--primary)' : '#ccc',
-                color: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 700,
-                fontSize: '0.85rem'
-              }}>2</div>
-              <span style={{ fontSize: '0.9rem', fontWeight: step === 2 ? 700 : 500, color: step === 2 ? 'var(--heading)' : 'var(--text-muted)' }}>Secure Payment</span>
+            <div className="enroll-step-container">
+              <div className={`enroll-step-number ${step >= 2 ? 'active' : ''}`}>2</div>
+              <span className={`enroll-step-label ${step === 2 ? 'active' : ''}`}>Secure Payment</span>
             </div>
-            <div style={{ height: '2px', width: '50px', backgroundColor: step === 3 ? 'var(--primary)' : '#ccc' }}></div>
+            <div className={`enroll-step-line ${step === 3 ? 'active' : ''}`}></div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{
-                width: '30px',
-                height: '30px',
-                borderRadius: '50%',
-                backgroundColor: step === 3 ? 'var(--primary)' : '#ccc',
-                color: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontWeight: 700,
-                fontSize: '0.85rem'
-              }}><Check size={14} /></div>
-              <span style={{ fontSize: '0.9rem', fontWeight: step === 3 ? 700 : 500, color: step === 3 ? 'var(--heading)' : 'var(--text-muted)' }}>Success</span>
+            <div className="enroll-step-container">
+              <div className={`enroll-step-number ${step === 3 ? 'active' : ''}`}><Check size={14} /></div>
+              <span className={`enroll-step-label ${step === 3 ? 'active' : ''}`}>Success</span>
             </div>
           </div>
 
           {/* STEP 3: SUCCESS */}
           {step === 3 && (
-            <div style={{
-              maxWidth: '650px',
-              margin: '0 auto',
-              backgroundColor: '#fff',
-              borderRadius: '24px',
-              padding: '40px',
-              textAlign: 'center',
-              boxShadow: 'var(--shadow-lg)',
-              border: '1px solid var(--border)'
-            }}>
-              <div style={{
-                width: '70px',
-                height: '70px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(74, 117, 89, 0.1)',
-                color: 'var(--primary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 24px auto'
-              }}>
+            <div className="enroll-success-box">
+              <div className="enroll-success-icon-circle">
                 <CheckCircle size={40} />
               </div>
-              <h2 style={{ color: 'var(--heading)', marginBottom: '16px' }}>Enrollment Confirmed!</h2>
-              <p style={{ color: 'var(--text)', marginBottom: '24px', lineHeight: 1.7 }}>
+              <h2 className="enroll-success-title">Enrollment Confirmed!</h2>
+              <p className="enroll-success-desc">
                 Thank you, <strong>{form.name}</strong>. Your payment was successfully processed. We have locked in your slot for the <strong>{selectedProgramData.title} ({form.duration} Weeks)</strong>.
               </p>
               
-              <div style={{
-                backgroundColor: '#FBFBFA',
-                borderRadius: '16px',
-                padding: '24px',
-                textAlign: 'left',
-                fontSize: '0.9rem',
-                marginBottom: '30px',
-                border: '1px solid var(--border)',
-                display: 'grid',
-                gap: '10px'
-              }}>
+              <div className="enroll-success-summary">
                 <div><strong>Biological Configuration:</strong> {form.age} Years &bull; Blood group {form.bloodGroup} &bull; Weight {form.weight} kg &bull; Height {form.height}</div>
                 <div><strong>Delivery Address:</strong> {form.address}</div>
-                <div><strong>Secured Gateway:</strong> Simulated Razorpay Checkout ({paymentMethod.toUpperCase()})</div>
-                <div style={{ borderTop: '1px solid var(--border)', paddingTop: '10px', color: 'var(--primary)', fontWeight: 700 }}>
+                <div><strong>Secured Gateway:</strong> Razorpay Secure Payment (Verified API Node)</div>
+                <div className="enroll-success-total">
                   Active Transaction Value: ₹{activePricing.offer.toLocaleString('en-IN')}/-
                 </div>
               </div>
 
-              <button onClick={() => navigate('/services')} className="btn btn-primary" style={{ minWidth: '220px' }}>
+              <button onClick={() => navigate('/services')} className="btn btn-primary enroll-success-btn">
                 Return to Services
               </button>
             </div>
@@ -398,30 +383,19 @@ const Enroll = () => {
 
           {/* STEP 1 & 2 CONTENT WRAPPER */}
           {step < 3 && (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: '1.2fr 0.8fr',
-              gap: '40px',
-              alignItems: 'start'
-            }} className="enroll-grid-layout">
+            <div className="enroll-grid-layout">
               
               {/* LEFT SIDE PANEL (Forms) */}
-              <div style={{
-                backgroundColor: '#fff',
-                borderRadius: '24px',
-                padding: '40px',
-                boxShadow: 'var(--shadow-md)',
-                border: '1px solid var(--border)'
-              }}>
+              <div className="enroll-form-panel">
                 
                 {/* STEP 1: BIOLOGICAL & PERSONAL STATS */}
                 {step === 1 && (
                   <form onSubmit={handleDetailsSubmit}>
-                    <h3 style={{ fontSize: '1.3rem', color: 'var(--heading)', marginBottom: '24px', fontWeight: 700 }}>
+                    <h3 className="enroll-form-title">
                       Biological Stats & Contact Info
                     </h3>
 
-                    <div style={{ display: 'grid', gap: '20px' }}>
+                    <div className="enroll-form-grid-vertical">
                       
                       {/* Name input */}
                       <div className="form-group">
@@ -439,7 +413,7 @@ const Enroll = () => {
                       </div>
 
                       {/* Email & Phone */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                      <div className="enroll-form-grid-half">
                         <div className="form-group">
                           <label className="form-label" htmlFor="email">Email Address</label>
                           <input
@@ -470,18 +444,17 @@ const Enroll = () => {
                       </div>
 
                       {/* Program choice override dropdowns */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '20px' }}>
+                      <div className="enroll-form-grid-asym">
                         <div className="form-group">
                           <label className="form-label" htmlFor="program">Change Program Choice</label>
                           <select
                             id="program"
                             name="program"
-                            className="form-input"
-                            style={{ cursor: 'pointer' }}
+                            className="form-input pointer-input"
                             value={form.program}
                             onChange={handleInput}
                           >
-                            {PROGRAMS_LIST.map(p => (
+                            {programs.map(p => (
                               <option key={p.id} value={p.id}>{p.title}</option>
                             ))}
                           </select>
@@ -492,8 +465,7 @@ const Enroll = () => {
                           <select
                             id="duration"
                             name="duration"
-                            className="form-input"
-                            style={{ cursor: 'pointer' }}
+                            className="form-input pointer-input"
                             value={form.duration}
                             onChange={handleInput}
                           >
@@ -507,7 +479,7 @@ const Enroll = () => {
                       </div>
 
                       {/* DOB and automatic age calculation */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '20px' }}>
+                      <div className="enroll-form-grid-asym">
                         <div className="form-group">
                           <label className="form-label" htmlFor="dob">Date of Birth</label>
                           <input
@@ -527,24 +499,22 @@ const Enroll = () => {
                             type="text"
                             id="age"
                             name="age"
-                            className="form-input"
+                            className="form-input disabled-input"
                             placeholder="Automatic"
                             readOnly
                             value={form.age ? `${form.age} Years` : ''}
-                            style={{ backgroundColor: '#F9FAFB', cursor: 'not-allowed' }}
                           />
                         </div>
                       </div>
 
                       {/* Stats details: Blood Group, Weight, Height */}
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+                      <div className="enroll-form-grid-thirds">
                         <div className="form-group">
                           <label className="form-label" htmlFor="bloodGroup">Blood Group</label>
                           <select
                             id="bloodGroup"
                             name="bloodGroup"
-                            className="form-input"
-                            style={{ cursor: 'pointer' }}
+                            className="form-input pointer-input"
                             value={form.bloodGroup}
                             onChange={handleInput}
                           >
@@ -602,269 +572,70 @@ const Enroll = () => {
 
                     </div>
 
-                    <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '30px', padding: '16px', fontWeight: 700 }}>
-                      Proceed to Payment &rarr;
+                    <button type="submit" className="btn btn-primary enroll-submit-btn">
+                      Proceed to Payment &arr;
                     </button>
                   </form>
                 )}
 
-                {/* STEP 2: SECURE PAYMENT GATEWAY (UPI / CARD) */}
+                {/* STEP 2: SECURE PAYMENT GATEWAY (RAZORPAY) */}
                 {step === 2 && (
-                  <form onSubmit={handlePaymentSubmit}>
-                    <h3 style={{ fontSize: '1.3rem', color: 'var(--heading)', marginBottom: '8px', fontWeight: 700 }}>
-                      Secure Gateway Selection
-                    </h3>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '24px' }}>
-                      Choose your payment mode to securely checkout via the local Razorpay API node.
-                    </p>
+                  <form onSubmit={handlePaymentSubmit} className="enroll-payment-form">
+                    <div>
+                      <h3 className="enroll-payment-title">
+                        Review & Complete Payment
+                      </h3>
+                      <p className="enroll-payment-subtitle">
+                        You will be redirected to the secure Razorpay Checkout node to complete your transaction.
+                      </p>
+                    </div>
 
-                    <div style={{ display: 'grid', gap: '24px' }}>
-                      
-                      {/* Payment Selection Grid */}
-                      <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(3, 1fr)',
-                        gap: '12px'
-                      }}>
-                        <div 
-                          onClick={() => { setPaymentMethod('gpay'); setPaymentErrors({}); }}
-                          style={{
-                            border: '2px solid',
-                            borderColor: paymentMethod === 'gpay' ? 'var(--primary)' : 'var(--border)',
-                            backgroundColor: paymentMethod === 'gpay' ? 'rgba(74, 117, 89, 0.05)' : '#fff',
-                            borderRadius: '12px',
-                            padding: '12px',
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            transition: '0.2s',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                          }}
-                        >
-                          <GPayLogo />
-                        </div>
-
-                        <div 
-                          onClick={() => { setPaymentMethod('phonepe'); setPaymentErrors({}); }}
-                          style={{
-                            border: '2px solid',
-                            borderColor: paymentMethod === 'phonepe' ? 'var(--primary)' : 'var(--border)',
-                            backgroundColor: paymentMethod === 'phonepe' ? 'rgba(74, 117, 89, 0.05)' : '#fff',
-                            borderRadius: '12px',
-                            padding: '12px',
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            transition: '0.2s',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                          }}
-                        >
-                          <PhonePeLogo />
-                        </div>
-
-                        <div 
-                          onClick={() => { setPaymentMethod('bhim'); setPaymentErrors({}); }}
-                          style={{
-                            border: '2px solid',
-                            borderColor: paymentMethod === 'bhim' ? 'var(--primary)' : 'var(--border)',
-                            backgroundColor: paymentMethod === 'bhim' ? 'rgba(74, 117, 89, 0.05)' : '#fff',
-                            borderRadius: '12px',
-                            padding: '12px',
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            transition: '0.2s',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                          }}
-                        >
-                          <BhimLogo />
-                        </div>
-
-                        <div 
-                          onClick={() => { setPaymentMethod('paytm'); setPaymentErrors({}); }}
-                          style={{
-                            border: '2px solid',
-                            borderColor: paymentMethod === 'paytm' ? 'var(--primary)' : 'var(--border)',
-                            backgroundColor: paymentMethod === 'paytm' ? 'rgba(74, 117, 89, 0.05)' : '#fff',
-                            borderRadius: '12px',
-                            padding: '12px',
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            transition: '0.2s',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                          }}
-                        >
-                          <PaytmLogo />
-                        </div>
-
-                        <div 
-                          onClick={() => { setPaymentMethod('card'); setPaymentErrors({}); }}
-                          style={{
-                            border: '2px solid',
-                            borderColor: paymentMethod === 'card' ? 'var(--primary)' : 'var(--border)',
-                            backgroundColor: paymentMethod === 'card' ? 'rgba(74, 117, 89, 0.05)' : '#fff',
-                            borderRadius: '12px',
-                            padding: '12px',
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            transition: '0.2s',
-                            gridColumn: 'span 2',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                          }}
-                        >
-                          <CardLogo />
+                    {/* Summary Info Cards */}
+                    <div className="enroll-summary-grid">
+                      <div className="enroll-summary-card">
+                        <h4 className="enroll-card-label">
+                          Billing Details
+                        </h4>
+                        <div className="enroll-card-details">
+                          <div><strong>Name:</strong> {form.name}</div>
+                          <div><strong>Email:</strong> {form.email}</div>
+                          <div><strong>Phone:</strong> {form.phone}</div>
                         </div>
                       </div>
 
-                      {/* SUB-FORM FOR UPI */}
-                      {['gpay', 'phonepe', 'bhim', 'paytm'].includes(paymentMethod) ? (
-                        <div style={{
-                          backgroundColor: '#F9FAFB',
-                          borderRadius: '16px',
-                          padding: '20px',
-                          border: '1px solid var(--border)'
-                        }}>
-                          <label className="form-label" htmlFor="upiId" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '0.75rem' }}>
-                            Enter {paymentMethod.toUpperCase()} UPI Address
-                          </label>
-                          <input 
-                            type="text"
-                            id="upiId"
-                            placeholder="e.g. mobileNumber@ybl or username@paytm"
-                            className="form-input"
-                            value={upiId}
-                            onChange={(e) => {
-                              setUpiId(e.target.value);
-                              if (paymentErrors.upiId) setPaymentErrors(prev => ({ ...prev, upiId: '' }));
-                            }}
-                            style={{ backgroundColor: '#fff' }}
-                          />
-                          {paymentErrors.upiId && <div className="form-error-msg" style={{ marginTop: '6px' }}><AlertCircle size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />{paymentErrors.upiId}</div>}
-                          <p style={{ margin: '10px 0 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                            * A collect request request notification will be pushed securely to your mobile app.
-                          </p>
+                      <div className="enroll-summary-card">
+                        <h4 className="enroll-card-label">
+                          Biological Parameters
+                        </h4>
+                        <div className="enroll-card-details">
+                          {form.age} Years &bull; Blood group {form.bloodGroup} &bull; Weight {form.weight} kg &bull; Height {form.height}
                         </div>
-                      ) : (
-                        
-                        /* SUB-FORM FOR CREDIT/DEBIT CARD */
-                        <div style={{
-                          backgroundColor: '#F9FAFB',
-                          borderRadius: '16px',
-                          padding: '24px',
-                          border: '1px solid var(--border)',
-                          display: 'grid',
-                          gap: '16px'
-                        }}>
-                          {/* Card Number */}
-                          <div className="form-group">
-                            <label className="form-label" htmlFor="cardNumber">Card Number</label>
-                            <input 
-                              type="text"
-                              id="cardNumber"
-                              placeholder="4111 2222 3333 4444"
-                              className="form-input"
-                              value={cardDetails.number}
-                              onChange={(e) => {
-                                setCardDetails({ ...cardDetails, number: e.target.value });
-                                if (paymentErrors.cardNumber) setPaymentErrors(prev => ({ ...prev, cardNumber: '' }));
-                              }}
-                              style={{ backgroundColor: '#fff' }}
-                            />
-                            {paymentErrors.cardNumber && <div className="form-error-msg"><AlertCircle size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />{paymentErrors.cardNumber}</div>}
-                          </div>
-
-                          {/* Expiry & CVV */}
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                            <div className="form-group">
-                              <label className="form-label" htmlFor="expiry">Expiry (MM/YY)</label>
-                              <input 
-                                type="text"
-                                id="expiry"
-                                placeholder="12/28"
-                                className="form-input"
-                                value={cardDetails.expiry}
-                                onChange={(e) => {
-                                  setCardDetails({ ...cardDetails, expiry: e.target.value });
-                                  if (paymentErrors.expiry) setPaymentErrors(prev => ({ ...prev, expiry: '' }));
-                                }}
-                                style={{ backgroundColor: '#fff' }}
-                              />
-                              {paymentErrors.expiry && <div className="form-error-msg"><AlertCircle size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />{paymentErrors.expiry}</div>}
-                            </div>
-
-                            <div className="form-group">
-                              <label className="form-label" htmlFor="cvv">CVV</label>
-                              <input 
-                                type="password"
-                                id="cvv"
-                                placeholder="***"
-                                maxLength="3"
-                                className="form-input"
-                                value={cardDetails.cvv}
-                                onChange={(e) => {
-                                  setCardDetails({ ...cardDetails, cvv: e.target.value });
-                                  if (paymentErrors.cvv) setPaymentErrors(prev => ({ ...prev, cvv: '' }));
-                                }}
-                                style={{ backgroundColor: '#fff' }}
-                              />
-                              {paymentErrors.cvv && <div className="form-error-msg"><AlertCircle size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />{paymentErrors.cvv}</div>}
-                            </div>
-                          </div>
-
-                          {/* Card Name */}
-                          <div className="form-group">
-                            <label className="form-label" htmlFor="cardName">Cardholder Name</label>
-                            <input 
-                              type="text"
-                              id="cardName"
-                              placeholder="Name written on card"
-                              className="form-input"
-                              value={cardDetails.name}
-                              onChange={(e) => {
-                                setCardDetails({ ...cardDetails, name: e.target.value });
-                                if (paymentErrors.cardName) setPaymentErrors(prev => ({ ...prev, cardName: '' }));
-                              }}
-                              style={{ backgroundColor: '#fff' }}
-                            />
-                            {paymentErrors.cardName && <div className="form-error-msg"><AlertCircle size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />{paymentErrors.cardName}</div>}
-                          </div>
-                        </div>
-                      )}
+                      </div>
                     </div>
 
+                    {/* Security & Badges */}
+                    <div className="enroll-security-card">
+                      <Shield size={36} color="var(--primary)" />
+                      <div className="enroll-security-text">
+                        <strong>100% Encrypted Transactions</strong>
+                        <div className="desc">Payments are securely routed via 128-bit SSL encrypted connection through the official Razorpay node.</div>
+                      </div>
+                    </div>
+
+                    {/* Pay Button */}
                     <button 
                       type="submit" 
-                      className="btn btn-primary" 
+                      className={`btn btn-primary enroll-pay-btn ${isProcessingPayment ? 'loading' : ''}`}
                       disabled={isProcessingPayment}
-                      style={{ 
-                        width: '100%', 
-                        marginTop: '30px', 
-                        padding: '16px', 
-                        fontWeight: 700,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '8px'
-                      }}
                     >
                       {isProcessingPayment ? (
                         <>
                           <RefreshCw className="spin-animation" size={16} /> Connecting Secure Node...
                         </>
                       ) : (
-                        `Pay Securely ₹${activePricing.offer.toLocaleString('en-IN')}/-`
+                        <>
+                          <CreditCard size={18} /> Pay Securely ₹{activePricing.offer.toLocaleString('en-IN')}/-
+                        </>
                       )}
                     </button>
                   </form>
@@ -873,75 +644,51 @@ const Enroll = () => {
               </div>
 
               {/* RIGHT SIDE PANEL (Summary Card) */}
-              <div style={{
-                backgroundColor: '#FAF6F0',
-                borderRadius: '24px',
-                padding: '30px',
-                border: '1px solid var(--border)',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '24px',
-                position: 'sticky',
-                top: '100px'
-              }}>
+              <div className="enroll-sidebar">
                 <div>
-                  <h4 style={{ color: 'var(--heading)', marginBottom: '4px', fontSize: '1.1rem', fontWeight: 700 }}>
+                  <h4 className="enroll-sidebar-title">
                     Chosen Pricing Details
                   </h4>
-                  <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', margin: 0 }}>
+                  <p className="enroll-sidebar-subtitle">
                     Calculated based on your selection.
                   </p>
                 </div>
 
                 {/* Package Details Box */}
-                <div style={{
-                  backgroundColor: '#fff',
-                  borderRadius: '16px',
-                  padding: '20px',
-                  border: '1px solid var(--border)'
-                }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                <div className="enroll-package-box">
+                  <span className="enroll-package-label">
                     Selected Program & Term
                   </span>
-                  <h4 style={{ color: 'var(--heading)', margin: '4px 0 0 0', fontSize: '1.05rem', fontWeight: 700 }}>
+                  <h4 className="enroll-package-title">
                     {selectedProgramData.title}
                   </h4>
-                  <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                  <div className="enroll-package-desc">
                     {form.duration} Weeks duration setup
                   </div>
                 </div>
 
                 {/* Pricing Box */}
-                <div style={{ display: 'grid', gap: '10px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                <div className="enroll-pricing-box">
+                  <div className="enroll-pricing-row">
                     <span>Original Price:</span>
-                    <span style={{ textDecoration: 'line-through' }}>₹{activePricing.original.toLocaleString('en-IN')}/-</span>
+                    <span>₹{activePricing.original.toLocaleString('en-IN')}/-</span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem', fontWeight: 700, color: 'var(--heading)' }}>
+                  <div className="enroll-pricing-row-main">
                     <span>Offer Price:</span>
-                    <span style={{ color: 'var(--secondary)', fontSize: '1.3rem' }}>₹{activePricing.offer.toLocaleString('en-IN')}/-</span>
+                    <span className="enroll-pricing-value">₹{activePricing.offer.toLocaleString('en-IN')}/-</span>
                   </div>
-                  <div style={{
-                    backgroundColor: 'rgba(74, 117, 89, 0.08)',
-                    borderRadius: '8px',
-                    padding: '8px 12px',
-                    fontSize: '0.8rem',
-                    color: 'var(--primary)',
-                    fontWeight: 700,
-                    textAlign: 'center',
-                    marginTop: '8px'
-                  }}>
+                  <div className="enroll-savings-badge">
                     You Save: ₹{(activePricing.original - activePricing.offer).toLocaleString('en-IN')}/- ({Math.round(((activePricing.original - activePricing.offer) / activePricing.original) * 100)}% Off)
                   </div>
                 </div>
 
-                <div style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
-                  <div style={{ display: 'flex', gap: '10px', fontSize: '0.825rem', color: 'var(--text)', marginBottom: '10px' }}>
-                    <Shield size={16} color="var(--primary)" style={{ flexShrink: 0 }} />
+                <div className="enroll-protection-section">
+                  <div className="enroll-protection-line">
+                    <Shield size={16} color="var(--primary)" />
                     <span>14-day refund protection applies automatically.</span>
                   </div>
-                  <div style={{ display: 'flex', gap: '10px', fontSize: '0.825rem', color: 'var(--text)' }}>
-                    <Heart size={16} color="var(--secondary)" style={{ flexShrink: 0 }} />
+                  <div className="enroll-protection-line">
+                    <Heart size={16} color="var(--secondary)" />
                     <span>Personalized dietitian review every 7 days.</span>
                   </div>
                 </div>
@@ -954,14 +701,14 @@ const Enroll = () => {
     );
   } catch (err) {
     return (
-      <div style={{ padding: '80px 20px', textAlign: 'center', backgroundColor: '#FFF5F5', color: '#D32F2F', fontFamily: 'sans-serif' }}>
-        <div style={{ maxWidth: '600px', margin: '0 auto', border: '1px solid #FFCDD2', borderRadius: '12px', padding: '30px', backgroundColor: '#fff', boxShadow: '0 4px 6px rgba(0,0,0,0.05)' }}>
-          <h2 style={{ margin: '0 0 10px 0', fontSize: '1.5rem' }}>Enrollment Module Rendering Error</h2>
-          <p style={{ fontSize: '0.9rem', color: '#555', marginBottom: '20px' }}>We caught a JavaScript routing or reference error during compilation rendering. Diagnostics trace details:</p>
-          <pre style={{ textAlign: 'left', backgroundColor: '#F9F9F9', padding: '15px', borderRadius: '8px', overflowX: 'auto', fontSize: '0.8rem', color: '#333', border: '1px solid #E0E0E0', whiteSpace: 'pre-wrap' }}>
+      <div className="enroll-error-main">
+        <div className="enroll-error-box">
+          <h2>Enrollment Module Rendering Error</h2>
+          <p>We caught a JavaScript routing or reference error during compilation rendering. Diagnostics trace details:</p>
+          <pre className="enroll-error-stack">
             {err.stack || err.toString()}
           </pre>
-          <Link to="/services" style={{ display: 'inline-block', marginTop: '20px', padding: '10px 20px', backgroundColor: 'var(--primary, #4A7559)', color: '#fff', textDecoration: 'none', borderRadius: '8px', fontWeight: 600 }}>
+          <Link to="/services" className="enroll-error-link">
             Return to Services Tab
           </Link>
         </div>
