@@ -117,7 +117,7 @@ const POSTS = [
 const RECIPE = {
   title: "Thyroid & Metabolic Healing Oats",
   desc: "Warm, mineral-dense oats packed with trace elements to support hormone mapping, active metabolism, and energy reserves.",
-  image: "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&w=600&q=80",
+  image: "https://images.unsplash.com/photo-1623479322729-28b25c16b011?auto=format&fit=crop&w=600&q=80",
   prep: "5 mins",
   cook: "10 mins",
   servings: "1 Serving",
