@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { Check, AlertCircle, ArrowLeft, Heart, Shield, CreditCard, Smartphone, CheckCircle, RefreshCw } from 'lucide-react';
 
@@ -130,19 +130,25 @@ const Enroll = () => {
       address: ''
     });
 
-    // Payment method states
-    const [paymentMethod, setPaymentMethod] = useState('gpay');
-    const [upiId, setUpiId] = useState('');
-    const [cardDetails, setCardDetails] = useState({
-      number: '',
-      expiry: '',
-      cvv: '',
-      name: ''
-    });
-    const [paymentErrors, setPaymentErrors] = useState({});
+    // Dynamic programs & pricing from database
+    const [programs, setPrograms] = useState(PROGRAMS_LIST);
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
     const [errors, setErrors] = useState({});
+
+    // Fetch dynamic programs on mount
+    useEffect(() => {
+      fetch('http://localhost:5000/api/plans')
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0) {
+            setPrograms(data);
+          }
+        })
+        .catch(err => {
+          console.warn('Could not fetch dynamic plans from server, using static fallback:', err.message);
+        });
+    }, []);
 
     // Auto-calculate age from DOB
     const calculateAge = (dobString) => {
@@ -158,7 +164,7 @@ const Enroll = () => {
     };
 
     // Find pricing based on program selection
-    const selectedProgramData = PROGRAMS_LIST.find(p => p.id === form.program) || PROGRAMS_LIST[0];
+    const selectedProgramData = programs.find(p => p.id === form.program) || programs[0] || PROGRAMS_LIST[0];
     const activePricing = selectedProgramData.pricing.find(pr => pr.weeks === Number(form.duration)) || selectedProgramData.pricing[2];
 
     const handleInput = (e) => {
@@ -212,44 +218,101 @@ const Enroll = () => {
       setStep(2);
     };
 
-    // Process secure checkout
-    const handlePaymentSubmit = (e) => {
+    // Process secure checkout with Razorpay
+    const handlePaymentSubmit = async (e) => {
       e.preventDefault();
-      const pErrors = {};
-
-      if (['gpay', 'phonepe', 'bhim', 'paytm'].includes(paymentMethod)) {
-        if (!upiId.trim()) {
-          pErrors.upiId = "UPI ID is required.";
-        } else if (!upiId.includes('@')) {
-          pErrors.upiId = "Please enter a valid UPI ID (e.g. username@bank).";
-        }
-      } else {
-        if (!cardDetails.number.trim() || cardDetails.number.replace(/\s/g, '').length < 16) {
-          pErrors.cardNumber = "Enter a valid 16-digit card number.";
-        }
-        if (!cardDetails.expiry.trim() || !/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(cardDetails.expiry)) {
-          pErrors.expiry = "Enter expiry date (MM/YY).";
-        }
-        if (!cardDetails.cvv.trim() || cardDetails.cvv.length < 3) {
-          pErrors.cvv = "Enter 3-digit CVV.";
-        }
-        if (!cardDetails.name.trim()) {
-          pErrors.cardName = "Enter cardholder name.";
-        }
-      }
-
-      if (Object.keys(pErrors).length > 0) {
-        setPaymentErrors(pErrors);
-        return;
-      }
-
       setIsProcessingPayment(true);
 
-      // Simulate network request to payment gateway
-      setTimeout(() => {
+      try {
+        // 1. Create order on the backend to dynamically calculate amount and key configuration securely
+        const response = await fetch('http://localhost:5000/api/create-order', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: form.name,
+            email: form.email,
+            phone: form.phone,
+            programId: form.program,
+            weeks: form.duration,
+            bloodGroup: form.bloodGroup,
+            weight: form.weight,
+            height: form.height,
+            dob: form.dob,
+            age: form.age,
+            address: form.address
+          })
+        });
+
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.error || 'Server rejected order creation request.');
+        }
+
+        const orderData = await response.json(); // returns orderId, amount, currency, keyId
+
+        // 2. Configure Razorpay Standard Checkout SDK popup options
+        const options = {
+          key: orderData.keyId,
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: "One Step More",
+          description: `Enrollment in ${selectedProgramData.title}`,
+          order_id: orderData.orderId,
+          prefill: {
+            name: form.name,
+            email: form.email,
+            contact: form.phone
+          },
+          theme: {
+            color: "#4A7559"
+          },
+          handler: async function (paymentResponse) {
+            try {
+              setIsProcessingPayment(true);
+              
+              // 3. Post to backend node to verify signature of payment before confirming order
+              const verifyResponse = await fetch('http://localhost:5000/api/verify-payment', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                  razorpay_order_id: paymentResponse.razorpay_order_id,
+                  razorpay_signature: paymentResponse.razorpay_signature
+                })
+              });
+
+              const verifyData = await verifyResponse.json();
+              if (verifyData.success) {
+                setStep(3); // Direct to payment success view
+              } else {
+                alert(verifyData.error || 'Razorpay Signature verification failed.');
+              }
+            } catch (err) {
+              console.error('Error verifying Razorpay transaction signature:', err);
+              alert('Network error verifying payment. Please contact Support.');
+            } finally {
+              setIsProcessingPayment(false);
+            }
+          },
+          modal: {
+            ondismiss: function () {
+              setIsProcessingPayment(false);
+            }
+          }
+        };
+
+        const rzp = new window.Razorpay(options);
+        rzp.open();
+
+      } catch (err) {
+        console.error('Razorpay Order API creation failed:', err);
+        alert(err.message || 'Payment server is offline or unreachable. Please try again later.');
         setIsProcessingPayment(false);
-        setStep(3); // Success step
-      }, 2000);
+      }
     };
 
     return (
@@ -384,7 +447,7 @@ const Enroll = () => {
               }}>
                 <div><strong>Biological Configuration:</strong> {form.age} Years &bull; Blood group {form.bloodGroup} &bull; Weight {form.weight} kg &bull; Height {form.height}</div>
                 <div><strong>Delivery Address:</strong> {form.address}</div>
-                <div><strong>Secured Gateway:</strong> Simulated Razorpay Checkout ({paymentMethod.toUpperCase()})</div>
+                <div><strong>Secured Gateway:</strong> Razorpay Secure Payment (Verified API Node)</div>
                 <div style={{ borderTop: '1px solid var(--border)', paddingTop: '10px', color: 'var(--primary)', fontWeight: 700 }}>
                   Active Transaction Value: ₹{activePricing.offer.toLocaleString('en-IN')}/-
                 </div>
@@ -481,7 +544,7 @@ const Enroll = () => {
                             value={form.program}
                             onChange={handleInput}
                           >
-                            {PROGRAMS_LIST.map(p => (
+                            {programs.map(p => (
                               <option key={p.id} value={p.id}>{p.title}</option>
                             ))}
                           </select>
@@ -608,255 +671,87 @@ const Enroll = () => {
                   </form>
                 )}
 
-                {/* STEP 2: SECURE PAYMENT GATEWAY (UPI / CARD) */}
+                {/* STEP 2: SECURE PAYMENT GATEWAY (RAZORPAY) */}
                 {step === 2 && (
-                  <form onSubmit={handlePaymentSubmit}>
-                    <h3 style={{ fontSize: '1.3rem', color: 'var(--heading)', marginBottom: '8px', fontWeight: 700 }}>
-                      Secure Gateway Selection
-                    </h3>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '24px' }}>
-                      Choose your payment mode to securely checkout via the local Razorpay API node.
-                    </p>
+                  <form onSubmit={handlePaymentSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    <div>
+                      <h3 style={{ fontSize: '1.4rem', color: 'var(--heading)', marginBottom: '6px', fontWeight: 700 }}>
+                        Review & Complete Payment
+                      </h3>
+                      <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', margin: 0 }}>
+                        You will be redirected to the secure Razorpay Checkout node to complete your transaction.
+                      </p>
+                    </div>
 
-                    <div style={{ display: 'grid', gap: '24px' }}>
-                      
-                      {/* Payment Selection Grid */}
+                    {/* Summary Info Cards */}
+                    <div style={{ display: 'grid', gap: '16px' }}>
                       <div style={{
+                        backgroundColor: '#FAF8F5',
+                        borderRadius: '16px',
+                        padding: '16px 20px',
+                        border: '1px solid var(--border)',
                         display: 'grid',
-                        gridTemplateColumns: 'repeat(3, 1fr)',
                         gap: '12px'
                       }}>
-                        <div 
-                          onClick={() => { setPaymentMethod('gpay'); setPaymentErrors({}); }}
-                          style={{
-                            border: '2px solid',
-                            borderColor: paymentMethod === 'gpay' ? 'var(--primary)' : 'var(--border)',
-                            backgroundColor: paymentMethod === 'gpay' ? 'rgba(74, 117, 89, 0.05)' : '#fff',
-                            borderRadius: '12px',
-                            padding: '12px',
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            transition: '0.2s',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                          }}
-                        >
-                          <GPayLogo />
-                        </div>
-
-                        <div 
-                          onClick={() => { setPaymentMethod('phonepe'); setPaymentErrors({}); }}
-                          style={{
-                            border: '2px solid',
-                            borderColor: paymentMethod === 'phonepe' ? 'var(--primary)' : 'var(--border)',
-                            backgroundColor: paymentMethod === 'phonepe' ? 'rgba(74, 117, 89, 0.05)' : '#fff',
-                            borderRadius: '12px',
-                            padding: '12px',
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            transition: '0.2s',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                          }}
-                        >
-                          <PhonePeLogo />
-                        </div>
-
-                        <div 
-                          onClick={() => { setPaymentMethod('bhim'); setPaymentErrors({}); }}
-                          style={{
-                            border: '2px solid',
-                            borderColor: paymentMethod === 'bhim' ? 'var(--primary)' : 'var(--border)',
-                            backgroundColor: paymentMethod === 'bhim' ? 'rgba(74, 117, 89, 0.05)' : '#fff',
-                            borderRadius: '12px',
-                            padding: '12px',
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            transition: '0.2s',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                          }}
-                        >
-                          <BhimLogo />
-                        </div>
-
-                        <div 
-                          onClick={() => { setPaymentMethod('paytm'); setPaymentErrors({}); }}
-                          style={{
-                            border: '2px solid',
-                            borderColor: paymentMethod === 'paytm' ? 'var(--primary)' : 'var(--border)',
-                            backgroundColor: paymentMethod === 'paytm' ? 'rgba(74, 117, 89, 0.05)' : '#fff',
-                            borderRadius: '12px',
-                            padding: '12px',
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            transition: '0.2s',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                          }}
-                        >
-                          <PaytmLogo />
-                        </div>
-
-                        <div 
-                          onClick={() => { setPaymentMethod('card'); setPaymentErrors({}); }}
-                          style={{
-                            border: '2px solid',
-                            borderColor: paymentMethod === 'card' ? 'var(--primary)' : 'var(--border)',
-                            backgroundColor: paymentMethod === 'card' ? 'rgba(74, 117, 89, 0.05)' : '#fff',
-                            borderRadius: '12px',
-                            padding: '12px',
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            transition: '0.2s',
-                            gridColumn: 'span 2',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                          }}
-                        >
-                          <CardLogo />
+                        <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
+                          Billing Details
+                        </h4>
+                        <div style={{ display: 'grid', gap: '6px', fontSize: '0.9rem', color: 'var(--text)' }}>
+                          <div><strong>Name:</strong> {form.name}</div>
+                          <div><strong>Email:</strong> {form.email}</div>
+                          <div><strong>Phone:</strong> {form.phone}</div>
                         </div>
                       </div>
 
-                      {/* SUB-FORM FOR UPI */}
-                      {['gpay', 'phonepe', 'bhim', 'paytm'].includes(paymentMethod) ? (
-                        <div style={{
-                          backgroundColor: '#F9FAFB',
-                          borderRadius: '16px',
-                          padding: '20px',
-                          border: '1px solid var(--border)'
-                        }}>
-                          <label className="form-label" htmlFor="upiId" style={{ textTransform: 'uppercase', letterSpacing: '0.5px', fontSize: '0.75rem' }}>
-                            Enter {paymentMethod.toUpperCase()} UPI Address
-                          </label>
-                          <input 
-                            type="text"
-                            id="upiId"
-                            placeholder="e.g. mobileNumber@ybl or username@paytm"
-                            className="form-input"
-                            value={upiId}
-                            onChange={(e) => {
-                              setUpiId(e.target.value);
-                              if (paymentErrors.upiId) setPaymentErrors(prev => ({ ...prev, upiId: '' }));
-                            }}
-                            style={{ backgroundColor: '#fff' }}
-                          />
-                          {paymentErrors.upiId && <div className="form-error-msg" style={{ marginTop: '6px' }}><AlertCircle size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />{paymentErrors.upiId}</div>}
-                          <p style={{ margin: '10px 0 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                            * A collect request request notification will be pushed securely to your mobile app.
-                          </p>
+                      <div style={{
+                        backgroundColor: '#FAF8F5',
+                        borderRadius: '16px',
+                        padding: '16px 20px',
+                        border: '1px solid var(--border)',
+                        display: 'grid',
+                        gap: '12px'
+                      }}>
+                        <h4 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
+                          Biological Parameters
+                        </h4>
+                        <div style={{ fontSize: '0.9rem', color: 'var(--text)' }}>
+                          {form.age} Years &bull; Blood group {form.bloodGroup} &bull; Weight {form.weight} kg &bull; Height {form.height}
                         </div>
-                      ) : (
-                        
-                        /* SUB-FORM FOR CREDIT/DEBIT CARD */
-                        <div style={{
-                          backgroundColor: '#F9FAFB',
-                          borderRadius: '16px',
-                          padding: '24px',
-                          border: '1px solid var(--border)',
-                          display: 'grid',
-                          gap: '16px'
-                        }}>
-                          {/* Card Number */}
-                          <div className="form-group">
-                            <label className="form-label" htmlFor="cardNumber">Card Number</label>
-                            <input 
-                              type="text"
-                              id="cardNumber"
-                              placeholder="4111 2222 3333 4444"
-                              className="form-input"
-                              value={cardDetails.number}
-                              onChange={(e) => {
-                                setCardDetails({ ...cardDetails, number: e.target.value });
-                                if (paymentErrors.cardNumber) setPaymentErrors(prev => ({ ...prev, cardNumber: '' }));
-                              }}
-                              style={{ backgroundColor: '#fff' }}
-                            />
-                            {paymentErrors.cardNumber && <div className="form-error-msg"><AlertCircle size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />{paymentErrors.cardNumber}</div>}
-                          </div>
-
-                          {/* Expiry & CVV */}
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                            <div className="form-group">
-                              <label className="form-label" htmlFor="expiry">Expiry (MM/YY)</label>
-                              <input 
-                                type="text"
-                                id="expiry"
-                                placeholder="12/28"
-                                className="form-input"
-                                value={cardDetails.expiry}
-                                onChange={(e) => {
-                                  setCardDetails({ ...cardDetails, expiry: e.target.value });
-                                  if (paymentErrors.expiry) setPaymentErrors(prev => ({ ...prev, expiry: '' }));
-                                }}
-                                style={{ backgroundColor: '#fff' }}
-                              />
-                              {paymentErrors.expiry && <div className="form-error-msg"><AlertCircle size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />{paymentErrors.expiry}</div>}
-                            </div>
-
-                            <div className="form-group">
-                              <label className="form-label" htmlFor="cvv">CVV</label>
-                              <input 
-                                type="password"
-                                id="cvv"
-                                placeholder="***"
-                                maxLength="3"
-                                className="form-input"
-                                value={cardDetails.cvv}
-                                onChange={(e) => {
-                                  setCardDetails({ ...cardDetails, cvv: e.target.value });
-                                  if (paymentErrors.cvv) setPaymentErrors(prev => ({ ...prev, cvv: '' }));
-                                }}
-                                style={{ backgroundColor: '#fff' }}
-                              />
-                              {paymentErrors.cvv && <div className="form-error-msg"><AlertCircle size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />{paymentErrors.cvv}</div>}
-                            </div>
-                          </div>
-
-                          {/* Card Name */}
-                          <div className="form-group">
-                            <label className="form-label" htmlFor="cardName">Cardholder Name</label>
-                            <input 
-                              type="text"
-                              id="cardName"
-                              placeholder="Name written on card"
-                              className="form-input"
-                              value={cardDetails.name}
-                              onChange={(e) => {
-                                setCardDetails({ ...cardDetails, name: e.target.value });
-                                if (paymentErrors.cardName) setPaymentErrors(prev => ({ ...prev, cardName: '' }));
-                              }}
-                              style={{ backgroundColor: '#fff' }}
-                            />
-                            {paymentErrors.cardName && <div className="form-error-msg"><AlertCircle size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />{paymentErrors.cardName}</div>}
-                          </div>
-                        </div>
-                      )}
+                      </div>
                     </div>
 
+                    {/* Security & Badges */}
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '16px',
+                      backgroundColor: 'rgba(74, 117, 89, 0.05)',
+                      borderRadius: '16px',
+                      padding: '16px 20px',
+                      border: '1px solid rgba(74, 117, 89, 0.15)'
+                    }}>
+                      <Shield size={36} color="var(--primary)" style={{ flexShrink: 0 }} />
+                      <div style={{ fontSize: '0.825rem', color: 'var(--text)', lineHeight: 1.4 }}>
+                        <strong style={{ color: 'var(--heading)' }}>100% Encrypted Transactions</strong>
+                        <div style={{ color: 'var(--text-muted)' }}>Payments are securely routed via 128-bit SSL encrypted connection through the official Razorpay node.</div>
+                      </div>
+                    </div>
+
+                    {/* Pay Button */}
                     <button 
                       type="submit" 
                       className="btn btn-primary" 
                       disabled={isProcessingPayment}
                       style={{ 
                         width: '100%', 
-                        marginTop: '30px', 
                         padding: '16px', 
                         fontWeight: 700,
+                        fontSize: '1rem',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: '8px'
+                        gap: '10px',
+                        cursor: isProcessingPayment ? 'not-allowed' : 'pointer'
                       }}
                     >
                       {isProcessingPayment ? (
@@ -864,7 +759,9 @@ const Enroll = () => {
                           <RefreshCw className="spin-animation" size={16} /> Connecting Secure Node...
                         </>
                       ) : (
-                        `Pay Securely ₹${activePricing.offer.toLocaleString('en-IN')}/-`
+                        <>
+                          <CreditCard size={18} /> Pay Securely ₹{activePricing.offer.toLocaleString('en-IN')}/-
+                        </>
                       )}
                     </button>
                   </form>
