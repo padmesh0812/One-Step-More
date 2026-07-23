@@ -36,6 +36,8 @@ const Contact = () => {
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [activeFaq, setActiveFaq] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const handleInput = (e) => {
     const { name, value } = e.target;
@@ -45,8 +47,9 @@ const Contact = () => {
     }
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError('');
     const tempErrors = {};
     if (!form.name.trim()) tempErrors.name = "Name is required.";
     if (!form.email.trim()) {
@@ -67,8 +70,38 @@ const Contact = () => {
       return;
     }
 
-    setSubmitted(true);
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('http://localhost:5000/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(form)
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || 'Failed to submit enquiry.');
+      }
+
+      setSubmitted(true);
+      setForm({
+        name: '',
+        email: '',
+        phone: '',
+        reason: '',
+        address: '',
+        message: ''
+      });
+    } catch (err) {
+      console.error('Submission error:', err);
+      setSubmitError(err.message || 'Server connection failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
 
   const toggleFaq = (idx) => {
     setActiveFaq(activeFaq === idx ? null : idx);
@@ -144,7 +177,11 @@ const Contact = () => {
                 </div>
                 <h4>Thank You!</h4>
                 <p className="contact-success-desc">We have successfully received your inquiry. One of our dedicated wellness coaches will contact you within 24 hours to schedule your consultation call.</p>
-                <button onClick={() => setSubmitted(false)} className="btn btn-outline">
+                <button onClick={() => {
+                  setSubmitted(false);
+                  setErrors({});
+                  setSubmitError('');
+                }} className="btn btn-outline">
                   Send Another Message
                 </button>
               </div>
@@ -152,6 +189,13 @@ const Contact = () => {
               <form onSubmit={handleFormSubmit}>
                 <h3>Enquiry Form</h3>
                 <p className="contact-form-subtitle">Fill out this enquiry form to connect with our expert dietitian or yoga trainer for a custom roadmap call.</p>
+
+                {submitError && (
+                  <div className="form-error-msg" style={{ padding: '12px', background: '#fdf2f2', border: '1px solid #f8b4b4', borderRadius: '8px', marginBottom: '20px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <AlertCircle size={18} style={{ color: '#d32f2f', flexShrink: 0 }} />
+                    <span>{submitError}</span>
+                  </div>
+                )}
 
                 <div className="form-row">
                   <div className="form-group">
@@ -246,8 +290,8 @@ const Contact = () => {
                   ></textarea>
                 </div>
 
-                <button type="submit" className="btn btn-primary contact-submit-btn">
-                  Submit Inquiry
+                <button type="submit" className="btn btn-primary contact-submit-btn" disabled={isSubmitting}>
+                  {isSubmitting ? "Submitting Inquiry..." : "Submit Inquiry"}
                 </button>
               </form>
             )}

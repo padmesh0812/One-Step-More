@@ -129,6 +129,49 @@ app.post('/api/verify-payment', async (req, res) => {
   }
 });
 
+// 4. Save Contact/Enquiry submissions into SQLite
+app.post('/api/contact', async (req, res) => {
+  try {
+    const { name, email, phone, reason, address, message } = req.body;
+
+    // Validate inputs
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Name is required.' });
+    }
+    if (!email || !email.trim()) {
+      return res.status(400).json({ error: 'Email is required.' });
+    }
+    if (!phone || !phone.trim()) {
+      return res.status(400).json({ error: 'Phone number is required.' });
+    }
+    if (!reason || !reason.trim()) {
+      return res.status(400).json({ error: 'Reason/Program selection is required.' });
+    }
+    if (!address || !address.trim()) {
+      return res.status(400).json({ error: 'Address is required.' });
+    }
+
+    // Save inquiry to database
+    await dbRun(`
+      INSERT INTO contacts (name, email, phone, reason, address, message)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `, [
+      name.trim(),
+      email.trim(),
+      phone.trim(),
+      reason,
+      address.trim(),
+      message ? message.trim() : ''
+    ]);
+
+    res.json({ success: true, message: 'Enquiry submitted successfully! We will contact you soon.' });
+  } catch (err) {
+    console.error('Error saving contact enquiry:', err.message || err);
+    res.status(500).json({ error: 'Server error saving enquiry.' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Backend server running on http://localhost:${PORT}`);
 });
+
