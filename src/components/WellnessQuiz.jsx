@@ -140,10 +140,17 @@ const WellnessQuiz = () => {
     <div className="quiz-section">
       <div className="quiz-container">
         {currentStep < QUESTIONS.length ? (
-          <div>
+          <div className="quiz-content-wrapper">
             <div className="quiz-header">
-              <h3>Personalized Wellness Quiz</h3>
-              <p>Find the custom diet, yoga, and lifestyle path that matches your current routine and goals.</p>
+              <div className="quiz-title-wrap">
+                <div className="quiz-icon-badge">
+                  <Compass size={22} color="var(--primary)" />
+                </div>
+                <div>
+                  <h3>Personalized Wellness Quiz</h3>
+                  <p>Discover your custom diet, yoga & habit roadmap</p>
+                </div>
+              </div>
             </div>
 
             <div className="quiz-progress-wrapper">

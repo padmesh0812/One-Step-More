@@ -1,35 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Check, ArrowRight, Apple, Activity, Heart, Shield, Plus, Minus, X, AlertCircle } from 'lucide-react';
+import { 
+  Check, ArrowRight, Apple, Activity, Heart, Shield, 
+  Plus, Minus, Star, Users, ShieldCheck, Sparkles, PhoneCall,
+  ChevronDown, Calendar
+} from 'lucide-react';
 import './Services.css';
 
 const PROGRAMS_DATA = [
   {
     id: 'diet',
-    title: "Customized Diet Program",
-    subtitle: "Rebuild Your Eating Patterns & Drop the Weight of Inconsistency",
-    description: "Whether it's your bodyweight or it is the weight of procrastination, inconsistency, low motivation levels, work-life imbalance, judgments, or simply not knowing where to start. This program will help you not just in losing weight but also in dropping the burden of achieving that weight loss. Don't let this extra weight pull you back.",
-    icon: <Apple size={24} />,
+    title: "CUSTOMIZED DIET PROGRAM",
+    tabLabel: "Customized Diet",
+    category: "Nutrition & Metabolic Health",
+    badge: "✨ Most Popular For Women",
+    badgeColor: "var(--primary)",
+    image: '/assets/images/programs/diet.jpg',
+    enrolledCount: '31,784+',
+    rating: '4.9',
+    reviewsCount: '1,420',
+    description: "Whether it's your bodyweight or it is the weight of procrastination, inconsistency, low motivation levels, work-life imbalance, judgments or simply not knowing where to start. This program will help you not just in losing weight but also in dropping the burden of achieving that weight loss. Don't let this extra weight pull you back. Go chase your goals and dreams.",
     bestFor: [
-      "Weight Loss & Fat Reduction",
-      "PCOD & PCOS Reversal",
-      "Thyroid & Metabolic Sluggishness",
+      "Weight Loss & Belly Fat Reduction",
+      "PCOD / PCOS Reversal",
+      "Thyroid Disorders",
       "Diabetes & BP Management",
-      "Pregnancy & Prenatal Nutrition",
-      "Lifestyle Correction & Stress Eating"
+      "Postpartum Fat Loss & Recovery",
+      "Stress Eating & Gut Healing"
     ],
     keyPoints: [
-      "Dedicated Personal Nutritionist guiding you daily",
+      "Dedicated Nutritionist",
       "Personalized diet plan every week (7 days plan, no repetition)",
-      "Simple, home-cooked diet plans (with quantities, calories and nutritional details)",
-      "Weekly video consultation call with coach (In-depth analysis, motivation and Q&A)",
-      "Consultation Notes delivered after every review call",
+      "Simple Diet Plan (with quantities, calories and nutritional details)",
+      "Customization for Medical conditions (like PCOD, Diabetes, Thyroid, BP, Pregnancy, Stress, Kidney, Liver disorders etc)",
+      "Video consultation call with coach every week",
+      "Weekly Counselling Call (In-depth analysis, motivation and Q&A)",
+      "Consultation Notes after every call",
       "Dedicated chat support with your coach for 9 hours (Mon to Sat)",
-      "28 days structured Grocery plan to take the guessing work away",
-      "Option to choose workout plans (Home workout or Yoga)",
-      "Special meal planning templates for travel, holidays, festivals, and weddings",
-      "Weekly motivation activities & powerful affirmations to manifest your fitness goals",
-      "Lifetime access to the 1Stepmore Premium Community"
+      "28 days Grocery plan",
+      "Option to choose workout plans (Home or yoga)",
+      "Special meal planning for travel, holidays, festivals, weddings etc.",
+      "Weekly fun activities for Motivation",
+      "Powerful affirmations to help you manifest your fitness goals",
+      "Lifetime access to the 1 Step More Premium Community"
     ],
     pricing: [
       { weeks: 4, original: 3999, offer: 2500 },
@@ -41,63 +54,75 @@ const PROGRAMS_DATA = [
   },
   {
     id: 'child',
-    title: "Customized Child Nutrition",
-    subtitle: "Healthy Growth & Immunity Starts with the Right Nutrition",
-    description: "Every child is unique, and so are their nutritional needs. Our customized child nutrition program is designed to support healthy growth, improve immunity, build healthy eating habits, and address parental concerns like underweight, overweight, picky eating, low immunity, and nutritional deficiencies.",
-    icon: <Heart size={24} />,
+    title: "CUSTOMIZED CHILD NUTRITION PROGRAM",
+    tabLabel: "Child Nutrition",
+    category: "Child Growth & Immunity",
+    badge: "🔥 Healthy Growth Starts With Right Nutrition",
+    badgeColor: "#F57C00",
+    image: '/assets/images/programs/child.jpg',
+    enrolledCount: '14,250+',
+    rating: '4.9',
+    reviewsCount: '890',
+    description: "Healthy Growth Starts with the Right Nutrition. Every child is unique, and so are their nutritional needs. Our customized child nutrition program is designed to support healthy growth, improve immunity, build healthy eating habits, and address concerns like underweight, overweight, picky eating, low immunity, and nutritional deficiencies.",
     bestFor: [
       "Underweight Children",
       "Overweight & Childhood Obesity",
-      "Picky Eaters & Meal Refusals",
+      "Picky Eaters & Poor Appetite",
       "Low Immunity & Frequent Illness",
-      "Poor Appetite & Brain Fog",
-      "Nutritional Deficiencies & Active Growth"
+      "Nutritional Deficiencies",
+      "Healthy Growth & Development"
     ],
     keyPoints: [
-      "Personalized Child Diet Plan based on age, height, weight & goals",
-      "Easy-to-follow, delicious home-cooked child-friendly meal plans",
-      "Weekly Progress Review and diet modifications as the child grows",
-      "Comprehensive growth & weight monitoring schedules",
-      "Healthy snack and home-made treats recommendations",
-      "Creative School Tiffin / Lunchbox meal ideas children love",
-      "Direct Parent Nutrition Guidance & mindset coaching for meal times",
-      "WhatsApp Support with your child nutritionist",
-      "Lifestyle, sleep, and hydration trackers",
-      "Focus on building sustainable healthy eating habits early in life"
+      "Personalized Child Diet Plan based on child's age, height, weight & health goals",
+      "Easy-to-follow, home-cooked meal plans",
+      "Weekly Progress Review & plan modifications",
+      "Growth & Weight Monitoring",
+      "Healthy Snack Recommendations",
+      "School Tiffin Meal Ideas",
+      "Parent Nutrition Guidance",
+      "Dedicated WhatsApp Support",
+      "Lifestyle & Hydration Guidance",
+      "Sustainable Healthy Eating Habits (no temporary diets)"
     ],
     pricing: [
       { weeks: 4, original: 2000, offer: 1500 },
       { weeks: 8, original: 4000, offer: 2800 },
       { weeks: 12, original: 6000, offer: 3900 },
       { weeks: 24, original: 12000, offer: 6900 },
-      { weeks: 48, original: 24000, offer: 11900 } // Sane default instead of typo 1900
+      { weeks: 48, original: 24000, offer: 11900 }
     ]
   },
   {
     id: 'group-yoga',
-    title: "Yoga & Beyond (Group Sessions)",
-    subtitle: "Transform Your Health Through Traditional Yoga & Breathwork",
-    description: "Experience expert-guided online yoga sessions designed to improve flexibility, strength, posture, mobility, and overall well-being. Whether you're a beginner or an experienced practitioner, our certified yoga trainers will help you achieve your health goals with a structured and progressive group environment.",
-    icon: <Activity size={24} />,
+    title: "YOGA & BEYOND - GROUP SESSIONS",
+    tabLabel: "Live Group Yoga",
+    category: "Traditional Yoga & Breathwork",
+    badge: "🧘‍♀️ Live Interactive Online Classes",
+    badgeColor: "#0284C7",
+    image: '/assets/images/programs/yoga.jpg',
+    enrolledCount: '22,900+',
+    rating: '4.8',
+    reviewsCount: '1,120',
+    description: "Transform Your Health Through Traditional Yoga. Experience expert-guided online yoga sessions designed to improve flexibility, strength, posture, mobility, and overall well-being. Whether you're a beginner or an experienced practitioner, our certified yoga trainers will help you achieve your health goals with a structured and personalized approach.",
     bestFor: [
-      "Body Flexibility & Mobility",
-      "Chronic Back, Neck & Shoulder Pain",
-      "Stress Management & Anxiety Relief",
-      "PCOD/PCOS & Thyroid Balance",
-      "Core Stabilization & Balance",
-      "General Fitness & Mindful Living"
+      "Weight Loss & Fat Burning",
+      "Back & Neck Pain Relief",
+      "Flexibility & Mobility",
+      "Stress Management & Relaxation",
+      "PCOD / PCOS & Thyroid Balance",
+      "Overall Fitness & Posture"
     ],
     keyPoints: [
-      "Live interactive online group classes (Monday to Friday)",
-      "Certified and experienced Yoga Trainer guidance",
-      "Beginner-friendly progressive class designs",
-      "Strength, Mobility & Flexibility focus in each flow",
-      "Deep breathing practices (Pranayama) to calm hyperactive nervous system",
-      "Meditation & deep relaxation techniques",
-      "Posture correction audits with live trainer feedback",
-      "Consistent progress tracking reviews",
-      "WhatsApp community and support circles",
-      "Session recordings available for catch-ups"
+      "Live Group Yoga Sessions (Monday–Friday)",
+      "Certified Yoga Trainer guidance",
+      "Beginner-Friendly Classes & progressive flows",
+      "Strength, Mobility & Flexibility Training",
+      "Breathing Practices (Pranayama)",
+      "Meditation & Deep Relaxation",
+      "Posture Correction & alignment audits",
+      "Consistent Progress Tracking",
+      "WhatsApp Support Circle",
+      "Session Recordings for flexible access"
     ],
     pricing: [
       { weeks: 4, original: 1999, offer: 999 },
@@ -109,32 +134,39 @@ const PROGRAMS_DATA = [
   },
   {
     id: 'one-yoga',
-    title: "1:1 Live Personal Yoga",
-    subtitle: "Eliminate Root Causes & Recover Your Health Happily",
-    description: "Weight loss or healthy weight loss—just losing weight should not be the goal. Eliminating the root cause of unwanted fat and repairing the entire machine called the body is the right way. Join this program if you want to lose weight happily and sustain it, where we provide you the right workout and amazing non-repetitive yoga sessions to lose that unwanted weight with a bonus of improved nervous system, gut, and mental health.",
-    icon: <Activity size={24} />,
+    title: "CUSTOMIZED YOGA PROGRAM WITH LIVE 1:1 SESSIONS",
+    tabLabel: "1:1 Personal Yoga",
+    category: "1-on-1 Personal Yoga Program",
+    badge: "⭐ 1:1 Private Trainer Attention",
+    badgeColor: "#8B5CF6",
+    image: '/assets/images/programs/weight.jpg',
+    enrolledCount: '9,840+',
+    rating: '5.0',
+    reviewsCount: '650',
+    description: "Weight loss or Healthy weight loss. Just losing weight should not be the goal. But, eliminating the root cause of unwanted fat and repairing the entire machine called body is the right way. Join this program if you want to lose weight happily and sustain it, where we provide you the right workout and amazing non-repetitive yoga sessions to lose that unwanted weight with bonus of improved nervous system, gut and mental health.",
     bestFor: [
-      "Custom Weight Loss & Toning",
-      "Back, Neck & Spine Alignment",
-      "PCOS/PCOD & Hormonal Mapping",
-      "Thyroid Disorders & Metabolic Fatigue",
+      "Weight Loss & Stubborn Fat",
+      "Back & Neck Pain Rehabilitation",
+      "PCOS / PCOD & Thyroid Disorders",
       "Diabetes Management",
-      "Postnatal Recovery & Pelvic Floor Strength",
-      "Stress, Anxiety & Deep Insomnia",
-      "Senior Citizens & Joint Support"
+      "Stress & Anxiety Relief",
+      "Postnatal Recovery & Pelvic Strength",
+      "Senior Citizens Gentle Mobility",
+      "Flexibility & Overall Wellness"
     ],
     keyPoints: [
-      "One-on-One Live Yoga Sessions with 1Stepmore Yoga Coach",
-      "100% personalized Yoga Plan adjusted for your joints & fitness level",
-      "Flexible session timing according to your schedule",
-      "Weekly progress assessment and physical feedback reviews",
-      "Tailored practice focusing on clinical health goals (back pain, thyroid)",
-      "Dedicated Pranayama & meditation segments",
-      "Circadian lifestyle guidance and posture correction",
-      "Priority trainer assistance & direct WhatsApp support",
-      "Ashtanga, Hatha, and Power Yoga combined flows",
+      "One-on-One Live Yoga Sessions with 1 Step More Yoga Coach",
+      "Personalized Yoga Plan tailored for your health goals",
+      "Flexible Session Timing based on your schedule",
+      "Weekly Progress Assessment & posture review",
+      "Customized Practice for Your Health Goals",
+      "Pranayama & Meditation for nervous system calming",
+      "Lifestyle Guidance & Posture Correction",
+      "Priority Trainer Assistance & WhatsApp Support",
+      "Technique & Alignment Correction",
+      "Ashtanga, Hatha and Power Yoga Sessions",
       "Weight loss special targeted workouts",
-      "Access to 1Stepmore premium community"
+      "Lifetime access to 1 Step More Premium Community"
     ],
     pricing: [
       { weeks: 4, original: 4999, offer: 2999 },
@@ -146,28 +178,35 @@ const PROGRAMS_DATA = [
   },
   {
     id: 'combo',
-    title: "Diet & Group Yoga Combo",
-    subtitle: "Eat Right. Move Better. Live Healthier.",
-    description: "Achieve your health goals with a complete wellness program that combines a personalized diet plan with live group yoga sessions. Get the best of both worlds: clinical nutrition assessments and daily movement flows, along with expert guidance, regular follow-ups, and a sustainable approach to healthy living.",
-    icon: <Shield size={24} />,
+    title: "CUSTOMIZED DIET AND GROUP LIVE YOGA SESSIONS",
+    tabLabel: "Diet & Yoga Combo",
+    category: "Complete Wellness Program",
+    badge: "⚡ Complete 360° Transformation",
+    badgeColor: "#10B981",
+    image: '/assets/images/programs/lifestyle.jpg',
+    enrolledCount: '18,600+',
+    rating: '4.9',
+    reviewsCount: '980',
+    description: "Eat Right. Move Better. Live Healthier. Achieve your health goals with a complete wellness program that combines a personalized diet plan with live group yoga sessions. Get expert guidance, regular follow-ups, and a sustainable approach to healthy living.",
     bestFor: [
-      "Comprehensive Fat Loss & Toning",
-      "Hormonal Balancing (PCOS/PCOD/Thyroid)",
-      "Metabolic Boost & Diabetes Control",
-      "Stress Management & Anxiety Reset",
-      "Core & Spine Alignment Rehabilitation",
-      "Overall Fitness & Wellness Lifestyles"
+      "Weight Loss & Fat Loss",
+      "PCOS / PCOD Reversal",
+      "Thyroid Disorders",
+      "Diabetes Management",
+      "Stress Management",
+      "Back Pain Relief",
+      "Overall Fitness & Lifelong Wellness"
     ],
     keyPoints: [
-      "Customized Clinical Diet Plan (7-day non-repetitive cycles)",
-      "Live Group Yoga Sessions (Monday to Friday)",
-      "Weekly dietitian review and diet plan modifications",
-      "Mobility, strength, flexibility, & alignment training",
-      "Pranayama & deep stress-release meditation",
-      "Healthy lifestyle coaching & circadian habit setups",
-      "Joint guidance by Certified Nutritionist & Certified Yoga Trainer",
-      "Continuous WhatsApp Support and progress tracking",
-      "Access to 1Stepmore Premium community circles"
+      "Customized Diet Plan tailored to your metabolic needs",
+      "Live Group Yoga Sessions (Monday–Friday)",
+      "Weekly Diet Review & follow-ups",
+      "Regular Diet Plan Modifications",
+      "Pranayama & Guided Meditation",
+      "Mobility, Strength & Flexibility Training",
+      "Healthy Lifestyle Coaching",
+      "Dedicated WhatsApp Support",
+      "Guidance by Certified Nutritionist & Certified Yoga Trainer"
     ],
     pricing: [
       { weeks: 4, original: 4499, offer: 2999 },
@@ -181,213 +220,304 @@ const PROGRAMS_DATA = [
 
 const FAQS_DATA = [
   {
-    q: "What kind of food will be given in the meal plan?",
-    a: "Our diet plans include basic home-based food that is easily accessible. No fancy fat cutter drinks, expensive exotic ingredients, or fad supplements are required. We focus on clean, home-cooked Indian meals."
+    q: "Q1) What kind of food will be given in the meal plan?",
+    a: "Our diet plans include basic home-based food. No fat cutter drinks or fad supplements."
   },
   {
-    q: "How frequently will my diet change?",
-    a: "A new diet chart will be given every week (every 7 days). Your nutritionist will review your previous week's progress, sleep patterns, energy levels, and measurements before tailoring the next chart to prevent plateaus."
+    q: "Q2) How frequently will my diet change?",
+    a: "A new diet will be given every week. A Diet chart will be created on the basis of careful review of the previous week’s progress."
   },
   {
-    q: "I have tried a lot of diet programs in the past but nothing worked or I gained back the weight. How is your program different?",
-    a: "We reject crash dieting. Through this program, we work directly on your daily eating patterns and lifestyle habit loops. The meals promote traditional, home-cooked food. We educate you to understand your body's requirements so you can sustain your weight loss for the rest of your life."
+    q: "Q3) I have tried a lot of diet programs in past but nothing worked or gained back the weight. How is your program any different?",
+    a: "We believe in sustainability and hence through this program, we work on your eating patterns and lifestyle. The meals provided promote home-cooked Indian food items. We educate our clients to understand their body's requirements and enable them to understand their own body and its requirements. Getting fitter, feeling transformed, and believing in sustainable wellness is what 1 Step More truly stands for."
   },
   {
-    q: "How much weight can I lose in one month?",
-    a: "There is no fixed answer as it depends on your starting weight, activity level, and compliance. On average, clients who follow our personalized plans precisely lose up to 5kg of fat in a month safely and healthily."
+    q: "Q4) How much weight can I lose in one month?",
+    a: "There is no fixed answer to this question. It depends on your current weight and how precisely you follow the given plans. On an average people who enrol with us lose upto 5kg in a month."
   },
   {
-    q: "How soon will I see results?",
-    a: "Just as eating poorly affects the body immediately, so does eating clean. While weight scales take a few weeks to show major drops, you will start feeling lighter, more energetic, and observe reduced bloating within a week or two."
+    q: "Q5) How soon will I see results?",
+    a: "Just as eating wrong has an immediate effect on the body, so does eating correct. It might not be a measurable effect but you will start feeling better, more energetic and shrunk within a week or two of following the diet and exercising. Weight loss or rather fat loss, is a by-product. If you follow the plan, results will follow you back."
   },
   {
-    q: "What kind of exercise is recommended?",
-    a: "We recommend any form of movement that challenges you and is enjoyable, such as strength training, HIIT, walking, running, or yoga. For our yoga plans, our certified trainer corrects your alignment in real-time."
+    q: "Q6) What kind of exercise is recommended?",
+    a: "Any form of exercise like strength training, HIIT, running, yoga etc. which is challenging and enjoyable for you is recommended. There is no definite answer to these questions. Everybody is different and so are its needs."
   }
 ];
 
 const Services = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
   const [activeTab, setActiveTab] = useState(location.state?.tab || 'diet');
   const [selectedDurations, setSelectedDurations] = useState({
-    diet: 12,
-    child: 12,
-    'group-yoga': 12,
-    'one-yoga': 12,
-    combo: 12
+    diet: 4,
+    child: 4,
+    'group-yoga': 4,
+    'one-yoga': 4,
+    combo: 4
   });
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
 
-  const activeProgram = PROGRAMS_DATA.find(p => p.id === activeTab);
-  const selectedDuration = selectedDurations[activeTab];
-  const activePricing = activeProgram.pricing.find(pr => pr.weeks === selectedDuration) || activeProgram.pricing[2];
+  // Update tab if location state changes (e.g. from homepage card navigation)
+  useEffect(() => {
+    if (location.state?.tab) {
+      setActiveTab(location.state.tab);
+    }
+  }, [location.state]);
+
+  const activeProgram = PROGRAMS_DATA.find(p => p.id === activeTab) || PROGRAMS_DATA[0];
+  const selectedDuration = selectedDurations[activeTab] || 4;
+  const activePricing = activeProgram.pricing.find(pr => pr.weeks === selectedDuration) || activeProgram.pricing[0];
 
   const handleDurationChange = (progId, weeks) => {
     setSelectedDurations(prev => ({
       ...prev,
-      [progId]: weeks
+      [progId]: Number(weeks)
     }));
   };
 
-  const calculateSavings = (orig, off) => {
-    return orig - off;
+  const handleEnrollClick = () => {
+    navigate('/enroll', { state: { program: activeTab, weeks: selectedDuration } });
   };
+
+  const toggleFaq = (index) => {
+    setOpenFaqIndex(openFaqIndex === index ? null : index);
+  };
+
+  const savings = activePricing.original - activePricing.offer;
+  const discountPercent = Math.round((savings / activePricing.original) * 100);
 
   return (
     <main className="services-main">
-      {/* Services Hero */}
-      <section className="section container services-hero-section">
-        <div className="section-header services-header">
-          <span className="section-tag">OUR STRUCTURED PROGRAMS</span>
-          <h1 className="services-title">Find the Right Program for <span>Your Journey</span></h1>
-          <p className="section-description">
-            Choose your focus area and select a duration tier. All diet plans are clinical-nutritionist certified, and all yoga classes are live-guided.
-          </p>
-        </div>
+      {/* Services Hero Header */}
+      <section className="services-hero-section">
+        <div className="container">
+          <div className="section-header services-header">
+            <span className="section-tag">OUR STRUCTURED PROGRAMS</span>
+            <h1 className="services-title">Choose Your Path to <span>Lasting Health</span></h1>
+            <p className="section-description">
+              Select a program to view full plan details, live coaching inclusions, and duration pricing tiers.
+            </p>
+          </div>
 
-        {/* Tab Buttons */}
-        <div className="services-tabs-container">
-          {PROGRAMS_DATA.map((prog) => (
-            <button
-              key={prog.id}
-              onClick={() => setActiveTab(prog.id)}
-              className={`filter-btn ${activeTab === prog.id ? 'active' : ''} services-tab-btn`}
-            >
-              {prog.icon}
-              {prog.title}
-            </button>
-          ))}
-        </div>
+          {/* Program Switcher Tabs */}
+          <div className="programs-nav-tabs">
+            {PROGRAMS_DATA.map((prog) => {
+              const isChild = prog.id === 'child';
+              const isActive = activeTab === prog.id;
+              return (
+                <button
+                  key={prog.id}
+                  onClick={() => setActiveTab(prog.id)}
+                  className={`program-nav-tab ${isActive ? 'active' : ''} ${isChild ? 'trending-tab' : ''}`}
+                >
+                  {isChild && <span className="trending-pill">🔥 Trending</span>}
+                  <span className="tab-title">{prog.tabLabel}</span>
+                </button>
+              );
+            })}
+          </div>
 
-        {/* Tab Content Box */}
-        <div className="services-content-card">
-          <div className="services-grid about-hero-grid">
-            
-            {/* Left Content Column */}
-            <div>
-              <span className="section-tag">{activeProgram.title}</span>
-              <h2 className="services-subtitle">
-                {activeProgram.subtitle}
-              </h2>
-              <p className="services-desc">
-                {activeProgram.description}
-              </p>
+          {/* 1. Main Showcase Hero Banner (1 Step More Brand Theme) */}
+          <div className="showcase-banner-card">
+            <div className="showcase-banner-grid">
 
-              <h3 className="services-section-title">
-                {activeTab === 'child' ? 'Best Suited For Children With:' : 'Ideal For Addressing:'}
-              </h3>
-              <div className="services-best-for-grid">
-                {activeProgram.bestFor.map((item, idx) => (
-                  <div key={idx} className="services-best-for-item">
-                    <div className="services-bullet-dot"></div>
-                    {item}
+              {/* Left Column: High-Res Program Picture */}
+              <div className="showcase-image-col">
+                <div className="showcase-img-wrap">
+                  <img
+                    src={activeProgram.image}
+                    alt={activeProgram.title}
+                    className="showcase-main-img"
+                  />
+                  <div className="showcase-img-badge">
+                    {activeProgram.badge}
                   </div>
-                ))}
+                </div>
+                <div className="showcase-social-proof">
+                  <div className="proof-item">
+                    <Users size={15} color="var(--primary)" />
+                    <span>Already Enrolled ({activeProgram.enrolledCount})</span>
+                  </div>
+                  <div className="proof-item">
+                    <Star size={15} color="var(--secondary)" fill="var(--secondary)" />
+                    <span>{activeProgram.rating} ({activeProgram.reviewsCount})</span>
+                  </div>
+                </div>
               </div>
 
-              <h3 className="services-section-title alt">
-                What's Included in the Program:
-              </h3>
-              <ul className="modal-list services-included-list">
-                {activeProgram.keyPoints.map((point, idx) => (
-                  <li key={idx} className="modal-list-item services-included-item">
-                    <Check size={18} color="var(--primary)" className="services-check-icon" />
-                    <span>{point}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+              {/* Right Column: Program Details, Pricing & Duration */}
+              <div className="showcase-details-col">
+                <span
+                  className="showcase-tag-badge"
+                  style={{
+                    backgroundColor: activeTab === 'child' ? 'rgba(245, 124, 0, 0.1)' : 'rgba(46, 125, 50, 0.1)',
+                    color: activeTab === 'child' ? 'var(--secondary)' : 'var(--primary)',
+                    borderColor: activeTab === 'child' ? 'rgba(245, 124, 0, 0.25)' : 'rgba(46, 125, 50, 0.25)'
+                  }}
+                >
+                  {activeProgram.badge}
+                </span>
 
-            {/* Right Interactive Calculator Column */}
-            <div className="services-calc-card">
-              <div>
-                <h3 className="services-calc-title">
-                  Choose Program Duration:
-                </h3>
-                <p className="services-calc-subtitle">
-                  Longer plans include deeper metabolic resetting and better value.
+                <h2 className="showcase-prog-title">
+                  {activeProgram.title}
+                </h2>
+
+                <p className="showcase-prog-desc">
+                  {activeProgram.description}
                 </p>
 
-                {/* Duration Pills */}
-                <div className="services-duration-grid">
-                  {activeProgram.pricing.map((price) => (
-                    <button
-                      key={price.weeks}
-                      onClick={() => handleDurationChange(activeTab, price.weeks)}
-                      className={`services-duration-btn ${selectedDuration === price.weeks ? 'active' : ''}`}
-                    >
-                      {price.weeks} W
-                    </button>
-                  ))}
+                {/* Price & Duration Row */}
+                <div className="showcase-pricing-box">
+                  <div className="showcase-price-wrap">
+                    <span className="showcase-offer-price">
+                      RS. {activePricing.offer.toLocaleString('en-IN')}/-
+                    </span>
+                    <span className="showcase-orig-price">
+                      ₹{activePricing.original.toLocaleString('en-IN')}
+                    </span>
+                    <span className="showcase-save-badge">
+                      {discountPercent}% OFF
+                    </span>
+                  </div>
+
+                  {/* Styled Duration Dropdown Selector */}
+                  <div className="showcase-duration-selector">
+                    <label htmlFor="duration-select-main" className="duration-label">Plan Duration:</label>
+                    <div className="select-container">
+                      <select
+                        id="duration-select-main"
+                        value={selectedDuration}
+                        onChange={(e) => handleDurationChange(activeTab, Number(e.target.value))}
+                        className="styled-duration-select"
+                      >
+                        {activeProgram.pricing.map((tier) => (
+                          <option key={tier.weeks} value={tier.weeks}>
+                            {tier.weeks} Week Plan ({tier.weeks * 7} Days)
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Pricing Output Panel */}
-                <div className="services-pricing-panel">
-                  <div className="services-pricing-row">
-                    <span className="services-pricing-label">Original Price:</span>
-                    <span className="services-original-price">
-                      ₹{activePricing.original.toLocaleString('en-IN')}/-
-                    </span>
-                  </div>
+                {/* Big Prominent Brand Enroll CTA Button */}
+                <div className="showcase-cta-wrap">
+                  <button
+                    onClick={handleEnrollClick}
+                    className="showcase-enroll-btn"
+                  >
+                    Enroll Now <ArrowRight size={18} />
+                  </button>
+                  <span className="showcase-guarantee-text">
+                    <ShieldCheck size={16} color="var(--primary)" /> 100% Certified Nutritionists & Experienced Yoga Coaches
+                  </span>
+                </div>
 
-                  <div className="services-pricing-row-main">
-                    <span className="services-offer-label">Special Offer Price:</span>
-                    <span className="services-offer-price">
-                      ₹{activePricing.offer.toLocaleString('en-IN')}/-
-                    </span>
-                  </div>
+              </div>
 
-                  <div className="services-savings-badge">
-                    Instant Savings of ₹{calculateSavings(activePricing.original, activePricing.offer).toLocaleString('en-IN')}/- ({Math.round(((activePricing.original - activePricing.offer) / activePricing.original) * 100)}% Off)
+            </div>
+          </div>
+
+          {/* 2. Key Points Section (Matching Theme) */}
+          <div className="showcase-keypoints-card">
+            <div className="keypoints-header">
+              <h3 className="keypoints-title">KEY POINTS</h3>
+              <div className="keypoints-underline"></div>
+              <p className="keypoints-subtitle">Everything included in your {activeProgram.title}:</p>
+            </div>
+
+            <div className="keypoints-grid">
+              {activeProgram.keyPoints.map((point, index) => (
+                <div key={index} className="keypoint-item">
+                  <div className="keypoint-icon-box">
+                    <Check size={15} strokeWidth={2.5} color="var(--primary)" />
                   </div>
+                  <span className="keypoint-text">{point}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Best For Tags & Direct Consultation CTA */}
+            <div className="keypoints-footer">
+              <div className="keypoints-bestfor-wrap">
+                <span className="bestfor-label">
+                  {activeTab === 'child' ? 'Best For Children With:' : 'Ideal For Addressing:'}
+                </span>
+                <div className="bestfor-tags">
+                  {activeProgram.bestFor.map((tag, idx) => (
+                    <span key={idx} className="bestfor-pill">{tag}</span>
+                  ))}
                 </div>
               </div>
 
-              {/* Consultation CTA */}
-              <button
-                onClick={() => navigate('/enroll', { state: { program: activeTab, weeks: selectedDuration } })}
-                className="btn btn-primary services-enroll-btn"
-              >
-                Enroll / Consult on this Plan <ArrowRight size={18} />
-              </button>
+              <div className="keypoints-actions">
+                <button onClick={handleEnrollClick} className="btn btn-primary btn-sm">
+                  Enroll In This Plan <ArrowRight size={15} />
+                </button>
+                <button onClick={() => navigate('/contact')} className="btn btn-outline btn-sm">
+                  Book Free Consultation
+                </button>
+              </div>
             </div>
 
           </div>
+
         </div>
       </section>
 
-      {/* Program FAQs Section */}
-      <section className="section services-faq-section">
-        <div className="container services-faq-container">
-          <div className="section-header">
-            <span className="section-tag">FAQ & TRANSPARENCY</span>
-            <h2>Frequently Asked Questions</h2>
-            <p>We believe in sustainability and zero hidden boundaries. Read our guidelines directly.</p>
-          </div>
+      {/* FAQs Section (Universal FAQ for all programs) */}
+      <section className="section container services-faq-section">
+        <div className="section-header">
+          <span className="section-tag">FREQUENTLY ASKED QUESTIONS</span>
+          <h2 className="section-title">Frequently Asked <span>Questions (FAQ)</span></h2>
+          <p className="section-description">
+            Everything you need to know about our nutritionist consultations, custom meal planning, and live yoga sessions.
+          </p>
+        </div>
 
-          <div className="services-faq-list">
-            {FAQS_DATA.map((faq, idx) => (
-              <div key={idx} className="services-faq-item">
-                <button
-                  onClick={() => setOpenFaqIndex(openFaqIndex === idx ? null : idx)}
-                  className="services-faq-trigger"
-                >
-                  <span className="services-faq-question">
-                    {faq.q}
-                  </span>
-                  <div className={`services-faq-icon ${openFaqIndex === idx ? 'active' : ''}`}>
-                    {openFaqIndex === idx ? <Minus size={14} /> : <Plus size={14} />}
-                  </div>
-                </button>
-
-                {openFaqIndex === idx && (
-                  <div className="services-faq-answer">
-                    {faq.a}
-                  </div>
-                )}
+        <div className="faq-accordion-wrapper">
+          {FAQS_DATA.map((faq, index) => (
+            <div
+              key={index}
+              className={`faq-item ${openFaqIndex === index ? 'active' : ''}`}
+              onClick={() => toggleFaq(index)}
+            >
+              <div className="faq-question">
+                <h4>{faq.q}</h4>
+                <div className="faq-toggle-icon">
+                  {openFaqIndex === index ? <Minus size={18} /> : <Plus size={18} />}
+                </div>
               </div>
-            ))}
+              {openFaqIndex === index && (
+                <div className="faq-answer">
+                  <p>{faq.a}</p>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Bottom Consultation CTA Banner */}
+      <section className="services-bottom-cta">
+        <div className="container">
+          <div className="services-cta-box">
+            <div className="services-cta-content">
+              <h2>Still Unsure Which Plan Suits You Best?</h2>
+              <p>
+                Speak directly with <span className="brand-name"><span className="brand-step">1 Step</span> <span className="brand-more">More</span></span> founder Dt. Pragati Mishra for an initial health evaluation.
+              </p>
+            </div>
+            <div className="services-cta-actions">
+              <button onClick={() => navigate('/contact')} className="btn btn-secondary">
+                <PhoneCall size={18} /> Book Free Call
+              </button>
+              <button onClick={() => navigate('/enroll', { state: { program: activeTab, weeks: selectedDuration } })} className="btn btn-outline-white">
+                Enroll Now <ArrowRight size={18} />
+              </button>
+            </div>
           </div>
         </div>
       </section>

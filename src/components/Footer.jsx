@@ -132,15 +132,18 @@ const Footer = () => {
       <div className="footer-bottom">
         <div className="footer-bottom-container">
           <div className="footer-bottom-left">
-            <Link to="/">
+            <Link to="/" className="footer-logo-link">
               <img 
-                src="/assets/images/logo/logo.jpeg" 
-                alt="One Step More Logo" 
+                src="/assets/images/logo/logo.png" 
+                alt="1 Step More Logo" 
                 className="footer-logo" 
               />
+              <span className="brand-name footer-brand-name">
+                <span className="brand-step">1 Step</span> <span className="brand-more">More</span>
+              </span>
             </Link>
             <p className="footer-copyright">
-              &copy; {new Date().getFullYear()} One Step More. All rights reserved. &bull; Every Healthy Habit Begins With One Small Step
+              &copy; {new Date().getFullYear()} <span className="brand-step">1 Step</span> <span className="brand-more">More</span>. All rights reserved. &bull; Every Healthy Habit Begins With One Small Step
             </p>
           </div>
           <div className="footer-bottom-right">

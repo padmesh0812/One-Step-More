@@ -1,191 +1,227 @@
-/* Enroll Page Styling */
+/* ==========================================================================
+   COMPACT ENROLL PAGE STYLING (EQUAL HEIGHT & SLEEK PROPORTIONS)
+   ========================================================================== */
 .enroll-main {
   background-color: #FAF8F5;
   min-height: 80vh;
-  padding: 40px 0;
+  padding: 30px 0 50px 0;
 }
 
 .enroll-back-wrapper {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .enroll-back-btn {
   background: none;
   border: none;
-  color: var(--primary);
+  color: var(--primary, #2E7D32);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  fontSize: 0.95rem;
+  gap: 6px;
+  font-size: 0.88rem;
   font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.enroll-back-btn:hover {
+  opacity: 0.8;
 }
 
 .enroll-header {
-  margin-bottom: 40px;
+  margin-bottom: 22px;
+  text-align: center;
 }
 
-/* Stepper */
+.enroll-header h1 {
+  font-family: var(--heading-font, 'Poppins', sans-serif);
+  font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+  font-weight: 800;
+  color: var(--heading, #1F2937);
+  margin-bottom: 4px;
+}
+
+.enroll-header h1 span {
+  color: var(--primary, #2E7D32);
+}
+
+.enroll-header p {
+  font-size: 0.88rem;
+  color: var(--text, #666);
+  margin: 0 auto;
+  max-width: 600px;
+}
+
+/* Stepper Progress Indicator */
 .enroll-stepper-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  max-width: 600px;
-  margin: 0 auto 40px auto;
-  gap: 15px;
+  max-width: 480px;
+  margin: 0 auto 24px auto;
+  gap: 12px;
 }
 
 .enroll-step-container {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .enroll-step-number {
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background-color: #ccc;
+  background-color: #D1D5DB;
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 0.85rem;
-  transition: background-color 0.2s;
+  font-size: 0.78rem;
+  transition: background-color 0.25s ease;
 }
 
 .enroll-step-number.active {
-  background-color: var(--primary);
+  background-color: var(--primary, #2E7D32);
 }
 
 .enroll-step-label {
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 500;
-  color: var(--text-muted);
-  transition: color 0.2s, font-weight 0.2s;
+  color: var(--text-muted, #9CA3AF);
+  transition: color 0.25s, font-weight 0.25s;
 }
 
 .enroll-step-label.active {
   font-weight: 700;
-  color: var(--heading);
+  color: var(--heading, #1F2937);
 }
 
 .enroll-step-line {
   height: 2px;
-  width: 50px;
-  background-color: #ccc;
-  transition: background-color 0.2s;
+  width: 36px;
+  background-color: #E5E7EB;
+  transition: background-color 0.25s ease;
 }
 
 .enroll-step-line.active {
-  background-color: var(--primary);
+  background-color: var(--primary, #2E7D32);
 }
 
-/* Step 3 Success */
-.enroll-success-box {
-  max-width: 650px;
-  margin: 0 auto;
-  background-color: #fff;
-  border-radius: 24px;
-  padding: 40px;
-  text-align: center;
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border);
-}
-
-.enroll-success-icon-circle {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  background-color: rgba(74, 117, 89, 0.1);
-  color: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 24px auto;
-}
-
-.enroll-success-title {
-  color: var(--heading);
-  margin-bottom: 16px;
-}
-
-.enroll-success-desc {
-  color: var(--text);
-  margin-bottom: 24px;
-  line-height: 1.7;
-}
-
-.enroll-success-summary {
-  background-color: #FBFBFA;
-  border-radius: 16px;
-  padding: 24px;
-  text-align: left;
-  font-size: 0.9rem;
-  margin-bottom: 30px;
-  border: 1px solid var(--border);
-  display: grid;
-  gap: 10px;
-}
-
-.enroll-success-total {
-  border-top: 1px solid var(--border);
-  padding-top: 10px;
-  color: var(--primary);
-  font-weight: 700;
-}
-
-.enroll-success-btn {
-  min-width: 220px;
-}
-
-/* Step 1 & 2 Main Layout */
+/* ==========================================================================
+   EQUAL HEIGHT 2-COLUMN GRID LAYOUT
+   ========================================================================== */
 .enroll-grid-layout {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 40px;
-  align-items: start;
+  grid-template-columns: 1.18fr 0.82fr;
+  gap: 20px;
+  align-items: stretch; /* Both columns match height precisely */
+  max-width: 1080px;
+  margin: 0 auto;
 }
 
-/* Left panel form card */
+@media (max-width: 900px) {
+  .enroll-grid-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* LEFT SIDE PANEL (Form Card) */
 .enroll-form-panel {
-  background-color: #fff;
-  border-radius: 24px;
-  padding: 40px;
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border);
+  background-color: #FFFFFF;
+  border-radius: 18px;
+  padding: 24px 26px;
+  box-shadow: 0 8px 24px rgba(46, 125, 50, 0.05);
+  border: 1.5px solid var(--border, #EFE8E4);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.enroll-step-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  flex: 1;
 }
 
 .enroll-form-title {
-  font-size: 1.3rem;
-  color: var(--heading);
-  margin-bottom: 24px;
+  font-family: var(--heading-font, 'Poppins', sans-serif);
+  font-size: 1.15rem;
+  color: var(--heading, #1F2937);
+  margin-bottom: 14px;
   font-weight: 700;
 }
 
-/* Form Grids */
+/* Form Grids & Inputs */
 .enroll-form-grid-vertical {
   display: grid;
-  gap: 20px;
+  gap: 10px;
 }
 
 .enroll-form-grid-half {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 10px;
 }
 
 .enroll-form-grid-asym {
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
-  gap: 20px;
+  gap: 10px;
 }
 
 .enroll-form-grid-thirds {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 20px;
+  gap: 10px;
+}
+
+@media (max-width: 576px) {
+  .enroll-form-grid-half,
+  .enroll-form-grid-asym,
+  .enroll-form-grid-thirds {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 0;
+}
+
+.form-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--heading, #2D2D2D);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 7px 11px;
+  border-radius: 7px;
+  border: 1.5px solid var(--border, #EFE8E4);
+  background-color: #FAFAFA;
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--heading, #2D2D2D);
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary, #2E7D32);
+  background-color: #FFFFFF;
 }
 
 .pointer-input {
@@ -193,75 +229,105 @@
 }
 
 .disabled-input {
-  background-color: #F9FAFB;
+  background-color: #F3F4F6;
+  color: #6B7280;
   cursor: not-allowed;
+}
+
+.form-error-msg {
+  font-size: 0.72rem;
+  color: #EF4444;
+  margin-top: 2px;
 }
 
 .enroll-submit-btn {
   width: 100%;
-  margin-top: 30px;
-  padding: 16px;
+  margin-top: 14px;
+  padding: 11px 20px;
   font-weight: 700;
+  font-size: 0.92rem;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--primary, #2E7D32) 0%, #1B5E20 100%);
+  color: #FFFFFF;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgba(46, 125, 50, 0.22);
+  transition: all 0.25s ease;
 }
 
-/* Step 2 Secure Checkout */
+.enroll-submit-btn:hover {
+  background: linear-gradient(135deg, #1B5E20 0%, #144917 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(46, 125, 50, 0.32);
+}
+
+/* ==========================================================================
+   STEP 2: PAYMENT REVIEW CARD
+   ========================================================================== */
 .enroll-payment-form {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  justify-content: space-between;
+  height: 100%;
+  gap: 14px;
 }
 
 .enroll-payment-title {
-  font-size: 1.4rem;
-  color: var(--heading);
-  margin-bottom: 6px;
+  font-family: var(--heading-font, 'Poppins', sans-serif);
+  font-size: 1.2rem;
+  color: var(--heading, #1F2937);
+  margin-bottom: 2px;
   font-weight: 700;
 }
 
 .enroll-payment-subtitle {
-  font-size: 0.875rem;
-  color: var(--text-muted);
+  font-size: 0.8rem;
+  color: var(--text-muted, #6B7280);
   margin: 0;
 }
 
 .enroll-summary-grid {
   display: grid;
-  gap: 16px;
+  gap: 10px;
 }
 
 .enroll-summary-card {
   background-color: #FAF8F5;
-  border-radius: 16px;
-  padding: 16px 20px;
-  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border, #EFE8E4);
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
 
 .enroll-card-label {
-  font-size: 0.8rem;
+  font-size: 0.74rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary, #2E7D32);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
   margin: 0;
 }
 
 .enroll-card-details {
   display: grid;
-  gap: 6px;
-  font-size: 0.9rem;
-  color: var(--text);
+  gap: 3px;
+  font-size: 0.82rem;
+  color: var(--text, #4B5563);
 }
 
 .enroll-security-card {
   display: flex;
   align-items: center;
-  gap: 16px;
-  background-color: rgba(74, 117, 89, 0.05);
-  border-radius: 16px;
-  padding: 16px 20px;
-  border: 1px solid rgba(74, 117, 89, 0.15);
+  gap: 12px;
+  background-color: rgba(46, 125, 50, 0.05);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(46, 125, 50, 0.15);
 }
 
 .enroll-security-card svg {
@@ -269,197 +335,225 @@
 }
 
 .enroll-security-text {
-  font-size: 0.825rem;
-  color: var(--text);
-  line-height: 1.4;
+  font-size: 0.78rem;
+  color: var(--text, #4B5563);
+  line-height: 1.35;
 }
 
 .enroll-security-text strong {
-  color: var(--heading);
+  color: var(--heading, #1F2937);
 }
 
 .enroll-security-text .desc {
-  color: var(--text-muted);
+  color: var(--text-muted, #6B7280);
 }
 
 .enroll-pay-btn {
-  width: 100%; 
-  padding: 16px; 
+  width: 100%;
+  padding: 12px 20px;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  border-radius: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
+  background: linear-gradient(135deg, var(--primary, #2E7D32) 0%, #1B5E20 100%);
+  box-shadow: 0 6px 18px rgba(46, 125, 50, 0.25);
 }
 
 .enroll-pay-btn.loading {
   cursor: not-allowed;
+  opacity: 0.85;
 }
 
-/* Right panel sidebar (summary) */
+/* ==========================================================================
+   RIGHT SIDE PANEL (SUMMARY & PRICE CARD)
+   ========================================================================== */
 .enroll-sidebar {
-  background-color: #FAF6F0;
-  border-radius: 24px;
-  padding: 30px;
-  border: 1px solid var(--border);
+  background-color: #FFFFFF;
+  border-radius: 18px;
+  padding: 24px 26px;
+  border: 1.5px solid var(--border, #EFE8E4);
+  box-shadow: 0 8px 24px rgba(46, 125, 50, 0.05);
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  position: sticky;
-  top: '100px';
+  justify-content: space-between;
+  height: 100%;
+  box-sizing: border-box;
+  gap: 14px;
 }
 
 .enroll-sidebar-title {
-  color: var(--heading);
-  margin-bottom: 4px;
+  font-family: var(--heading-font, 'Poppins', sans-serif);
+  color: var(--heading, #1F2937);
+  margin-bottom: 2px;
   font-size: 1.1rem;
   font-weight: 700;
 }
 
 .enroll-sidebar-subtitle {
-  font-size: 0.825rem;
-  color: var(--text-muted);
+  font-size: 0.78rem;
+  color: var(--text-muted, #6B7280);
   margin: 0;
 }
 
 .enroll-package-box {
-  background-color: #fff;
-  border-radius: 16px;
-  padding: 20px;
-  border: 1px solid var(--border);
+  background-color: #FAF8F5;
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border, #EFE8E4);
 }
 
 .enroll-package-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary, #2E7D32);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 
 .enroll-package-title {
-  color: var(--heading);
-  margin: 4px 0 0 0;
-  font-size: 1.05rem;
+  color: var(--heading, #1F2937);
+  margin: 3px 0 0 0;
+  font-size: 0.95rem;
   font-weight: 700;
 }
 
 .enroll-package-desc {
-  font-size: 0.9rem;
-  color: var(--text-muted);
+  font-size: 0.8rem;
+  color: var(--text-muted, #6B7280);
   margin-top: 2px;
 }
 
 .enroll-pricing-box {
+  background-color: #F8FBF8;
+  border-radius: 12px;
+  padding: 14px 16px;
+  border: 1.5px solid #E2EFE2;
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .enroll-pricing-row {
   display: flex;
   justify-content: space-between;
-  font-size: 0.9rem;
-  color: var(--text-muted);
+  font-size: 0.82rem;
+  color: var(--text-muted, #6B7280);
 }
 
 .enroll-pricing-row span:last-child {
   text-decoration: line-through;
+  color: #EF4444;
 }
 
 .enroll-pricing-row-main {
   display: flex;
   justify-content: space-between;
-  font-size: 1.1rem;
+  font-size: 0.96rem;
   font-weight: 700;
-  color: var(--heading);
+  color: var(--heading, #1F2937);
+  align-items: baseline;
 }
 
 .enroll-pricing-value {
-  color: var(--secondary);
-  font-size: 1.3rem;
+  color: var(--primary, #2E7D32);
+  font-size: 1.4rem;
+  font-weight: 800;
 }
 
 .enroll-savings-badge {
-  background-color: rgba(74, 117, 89, 0.08);
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 0.8rem;
-  color: var(--primary);
+  background-color: rgba(46, 125, 50, 0.1);
+  border: 1px solid rgba(46, 125, 50, 0.2);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.74rem;
+  color: var(--primary, #2E7D32);
   font-weight: 700;
   text-align: center;
-  margin-top: 8px;
+  margin-top: 2px;
 }
 
 .enroll-protection-section {
-  border-top: 1px solid var(--border);
-  padding-top: 16px;
+  border-top: 1px solid var(--border, #EFE8E4);
+  padding-top: 12px;
+  margin-top: auto;
+  display: grid;
+  gap: 6px;
 }
 
 .enroll-protection-line {
   display: flex;
-  gap: 10px;
-  font-size: 0.825rem;
-  color: var(--text);
-}
-
-.enroll-protection-line:first-child {
-  margin-bottom: 10px;
+  gap: 8px;
+  font-size: 0.76rem;
+  color: var(--text, #4B5563);
+  align-items: center;
 }
 
 .enroll-protection-line svg {
   flex-shrink: 0;
 }
 
-/* Error Screen */
-.enroll-error-main {
-  padding: 80px 20px;
-  text-align: center;
-  background-color: #FFF5F5;
-  color: #D32F2F;
-  font-family: sans-serif;
-}
-
-.enroll-error-box {
-  max-width: 600px;
+/* ==========================================================================
+   SUCCESS SCREEN
+   ========================================================================== */
+.enroll-success-box {
+  max-width: 580px;
   margin: 0 auto;
-  border: 1px solid #FFCDD2;
+  background-color: #FFFFFF;
+  border-radius: 20px;
+  padding: 32px 28px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  border: 1.5px solid var(--border, #EFE8E4);
+}
+
+.enroll-success-icon-circle {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background-color: rgba(46, 125, 50, 0.1);
+  color: var(--primary, #2E7D32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px auto;
+}
+
+.enroll-success-title {
+  color: var(--heading, #1F2937);
+  margin-bottom: 10px;
+  font-size: 1.4rem;
+}
+
+.enroll-success-desc {
+  color: var(--text, #4B5563);
+  margin-bottom: 18px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.enroll-success-summary {
+  background-color: #FBFBFA;
   border-radius: 12px;
-  padding: 30px;
-  background-color: #fff;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-}
-
-.enroll-error-box h2 {
-  margin: 0 0 10px 0;
-  font-size: 1.5rem;
-}
-
-.enroll-error-box p {
-  font-size: 0.9rem;
-  color: #555;
-  margin-bottom: 20px;
-}
-
-.enroll-error-stack {
+  padding: 16px;
   text-align: left;
-  background-color: #F9F9F9;
-  padding: 15px;
-  border-radius: 8px;
-  overflow-x: auto;
-  font-size: 0.8rem;
-  color: #333;
-  border: 1px solid #E0E0E0;
-  white-space: pre-wrap;
+  font-size: 0.82rem;
+  margin-bottom: 22px;
+  border: 1px solid var(--border, #EFE8E4);
+  display: grid;
+  gap: 8px;
 }
 
-.enroll-error-link {
-  display: inline-block;
-  margin-top: 20px;
-  padding: 10px 20px;
-  background-color: var(--primary, #4A7559);
-  color: #fff;
-  text-decoration: none;
-  border-radius: 8px;
-  font-weight: 600;
+.enroll-success-total {
+  border-top: 1px solid var(--border, #EFE8E4);
+  padding-top: 8px;
+  color: var(--primary, #2E7D32);
+  font-weight: 700;
+}
+
+.enroll-success-btn {
+  min-width: 200px;
+  padding: 10px 24px;
+  border-radius: 50px;
 }

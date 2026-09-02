@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { Check, AlertCircle, ArrowLeft, Heart, Shield, CreditCard, Smartphone, CheckCircle, RefreshCw } from 'lucide-react';
+import { Check, AlertCircle, ArrowLeft, Heart, Shield, CreditCard, Smartphone, CheckCircle, RefreshCw, ArrowRight } from 'lucide-react';
 import './Enroll.css';
 
 const PROGRAMS_LIST = [
@@ -8,22 +8,22 @@ const PROGRAMS_LIST = [
     id: 'diet',
     title: "Customized Diet Program",
     pricing: [
-      { weeks: 4, original: 4500, offer: 2999 },
-      { weeks: 8, original: 8899, offer: 5999 },
-      { weeks: 12, original: 12499, offer: 7999 },
-      { weeks: 24, original: 21899, offer: 11999 },
-      { weeks: 48, original: 43899, offer: 21999 }
+      { weeks: 4, original: 3999, offer: 2500 },
+      { weeks: 8, original: 7900, offer: 4900 },
+      { weeks: 12, original: 11900, offer: 6500 },
+      { weeks: 24, original: 23900, offer: 9900 },
+      { weeks: 48, original: 47800, offer: 19900 }
     ]
   },
   {
     id: 'child',
     title: "Customized Child Nutrition",
     pricing: [
-      { weeks: 4, original: 2500, offer: 1500 },
-      { weeks: 8, original: 4900, offer: 2900 },
-      { weeks: 12, original: 6900, offer: 3900 },
-      { weeks: 24, original: 11900, offer: 5900 },
-      { weeks: 48, original: 23900, offer: 11900 }
+      { weeks: 4, original: 2000, offer: 1500 },
+      { weeks: 8, original: 4000, offer: 2800 },
+      { weeks: 12, original: 6000, offer: 3900 },
+      { weeks: 24, original: 12000, offer: 6900 },
+      { weeks: 48, original: 24000, offer: 11900 }
     ]
   },
   {
@@ -31,21 +31,21 @@ const PROGRAMS_LIST = [
     title: "Yoga & Beyond (Group Sessions)",
     pricing: [
       { weeks: 4, original: 1999, offer: 999 },
-      { weeks: 8, original: 3899, offer: 1899 },
-      { weeks: 12, original: 5799, offer: 2699 },
-      { weeks: 24, original: 11499, offer: 4999 },
-      { weeks: 48, original: 21999, offer: 7999 }
+      { weeks: 8, original: 3999, offer: 1799 },
+      { weeks: 12, original: 5999, offer: 2499 },
+      { weeks: 24, original: 11999, offer: 4499 },
+      { weeks: 48, original: 23999, offer: 7999 }
     ]
   },
   {
     id: 'one-yoga',
     title: "1:1 Live Personal Yoga",
     pricing: [
-      { weeks: 4, original: 5999, offer: 2999 },
-      { weeks: 8, original: 11899, offer: 5899 },
-      { weeks: 12, original: 17499, offer: 8499 },
-      { weeks: 24, original: 33999, offer: 15999 },
-      { weeks: 48, original: 63999, offer: 27999 }
+      { weeks: 4, original: 4999, offer: 2999 },
+      { weeks: 8, original: 9999, offer: 5499 },
+      { weeks: 12, original: 14999, offer: 7999 },
+      { weeks: 24, original: 29999, offer: 14999 },
+      { weeks: 48, original: 59999, offer: 27999 }
     ]
   },
   {
@@ -258,7 +258,7 @@ const Enroll = () => {
           key: orderData.keyId,
           amount: orderData.amount,
           currency: orderData.currency,
-          name: "One Step More",
+          name: "1 Step More",
           description: `Enrollment in ${selectedProgramData.title}`,
           order_id: orderData.orderId,
           prefill: {
@@ -267,7 +267,7 @@ const Enroll = () => {
             contact: form.phone
           },
           theme: {
-            color: "#4A7559"
+            color: "#2E7D32"
           },
           handler: async function (paymentResponse) {
             try {
@@ -390,7 +390,7 @@ const Enroll = () => {
                 
                 {/* STEP 1: BIOLOGICAL & PERSONAL STATS */}
                 {step === 1 && (
-                  <form onSubmit={handleDetailsSubmit}>
+                  <form onSubmit={handleDetailsSubmit} className="enroll-step-form">
                     <h3 className="enroll-form-title">
                       Biological Stats & Contact Info
                     </h3>
@@ -573,7 +573,7 @@ const Enroll = () => {
                     </div>
 
                     <button type="submit" className="btn btn-primary enroll-submit-btn">
-                      Proceed to Payment &arr;
+                      Proceed to Payment <ArrowRight size={16} />
                     </button>
                   </form>
                 )}

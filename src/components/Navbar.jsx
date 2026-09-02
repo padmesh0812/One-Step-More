@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { Menu, X, Heart } from 'lucide-react';
+import { NavLink, Link } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,10 +17,16 @@ const Navbar = () => {
     <header className="header">
       <div className="container">
         <nav className="navbar">
-          <NavLink to="/" className="logo" onClick={closeMenu}>
-            <Heart size={28} fill="var(--primary)" color="var(--primary)" />
-            <span>One Step More</span>
-          </NavLink>
+          <Link to="/" className="logo" onClick={closeMenu} aria-label="1 Step More Home">
+            <img 
+              src="/assets/images/logo/logo.png" 
+              alt="1 Step More Logo" 
+              className="navbar-logo-img" 
+            />
+            <span className="brand-name">
+              <span className="brand-step">1 Step</span> <span className="brand-more">More</span>
+            </span>
+          </Link>
 
           <button className="menu-toggle" onClick={toggleMenu} aria-label="Toggle Menu">
             {isOpen ? <X size={28} /> : <Menu size={28} />}

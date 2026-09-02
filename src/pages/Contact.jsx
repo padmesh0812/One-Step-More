@@ -272,7 +272,7 @@ const Contact = () => {
               allowFullScreen="" 
               loading="lazy" 
               referrerPolicy="no-referrer-when-downgrade"
-              title="One Step More Gomti Nagar Lucknow Office Map"
+              title="1 Step More Gomti Nagar Lucknow Office Map"
             ></iframe>
           </div>
         </div>
