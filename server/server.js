@@ -11,10 +11,25 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Initialize Razorpay SDK
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
+// Initialize Razorpay SDK safely
+const razorpay = (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET)
+  ? new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET
+    })
+  : null;
+
+if (!razorpay) {
+  console.warn('⚠️ RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET is not set in environment. Set them in your deployment dashboard to enable payments.');
+}
+
+// Root / health check endpoint for cloud monitoring & status
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    service: 'One Step More Backend API',
+    uptime: process.uptime()
+  });
 });
 
 // 1. Get plans dynamically from the database
@@ -61,6 +76,12 @@ app.post('/api/create-order', async (req, res) => {
     const amountInPaise = amountInRupees * 100; // Razorpay expects amount in paise
 
     // Create Order in Razorpay
+    if (!razorpay) {
+      return res.status(503).json({
+        error: 'Razorpay keys are not configured on the backend. Please add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to your environment variables.'
+      });
+    }
+
     const options = {
       amount: amountInPaise,
       currency: 'INR',

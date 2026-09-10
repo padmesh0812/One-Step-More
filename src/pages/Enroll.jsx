@@ -108,6 +108,8 @@ const CardLogo = () => (
   </svg>
 );
 
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+
 const Enroll = () => {
   try {
     const location = useLocation();
@@ -121,14 +123,14 @@ const Enroll = () => {
       name: '',
       email: '',
       phone: '',
-      program: location.state?.program || 'diet',
-      duration: location.state?.weeks || 12,
       bloodGroup: '',
       weight: '',
       height: '',
       dob: '',
       age: '',
-      address: ''
+      address: '',
+      program: location.state?.programId || 'diet',
+      duration: location.state?.duration || 4
     });
 
     // Dynamic programs & pricing from database
@@ -139,7 +141,7 @@ const Enroll = () => {
 
     // Fetch dynamic programs on mount
     useEffect(() => {
-      fetch('http://localhost:5000/api/plans')
+      fetch(`${API_BASE_URL}/api/plans`)
         .then(res => res.json())
         .then(data => {
           if (Array.isArray(data) && data.length > 0) {
@@ -226,7 +228,7 @@ const Enroll = () => {
 
       try {
         // 1. Create order on the backend to dynamically calculate amount and key configuration securely
-        const response = await fetch('http://localhost:5000/api/create-order', {
+        const response = await fetch(`${API_BASE_URL}/api/create-order`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -274,7 +276,7 @@ const Enroll = () => {
               setIsProcessingPayment(true);
               
               // 3. Post to backend node to verify signature of payment before confirming order
-              const verifyResponse = await fetch('http://localhost:5000/api/verify-payment', {
+              const verifyResponse = await fetch(`${API_BASE_URL}/api/verify-payment`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json'
