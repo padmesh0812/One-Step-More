@@ -14,27 +14,27 @@ import slide4 from '../assets/images/about/slide 4.jpeg';
 const CAROUSEL_SLIDES = [
   {
     image: slide1,
-    badge: "✨ Dt. Pragati Mishra",
-    title: "Founder & Clinical Nutritionist",
-    caption: "Guiding women back to health, energy, and inner confidence."
+    badge: "🎤 Keynote & Wellness Seminars",
+    title: "Empowering Communities Through Health",
+    caption: "Educating and inspiring women on sustainable nutrition and active lifestyles at live wellness workshops."
   },
   {
     image: slide2,
-    badge: "🌿 Postpartum Transformation",
-    title: "Strength & Core Recovery",
-    caption: "Rebuilding your body gently while navigating the joy of motherhood."
+    badge: "🎙️ Public Speaker & Panelist",
+    title: "Advocating for Women's Wellness",
+    caption: "Sharing clinical expertise, evidence-based nutrition insights, and real client success journeys at health forums."
   },
   {
     image: slide3,
-    badge: "🥗 Practical Indian Nutrition",
-    title: "100% Home-Cooked Diets",
-    caption: "No exotic ingredients or starvation—just balanced, sustainable food."
+    badge: "🏆 Recognition & Milestones",
+    title: "Honored for Impact in Clinical Nutrition",
+    caption: "Celebrating milestones, client trust, and leadership in holistic healthcare with the 1 Step More community."
   },
   {
     image: slide4,
-    badge: "🧘‍♀️ Restorative Movement",
-    title: "Alignment Yoga & Pranayama",
-    caption: "Releasing back pain and maternal stress with mindful daily flows."
+    badge: "🎧 Podcast & Media Conversations",
+    title: "Spreading Wellness Beyond Boundaries",
+    caption: "Busting nutrition myths, sharing practical diet wisdom, and inspiring healthy daily habits through digital media."
   }
 ];
 
