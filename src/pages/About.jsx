@@ -6,28 +6,32 @@ import {
   XCircle, CheckCircle2 
 } from 'lucide-react';
 import './About.css';
+import slide1 from '../assets/images/about/slide 1.jpeg';
+import slide2 from '../assets/images/about/slide 2.jpeg';
+import slide3 from '../assets/images/about/slide 3.jpeg';
+import slide4 from '../assets/images/about/slide 4.jpeg';
 
 const CAROUSEL_SLIDES = [
   {
-    image: "/assets/images/founder/founder.jpg",
+    image: slide1,
     badge: "✨ Dt. Pragati Mishra",
     title: "Founder & Clinical Nutritionist",
     caption: "Guiding women back to health, energy, and inner confidence."
   },
   {
-    image: "/assets/images/programs/postpartum.jpg",
+    image: slide2,
     badge: "🌿 Postpartum Transformation",
     title: "Strength & Core Recovery",
     caption: "Rebuilding your body gently while navigating the joy of motherhood."
   },
   {
-    image: "/assets/images/programs/lifestyle.jpg",
+    image: slide3,
     badge: "🥗 Practical Indian Nutrition",
     title: "100% Home-Cooked Diets",
     caption: "No exotic ingredients or starvation—just balanced, sustainable food."
   },
   {
-    image: "/assets/images/programs/yoga.jpg",
+    image: slide4,
     badge: "🧘‍♀️ Restorative Movement",
     title: "Alignment Yoga & Pranayama",
     caption: "Releasing back pain and maternal stress with mindful daily flows."
