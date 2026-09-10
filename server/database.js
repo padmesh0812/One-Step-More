@@ -136,6 +136,20 @@ async function initTables() {
       )
     `);
 
+    // Create inquiries table for contact/consultation leads
+    await dbRun(`
+      CREATE TABLE IF NOT EXISTS inquiries (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        reason TEXT,
+        address TEXT,
+        message TEXT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
     // Check if plans need to be seeded
     const row = await dbGet('SELECT COUNT(*) as count FROM plans');
     if (row.count === 0) {

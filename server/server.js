@@ -2,11 +2,44 @@ import express from 'express';
 import cors from 'cors';
 import crypto from 'crypto';
 import Razorpay from 'razorpay';
+import nodemailer from 'nodemailer';
 import 'dotenv/config';
 import { dbGet, dbRun, dbAll } from './database.js';
+import { renderAdminHtml } from './adminDashboard.js';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Setup Nodemailer transporter if credentials provided
+const transporter = (process.env.SMTP_USER && process.env.SMTP_PASS) ? nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  }
+}) : null;
+
+async function sendNotificationEmail({ subject, htmlText }) {
+  const targetEmail = process.env.NOTIFICATION_EMAIL || 'onestepmore04@gmail.com';
+  
+  if (transporter) {
+    try {
+      await transporter.sendMail({
+        from: `"1 Step More Alerts" <${process.env.SMTP_USER}>`,
+        to: targetEmail,
+        subject,
+        html: htmlText
+      });
+      console.log(`[Email Sent] Successfully delivered notification to ${targetEmail}`);
+      return true;
+    } catch (err) {
+      console.error('[Email Error] Failed to send via Nodemailer:', err.message);
+    }
+  } else {
+    console.log(`[Email Notice] Recipient: ${targetEmail} | Subject: ${subject}`);
+  }
+  return false;
+}
 
 app.use(cors());
 app.use(express.json());
@@ -135,6 +168,28 @@ app.post('/api/verify-payment', async (req, res) => {
         'UPDATE orders SET status = ?, razorpay_payment_id = ? WHERE razorpay_order_id = ?',
         ['paid', razorpay_payment_id, razorpay_order_id]
       );
+
+      // Send email alert for paid enrollment
+      dbGet('SELECT * FROM orders WHERE razorpay_order_id = ?', [razorpay_order_id])
+        .then(orderInfo => {
+          sendNotificationEmail({
+            subject: `💰 Payment Received: ₹${orderInfo?.amount || ''} from ${orderInfo?.name || 'Customer'}`,
+            htmlText: `
+              <h2>🎉 New Paid Enrollment Received!</h2>
+              <p><strong>Customer:</strong> ${orderInfo?.name || '-'}</p>
+              <p><strong>Phone:</strong> <a href="tel:${orderInfo?.phone}">${orderInfo?.phone || '-'}</a></p>
+              <p><strong>Email:</strong> ${orderInfo?.email || '-'}</p>
+              <p><strong>Program:</strong> ${orderInfo?.program_id || '-'} (${orderInfo?.duration || '-'} Weeks)</p>
+              <p><strong>Amount:</strong> ₹${orderInfo?.amount || '-'}</p>
+              <p><strong>Payment ID:</strong> ${razorpay_payment_id}</p>
+              <p><strong>Order ID:</strong> ${razorpay_order_id}</p>
+              <hr/>
+              <p><a href="https://one-step-more.onrender.com/admin" style="background:#2E7D32;color:#fff;padding:8px 16px;text-decoration:none;border-radius:6px;">Open Admin Dashboard</a></p>
+            `
+          });
+        })
+        .catch(err => console.error('Error fetching order for email:', err));
+
       res.json({ success: true, message: 'Payment verified and order confirmed' });
     } else {
       console.warn('Signature verification failed for order:', razorpay_order_id);
@@ -147,6 +202,76 @@ app.post('/api/verify-payment', async (req, res) => {
   } catch (err) {
     console.error('Error verifying payment:', err.message);
     res.status(500).json({ error: 'Server error verifying payment' });
+  }
+});
+
+// 4. Record Contact / Consultation Enquiry & Send Email
+app.post('/api/contact', async (req, res) => {
+  try {
+    const { name, email, phone, reason, address, message } = req.body;
+
+    if (!name || !email || !phone) {
+      return res.status(400).json({ error: 'Name, email and phone number are required.' });
+    }
+
+    const result = await dbRun(`
+      INSERT INTO inquiries (name, email, phone, reason, address, message)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `, [name, email, phone, reason || 'General Inquiry', address || '', message || '']);
+
+    // Send instant email notification to onestepmore04@gmail.com
+    sendNotificationEmail({
+      subject: `🚨 New Consultation Enquiry: ${name} (${reason || 'Wellness'})`,
+      htmlText: `
+        <h2>📋 New Client Consultation Enquiry</h2>
+        <p><strong>Client Name:</strong> ${name}</p>
+        <p><strong>Phone:</strong> <a href="tel:${phone}">${phone}</a> | <a href="https://wa.me/${phone.replace(/[^0-9]/g, '')}">WhatsApp</a></p>
+        <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+        <p><strong>Goal / Reason:</strong> ${reason || 'General'}</p>
+        <p><strong>City / Address:</strong> ${address || 'N/A'}</p>
+        <p><strong>Message / Notes:</strong> ${message || 'N/A'}</p>
+        <hr/>
+        <p><a href="https://one-step-more.onrender.com/admin" style="background:#2E7D32;color:#fff;padding:8px 16px;text-decoration:none;border-radius:6px;">View All Leads in Admin Portal</a></p>
+      `
+    }).catch(e => console.error(e));
+
+    res.json({ success: true, message: 'Enquiry saved successfully', id: result.lastID });
+  } catch (err) {
+    console.error('Error recording contact inquiry:', err.message);
+    res.status(500).json({ error: 'Server error saving inquiry' });
+  }
+});
+
+// 5. Get all inquiries in JSON
+app.get('/api/inquiries', async (req, res) => {
+  try {
+    const rows = await dbAll('SELECT * FROM inquiries ORDER BY id DESC');
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error fetching inquiries' });
+  }
+});
+
+// 6. Get all orders in JSON
+app.get('/api/orders', async (req, res) => {
+  try {
+    const rows = await dbAll('SELECT * FROM orders ORDER BY id DESC');
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error fetching orders' });
+  }
+});
+
+// 7. Live Admin Dashboard View
+app.get('/admin', async (req, res) => {
+  try {
+    const inquiries = await dbAll('SELECT * FROM inquiries ORDER BY id DESC');
+    const orders = await dbAll('SELECT * FROM orders ORDER BY id DESC');
+    const html = renderAdminHtml(inquiries, orders);
+    res.send(html);
+  } catch (err) {
+    console.error('Admin portal rendering error:', err.message);
+    res.status(500).send('Error loading admin dashboard');
   }
 });
 

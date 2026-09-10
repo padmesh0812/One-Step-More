@@ -22,6 +22,8 @@ const FAQS = [
   }
 ];
 
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
+
 const Contact = () => {
   const location = useLocation();
   const [form, setForm] = useState({
@@ -35,6 +37,7 @@ const Contact = () => {
 
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeFaq, setActiveFaq] = useState(null);
 
   const handleInput = (e) => {
@@ -45,7 +48,7 @@ const Contact = () => {
     }
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     const tempErrors = {};
     if (!form.name.trim()) tempErrors.name = "Name is required.";
@@ -67,7 +70,24 @@ const Contact = () => {
       return;
     }
 
-    setSubmitted(true);
+    setIsSubmitting(true);
+    try {
+      // 1. Save to backend database and trigger email notification
+      await fetch(`${API_BASE_URL}/api/contact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(form)
+      });
+      setSubmitted(true);
+    } catch (err) {
+      console.warn('Backend contact save error:', err);
+      // Still show thank you to user so experience is seamless
+      setSubmitted(true);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const toggleFaq = (idx) => {
@@ -246,8 +266,8 @@ const Contact = () => {
                   ></textarea>
                 </div>
 
-                <button type="submit" className="btn btn-primary contact-submit-btn">
-                  Submit Inquiry
+                <button type="submit" className="btn btn-primary contact-submit-btn" disabled={isSubmitting}>
+                  {isSubmitting ? 'Submitting...' : 'Submit Inquiry'}
                 </button>
               </form>
             )}
