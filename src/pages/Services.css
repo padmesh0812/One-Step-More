@@ -626,6 +626,16 @@
   margin: 0;
 }
 
+.services-cta-box .brand-step {
+  color: #FFFFFF !important;
+  font-weight: 800;
+}
+
+.services-cta-box .brand-more {
+  color: #FFB74D !important;
+  font-weight: 800;
+}
+
 .services-cta-actions {
   display: flex;
   gap: 14px;
