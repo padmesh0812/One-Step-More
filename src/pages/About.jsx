@@ -87,7 +87,7 @@ const About = () => {
 
               <div className="about-hero-chips">
                 <div className="about-hero-chip">
-                  <UserCheck size={16} /> 500+ Women Guided
+                  <UserCheck size={16} /> 2000+ Women Guided
                 </div>
                 <div className="about-hero-chip">
                   <Salad size={16} /> 100% Home-Cooked Food
@@ -199,7 +199,7 @@ const About = () => {
                   <UserCheck size={20} />
                 </div>
                 <div className="founder-trust-text">
-                  <strong>500+ Mothers Guided</strong>
+                  <strong>2000+ Mothers Guided</strong>
                   <span>Rebuilding strength, energy & body relationship</span>
                 </div>
               </div>

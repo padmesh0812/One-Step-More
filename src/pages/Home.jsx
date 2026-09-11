@@ -263,7 +263,7 @@ const Home = () => {
                 alt="Dt. Pragati Mishra - Founder & Wellness Coach"
               />
               <div className="experience-card">
-                <h3>500+</h3>
+                <h3>2000+</h3>
                 <p>Women Guided</p>
               </div>
             </div>
