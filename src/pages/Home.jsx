@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Salad, Flower2, HeartPulse, Leaf, ArrowRight, Check } from 'lucide-react';
 import WellnessQuiz from '../components/WellnessQuiz';
 import BmiCalculator from '../components/BmiCalculator';
+import HomeTestimonials from '../components/HomeTestimonials';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -248,6 +249,9 @@ const Home = () => {
           </div>
         </div>
       </section>
+ 
+      {/* Client Transformations & Testimonials Section */}
+      <HomeTestimonials />
 
       {/* Founder Section */}
       <section className="founder section">

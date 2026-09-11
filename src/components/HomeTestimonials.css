@@ -1,0 +1,508 @@
+/* ==========================================================================
+   HOME TESTIMONIALS & CLIENT TRANSFORMATIONS COMPONENT
+   ========================================================================== */
+
+.home-testimonials-section {
+  background: linear-gradient(180deg, #FAF7F2 0%, #FFFFFF 100%);
+  padding: 90px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.home-testimonials-section .section-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(46, 125, 50, 0.08);
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 1.2px;
+  padding: 7px 16px;
+  border-radius: 50px;
+  margin-bottom: 14px;
+}
+
+.home-testimonials-section .tag-icon {
+  color: var(--secondary);
+}
+
+/* 3-Column Responsive Grid */
+.home-testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-top: 48px;
+  margin-bottom: 50px;
+}
+
+/* Transformation Card */
+.transformation-card {
+  background: #ffffff;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(46, 125, 50, 0.12);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.transformation-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 22px 45px rgba(46, 125, 50, 0.12);
+  border-color: rgba(46, 125, 50, 0.3);
+}
+
+/* Image Wrapper with Hover Zoom */
+.transformation-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: #f3ede6;
+}
+
+.transformation-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 0.5s ease;
+  display: block;
+}
+
+.transformation-card:hover .transformation-img {
+  transform: scale(1.04);
+}
+
+/* Badge Pill on Image */
+.image-badge-pill {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(22, 53, 25, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #FFFFFF;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 13px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.image-hover-zoom {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: all 0.3s ease;
+}
+
+.transformation-image-wrapper:hover .image-hover-zoom {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Card Body */
+.transformation-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* Result Metric Banner */
+.result-metric-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(46, 125, 50, 0.12) 0%, rgba(245, 124, 0, 0.1) 100%);
+  border: 1px solid rgba(46, 125, 50, 0.2);
+  padding: 8px 14px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.metric-icon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.metric-text {
+  font-weight: 700;
+  color: var(--primary);
+  font-size: 0.92rem;
+  letter-spacing: 0.2px;
+}
+
+/* Stars Row */
+.stars-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.rating-text {
+  margin-left: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #555;
+}
+
+/* Quote Box */
+.quote-box {
+  position: relative;
+  margin-bottom: 18px;
+  flex: 1;
+}
+
+.quote-icon {
+  color: #e5d8cb;
+  margin-bottom: 4px;
+}
+
+.quote-text {
+  font-size: 0.94rem;
+  line-height: 1.65;
+  color: #444;
+  font-style: italic;
+}
+
+/* Highlights List */
+.transformation-highlights {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.08);
+  padding-top: 14px;
+}
+
+.transformation-highlights li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+.check-bullet {
+  color: var(--primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Client Footer */
+.client-footer {
+  border-top: 1px solid #f0ebe4;
+  padding-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.client-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.client-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--heading);
+  margin: 0;
+}
+
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(46, 125, 50, 0.12);
+  color: var(--primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.client-program {
+  font-size: 0.8rem;
+  color: #777;
+  display: block;
+}
+
+/* Bottom CTA Banner */
+.testimonials-cta-banner {
+  background: linear-gradient(135deg, #1B4D20 0%, #2E7D32 60%, #3B9640 100%);
+  color: #FFFFFF;
+  border-radius: 24px;
+  padding: 40px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  box-shadow: 0 16px 40px rgba(46, 125, 50, 0.22);
+  position: relative;
+  overflow: hidden;
+}
+
+.testimonials-cta-banner::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(245, 124, 0, 0.3) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cta-banner-content {
+  max-width: 650px;
+  position: relative;
+  z-index: 1;
+}
+
+.cta-subtitle {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #FFD54F;
+  margin-bottom: 8px;
+}
+
+.cta-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+
+.cta-desc {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.cta-banner-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 260px;
+  position: relative;
+  z-index: 1;
+}
+
+.testimonials-cta-banner .btn-primary {
+  background: #FFFFFF;
+  color: #1B4D20;
+  border-color: #FFFFFF;
+  font-weight: 700;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.testimonials-cta-banner .btn-primary:hover {
+  background: #F57C00;
+  color: #FFFFFF;
+  border-color: #F57C00;
+}
+
+.testimonials-cta-banner .btn-outline {
+  border-color: rgba(255, 255, 255, 0.7);
+  color: #FFFFFF;
+  justify-content: center;
+}
+
+.testimonials-cta-banner .btn-outline:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #FFFFFF;
+}
+
+/* Lightbox Modal */
+.testimonial-lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: lightboxFadeIn 0.25s ease-out;
+}
+
+@keyframes lightboxFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.testimonial-lightbox-container {
+  background: #FFFFFF;
+  border-radius: 20px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  animation: lightboxScaleUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes lightboxScaleUp {
+  from { transform: scale(0.92); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.lightbox-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  color: #fff;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background 0.2s ease;
+}
+
+.lightbox-close-btn:hover {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+.lightbox-image-holder {
+  width: 100%;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 60vh;
+  overflow: hidden;
+}
+
+.lightbox-full-img {
+  max-width: 100%;
+  max-height: 60vh;
+  object-fit: contain;
+  display: block;
+}
+
+.lightbox-details {
+  padding: 24px;
+  background: #FFFFFF;
+}
+
+.lightbox-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.lightbox-client-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--heading);
+  margin: 0;
+}
+
+.lightbox-program {
+  font-size: 0.85rem;
+  color: #777;
+  margin: 2px 0 0 0;
+}
+
+.lightbox-result-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(46, 125, 50, 0.12);
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 6px 14px;
+  border-radius: 30px;
+}
+
+.lightbox-quote {
+  font-style: italic;
+  color: #555;
+  line-height: 1.6;
+  font-size: 0.96rem;
+  margin: 0;
+}
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .home-testimonials-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .testimonials-cta-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 36px 28px;
+  }
+  .cta-banner-actions {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-testimonials-section {
+    padding: 60px 0;
+  }
+  .home-testimonials-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  .transformation-image-wrapper {
+    height: 330px;
+  }
+  .cta-title {
+    font-size: 1.35rem;
+  }
+}
