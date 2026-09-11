@@ -112,11 +112,11 @@ const Footer = () => {
             <ul className="footer-ul help-ul">
               <li className="footer-help-li">
                 <strong className="footer-help-strong">Email Support:</strong>
-                hello@onestepmore.com
+                hello@onestepmore.in
               </li>
               <li className="footer-help-li">
                 <strong className="footer-help-strong">Phone Support:</strong>
-                +91 98765 43210
+                +91 8115660790
               </li>
               <li className="footer-help-li">
                 <strong className="footer-help-strong">Office Address:</strong>

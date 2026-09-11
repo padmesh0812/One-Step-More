@@ -104,7 +104,7 @@ const DEFAULT_PROGRAMS = [
     id: 'gut-detox',
     title: "10 Days Gut Cleaning Detox Plan",
     pricing: [
-      { weeks: 1.4, days: 10, label: "10 Days Plan", original: 1499, offer: 699 }
+      { weeks: 1.4, days: 10, label: "10 Days Plan", original: 1999, offer: 999 }
     ]
   }
 ];
