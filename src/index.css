@@ -2288,6 +2288,12 @@ main {
   background-image: url("./assets/images/programs/consultation.jpg");
 }
 
+.program-card.gut-detox {
+  background-image: url("./assets/images/programs/gut-detox.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
 .program-overlay {
   position: absolute;
   inset: 0;

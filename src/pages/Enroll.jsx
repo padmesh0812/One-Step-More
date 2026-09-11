@@ -58,6 +58,13 @@ const PROGRAMS_LIST = [
       { weeks: 24, original: 21899, offer: 11999 },
       { weeks: 48, original: 43899, offer: 21999 }
     ]
+  },
+  {
+    id: 'gut-detox',
+    title: "10 Days Gut Cleaning Detox Plan",
+    pricing: [
+      { weeks: 1.4, days: 10, label: "10 Days Plan", original: 1499, offer: 699 }
+    ]
   }
 ];
 
@@ -365,7 +372,7 @@ const Enroll = () => {
               </div>
               <h2 className="enroll-success-title">Enrollment Confirmed!</h2>
               <p className="enroll-success-desc">
-                Thank you, <strong>{form.name}</strong>. Your payment was successfully processed. We have locked in your slot for the <strong>{selectedProgramData.title} ({form.duration} Weeks)</strong>.
+                Thank you, <strong>{form.name}</strong>. Your payment was successfully processed. We have locked in your slot for the <strong>{selectedProgramData.title} ({activePricing.label || `${form.duration} Weeks`})</strong>.
               </p>
               
               <div className="enroll-success-summary">
@@ -665,7 +672,7 @@ const Enroll = () => {
                     {selectedProgramData.title}
                   </h4>
                   <div className="enroll-package-desc">
-                    {form.duration} Weeks duration setup
+                    {activePricing.label || `${form.duration} Weeks duration setup`}
                   </div>
                 </div>
 

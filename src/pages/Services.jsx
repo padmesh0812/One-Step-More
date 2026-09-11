@@ -215,6 +215,41 @@ const PROGRAMS_DATA = [
       { weeks: 24, original: 21899, offer: 11999 },
       { weeks: 48, original: 43899, offer: 21999 }
     ]
+  },
+  {
+    id: 'gut-detox',
+    title: "10 DAYS GUT CLEANING DETOX PLAN",
+    tabLabel: "Gut Detox (₹699)",
+    category: "Digestive Wellness & Microbiome Reset",
+    badge: "🍃 Special Detox Offer - Flat ₹699",
+    badgeColor: "#16A34A",
+    image: '/assets/images/programs/gut-detox.jpg',
+    enrolledCount: '8,450+',
+    rating: '5.0',
+    reviewsCount: '620',
+    description: "Reboot your digestion, flush out toxic waste, and reset sluggish metabolism with our intensive 10-Day Gut Cleaning Detox Plan. Guided by clinical nutrition science, this program heals chronic bloating, balances gut flora, and restores daily vitality—all through 100% home-cooked gut healing meals and targeted detox recipes.",
+    bestFor: [
+      "Chronic Bloating, Gas & Acidity",
+      "Sluggish Metabolism & Weight Loss Resistance",
+      "Irregular Digestion & Constipation",
+      "Post-Festive / Post-Vacation Heavy Detox",
+      "Low Daily Energy & Digestive Fatigue",
+      "Skin Breakouts Linked to Poor Gut Health"
+    ],
+    keyPoints: [
+      "Free one-on-one initial consultation",
+      "1 Live Gut Education Session on Zoom (Deep dive & Q&A)",
+      "Personalised gut-friendly daily diet plan",
+      "2 Days Free Detox Plan (Bonus cleansing booster)",
+      "Full-time chat and call support throughout the 10 days",
+      "Exclusive Gut Reset drink & herbal infusion recipes",
+      "Gut-friendly low-impact workout & stretch routine",
+      "Nutrition guidance for nourishing healthy gut bacteria",
+      "100% natural, home-cooked food (no chemical laxatives or pills)"
+    ],
+    pricing: [
+      { weeks: 1.4, days: 10, label: "10 Days Detox Plan (Special ₹699)", original: 1499, offer: 699 }
+    ]
   }
 ];
 
@@ -255,7 +290,8 @@ const Services = () => {
     child: 4,
     'group-yoga': 4,
     'one-yoga': 4,
-    combo: 4
+    combo: 4,
+    'gut-detox': 1.4
   });
   const [openFaqIndex, setOpenFaqIndex] = useState(null);
 
@@ -267,7 +303,7 @@ const Services = () => {
   }, [location.state]);
 
   const activeProgram = PROGRAMS_DATA.find(p => p.id === activeTab) || PROGRAMS_DATA[0];
-  const selectedDuration = selectedDurations[activeTab] || 4;
+  const selectedDuration = selectedDurations[activeTab] || (activeProgram.pricing[0]?.weeks || 4);
   const activePricing = activeProgram.pricing.find(pr => pr.weeks === selectedDuration) || activeProgram.pricing[0];
 
   const handleDurationChange = (progId, weeks) => {
@@ -278,7 +314,14 @@ const Services = () => {
   };
 
   const handleEnrollClick = () => {
-    navigate('/enroll', { state: { program: activeTab, weeks: selectedDuration } });
+    navigate('/enroll', { 
+      state: { 
+        program: activeTab, 
+        programId: activeTab, 
+        weeks: selectedDuration, 
+        duration: selectedDuration 
+      } 
+    });
   };
 
   const toggleFaq = (index) => {
@@ -305,14 +348,16 @@ const Services = () => {
           <div className="programs-nav-tabs">
             {PROGRAMS_DATA.map((prog) => {
               const isChild = prog.id === 'child';
+              const isDetox = prog.id === 'gut-detox';
               const isActive = activeTab === prog.id;
               return (
                 <button
                   key={prog.id}
                   onClick={() => setActiveTab(prog.id)}
-                  className={`program-nav-tab ${isActive ? 'active' : ''} ${isChild ? 'trending-tab' : ''}`}
+                  className={`program-nav-tab ${isActive ? 'active' : ''} ${isChild ? 'trending-tab' : ''} ${isDetox ? 'detox-tab' : ''}`}
                 >
                   {isChild && <span className="trending-pill">🔥 Trending</span>}
+                  {isDetox && <span className="trending-pill" style={{ background: '#16A34A', color: '#fff' }}>🍃 ₹699</span>}
                   <span className="tab-title">{prog.tabLabel}</span>
                 </button>
               );
@@ -352,9 +397,9 @@ const Services = () => {
                 <span
                   className="showcase-tag-badge"
                   style={{
-                    backgroundColor: activeTab === 'child' ? 'rgba(245, 124, 0, 0.1)' : 'rgba(46, 125, 50, 0.1)',
-                    color: activeTab === 'child' ? 'var(--secondary)' : 'var(--primary)',
-                    borderColor: activeTab === 'child' ? 'rgba(245, 124, 0, 0.25)' : 'rgba(46, 125, 50, 0.25)'
+                    backgroundColor: activeTab === 'child' ? 'rgba(245, 124, 0, 0.1)' : activeTab === 'gut-detox' ? 'rgba(22, 163, 74, 0.1)' : 'rgba(46, 125, 50, 0.1)',
+                    color: activeTab === 'child' ? 'var(--secondary)' : activeTab === 'gut-detox' ? '#16A34A' : 'var(--primary)',
+                    borderColor: activeTab === 'child' ? 'rgba(245, 124, 0, 0.25)' : activeTab === 'gut-detox' ? 'rgba(22, 163, 74, 0.25)' : 'rgba(46, 125, 50, 0.25)'
                   }}
                 >
                   {activeProgram.badge}
@@ -394,7 +439,7 @@ const Services = () => {
                       >
                         {activeProgram.pricing.map((tier) => (
                           <option key={tier.weeks} value={tier.weeks}>
-                            {tier.weeks} Week Plan ({tier.weeks * 7} Days)
+                            {tier.label ? tier.label : `${tier.weeks} Week Plan (${tier.weeks * 7} Days)`}
                           </option>
                         ))}
                       </select>

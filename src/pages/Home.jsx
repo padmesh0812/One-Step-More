@@ -236,13 +236,13 @@ const Home = () => {
               </div>
             </div>
 
-            {/* Card 6: Consultation */}
-            <div onClick={() => navigate('/services', { state: { tab: 'diet' } })} className="program-card consultation">
+            {/* Card 6: 10 Days Gut Detox Plan (₹699 Special) */}
+            <div onClick={() => navigate('/services', { state: { tab: 'gut-detox' } })} className="program-card gut-detox">
               <div className="program-overlay"></div>
               <div className="program-content">
-                <span className="program-category">Consultation</span>
-                <h3>One-on-One Consultation</h3>
-                <p>Personal health assessments and sustainable lifestyle habit roadmaps.</p>
+                <span className="program-category" style={{ background: '#16A34A', color: '#fff' }}>🍃 ₹699 Special</span>
+                <h3>10 Days Gut Cleaning Detox</h3>
+                <p>Cleanse toxins, heal bloating & reset your gut microbiome with custom diet, Zoom education & recipes.</p>
                 <div className="program-arrow">&rarr;</div>
               </div>
             </div>
