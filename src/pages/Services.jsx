@@ -223,7 +223,7 @@ const PROGRAMS_DATA = [
     category: "Digestive Wellness & Microbiome Reset",
     badge: "🍃 Special Detox Offer - Flat ₹699",
     badgeColor: "#16A34A",
-    image: '/assets/images/programs/gut-detox.jpg',
+    image: '/assets/images/programs/gut-detox.png',
     enrolledCount: '8,450+',
     rating: '5.0',
     reviewsCount: '620',
