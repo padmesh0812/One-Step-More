@@ -42,7 +42,7 @@ const Home = () => {
             </div>
             <div className="hero-image-container">
               <img 
-                src="/assets/images/hero/hero.png" 
+                src="/assets/images/hero/hero.webp" 
                 alt="Wellness Journey" 
                 className="hero-image"
               />
@@ -259,7 +259,7 @@ const Home = () => {
           <div className="founder-wrapper">
             <div className="founder-image">
               <img 
-                src="/assets/images/founder/founder.jpg" 
+                src="/assets/images/founder/founder.webp" 
                 alt="Dt. Pragati Mishra - Founder & Wellness Coach"
               />
               <div className="experience-card">

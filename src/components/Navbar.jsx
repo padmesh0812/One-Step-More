@@ -19,7 +19,7 @@ const Navbar = () => {
         <nav className="navbar">
           <Link to="/" className="logo" onClick={closeMenu} aria-label="1 Step More Home">
             <img 
-              src="/assets/images/logo/logo.png" 
+              src="/assets/images/logo/logo.webp" 
               alt="1 Step More Logo" 
               className="navbar-logo-img" 
             />

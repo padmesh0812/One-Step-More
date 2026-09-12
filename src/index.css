@@ -2036,7 +2036,7 @@ main {
 }
 
 .diet-card {
-  background-image: url("./assets/images/why-choose/diet.png");
+  background-image: url("./assets/images/why-choose/diet.webp");
   background-position: right center;
 }
 .diet-card::before {
@@ -2044,7 +2044,7 @@ main {
 }
 
 .yoga-card {
-  background-image: url("./assets/images/why-choose/yoga.png");
+  background-image: url("./assets/images/why-choose/yoga.webp");
   background-position: center;
 }
 .yoga-card::before {
@@ -2052,7 +2052,7 @@ main {
 }
 
 .weight-card {
-  background-image: url("./assets/images/why-choose/weight.png");
+  background-image: url("./assets/images/why-choose/weight.webp");
   background-position: right center;
 }
 .weight-card::before {
@@ -2060,7 +2060,7 @@ main {
 }
 
 .lifestyle-card {
-  background-image: url("./assets/images/why-choose/lifestyle.png");
+  background-image: url("./assets/images/why-choose/lifestyle.webp");
   background-position: right center;
 }
 .lifestyle-card::before {
@@ -2257,39 +2257,39 @@ main {
 }
 
 .program-card.diet {
-  background-image: url("./assets/images/programs/diet.jpg");
+  background-image: url("./assets/images/programs/diet.webp");
 }
 
 .program-card.child-nutrition,
 .program-card.child {
-  background-image: url("./assets/images/programs/child.jpg");
+  background-image: url("./assets/images/programs/child.webp");
 }
 
 .program-card.yoga,
 .program-card.group-yoga {
-  background-image: url("./assets/images/programs/yoga.jpg");
+  background-image: url("./assets/images/programs/yoga.webp");
 }
 
 .program-card.weight,
 .program-card.one-yoga {
-  background-image: url("./assets/images/programs/weight.jpg");
+  background-image: url("./assets/images/programs/weight.webp");
 }
 
 .program-card.postpartum {
-  background-image: url("./assets/images/programs/postpartum.jpg");
+  background-image: url("./assets/images/programs/postpartum.webp");
 }
 
 .program-card.lifestyle,
 .program-card.combo {
-  background-image: url("./assets/images/programs/lifestyle.jpg");
+  background-image: url("./assets/images/programs/lifestyle.webp");
 }
 
 .program-card.consultation {
-  background-image: url("./assets/images/programs/consultation.jpg");
+  background-image: url("./assets/images/programs/consultation.webp");
 }
 
 .program-card.gut-detox {
-  background-image: url("./assets/images/programs/gut-detox.png");
+  background-image: url("./assets/images/programs/gut-detox.webp");
   background-size: cover;
   background-position: center;
 }

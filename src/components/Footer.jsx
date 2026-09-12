@@ -9,7 +9,7 @@ const Footer = () => {
       {/* Main Footer Links */}
       <div className="footer-content-wrap">
         <div className="footer-grid">
-          
+
           {/* Column 1: Get to Know Us */}
           <div className="footer-col">
             <h4 className="footer-title">Get to Know Us</h4>
@@ -47,9 +47,9 @@ const Footer = () => {
             <h4 className="footer-title">Connect with Us</h4>
             <ul className="footer-ul">
               <li>
-                <a 
-                  href="https://www.instagram.com/pragati8379?igsh=c3g4NHZ4bzVucjNu" 
-                  target="_blank" 
+                <a
+                  href="https://www.instagram.com/pragati8379?igsh=c3g4NHZ4bzVucjNu"
+                  target="_blank"
                   rel="noreferrer"
                   className="footer-link"
                 >
@@ -57,9 +57,9 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a 
-                  href="https://www.facebook.com/share/1DGZYoWZdT/" 
-                  target="_blank" 
+                <a
+                  href="https://www.facebook.com/share/1DGZYoWZdT/"
+                  target="_blank"
                   rel="noreferrer"
                   className="footer-link"
                 >
@@ -67,9 +67,9 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a 
-                  href="https://youtube.com/@pragatimishra1941?si=-mK6NiLCwuWHnJYq" 
-                  target="_blank" 
+                <a
+                  href="https://youtube.com/@pragatimishra1941?si=-mK6NiLCwuWHnJYq"
+                  target="_blank"
                   rel="noreferrer"
                   className="footer-link"
                 >
@@ -133,10 +133,10 @@ const Footer = () => {
         <div className="footer-bottom-container">
           <div className="footer-bottom-left">
             <Link to="/" className="footer-logo-link">
-              <img 
-                src="/assets/images/logo/logo.png" 
-                alt="1 Step More Logo" 
-                className="footer-logo" 
+              <img
+                src="/assets/images/logo/logo.png"
+                alt="1 Step More Logo"
+                className="footer-logo"
               />
               <span className="brand-name footer-brand-name">
                 <span className="brand-step">1 Step</span> <span className="brand-more">More</span>

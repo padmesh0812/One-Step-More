@@ -6,10 +6,10 @@ import {
   XCircle, CheckCircle2 
 } from 'lucide-react';
 import './About.css';
-import slide1 from '../assets/images/about/slide 1.jpeg';
-import slide2 from '../assets/images/about/slide 2.jpeg';
-import slide3 from '../assets/images/about/slide 3.jpeg';
-import slide4 from '../assets/images/about/slide 4.jpeg';
+import slide1 from '../assets/images/about/slide 1.webp';
+import slide2 from '../assets/images/about/slide 2.webp';
+import slide3 from '../assets/images/about/slide 3.webp';
+import slide4 from '../assets/images/about/slide 4.webp';
 
 const CAROUSEL_SLIDES = [
   {
@@ -181,7 +181,7 @@ const About = () => {
             <div className="founder-spotlight-wrap">
               <div className="founder-portrait-card">
                 <img 
-                  src="/assets/images/founder/founder.jpg" 
+                  src="/assets/images/founder/founder.webp" 
                   alt="Dt. Pragati Mishra - Founder & Wellness Coach" 
                   className="founder-portrait-img"
                 />

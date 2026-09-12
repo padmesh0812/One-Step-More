@@ -7,9 +7,9 @@ import {
 import './HomeTestimonials.css';
 
 // Import client transformation images
-import client1Img from '../assets/images/testimonials/testimonial 1.jpeg';
-import client2Img from '../assets/images/testimonials/testimonial 2.jpeg';
-import client3Img from '../assets/images/testimonials/testimonial 3.jpeg';
+import client1Img from '../assets/images/testimonials/testimonial 1.webp';
+import client2Img from '../assets/images/testimonials/testimonial 2.webp';
+import client3Img from '../assets/images/testimonials/testimonial 3.webp';
 
 const TESTIMONIALS = [
   {
