@@ -43,3 +43,7 @@ export const SOCIAL_LINKS = {
 };
 
 export const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+
+export const API_BASE_URL = (
+  import.meta.env.VITE_API_URL || 'https://one-step-more.onrender.com'
+).replace(/\/$/, '');

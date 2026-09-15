@@ -11,11 +11,10 @@ import {
   ENROLL_FORM_LABELS, 
   ENROLL_PAYMENT_CONTENT, 
   ENROLL_SUCCESS_CONTENT, 
-  ENROLL_SIDEBAR_CONTENT 
+  ENROLL_SIDEBAR_CONTENT,
+  API_BASE_URL 
 } from '../../constants';
 import './Enroll.css';
-
-const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
 const Enroll = () => {
   try {

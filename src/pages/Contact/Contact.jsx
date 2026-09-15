@@ -10,11 +10,10 @@ import {
   CONTACT_FAQS, 
   CONTACT_FAQS_HEADER,
   CONTACT_INFO,
-  SOCIAL_LINKS
+  SOCIAL_LINKS,
+  API_BASE_URL
 } from '../../constants';
 import './Contact.css';
-
-const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
 const Contact = () => {
   const location = useLocation();
@@ -64,17 +63,20 @@ const Contact = () => {
 
     setIsSubmitting(true);
     try {
-      await fetch(`${API_BASE_URL}/api/contact`, {
+      const res = await fetch(`${API_BASE_URL}/api/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(form)
       });
+      if (!res.ok) {
+        throw new Error('Server returned an error while saving inquiry');
+      }
       setSubmitted(true);
     } catch (err) {
-      console.warn('Backend contact save error:', err);
-      setSubmitted(true);
+      console.error('Backend contact save error:', err);
+      alert('Could not submit inquiry right now. Please check your connection or reach us directly via WhatsApp / phone.');
     } finally {
       setIsSubmitting(false);
     }
