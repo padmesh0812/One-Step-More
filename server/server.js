@@ -15,28 +15,91 @@ const transporter = (process.env.SMTP_USER && process.env.SMTP_PASS) ? nodemaile
   service: 'gmail',
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
+    pass: process.env.SMTP_PASS.replace(/\s+/g, '') // remove spaces from 16-char app password if any
   }
 }) : null;
 
+// Helper: Send alert to business owner / admin
 async function sendNotificationEmail({ subject, htmlText }) {
-  const targetEmail = process.env.NOTIFICATION_EMAIL || 'onestepmore04@gmail.com';
+  const targetEmail = process.env.NOTIFICATION_EMAIL || process.env.SMTP_USER || 'onestepmore04@gmail.com';
   
   if (transporter) {
     try {
-      await transporter.sendMail({
+      const info = await transporter.sendMail({
         from: `"1 Step More Alerts" <${process.env.SMTP_USER}>`,
         to: targetEmail,
         subject,
         html: htmlText
       });
-      console.log(`[Email Sent] Successfully delivered notification to ${targetEmail}`);
+      console.log(`[Email Sent to Admin] ID: ${info.messageId} | Recipient: ${targetEmail}`);
       return true;
     } catch (err) {
-      console.error('[Email Error] Failed to send via Nodemailer:', err.message);
+      console.error('[Admin Email Error] Failed to send via Nodemailer:', err.message);
     }
   } else {
-    console.log(`[Email Notice] Recipient: ${targetEmail} | Subject: ${subject}`);
+    console.log(`[Email Notice] SMTP not configured. Recipient: ${targetEmail} | Subject: ${subject}`);
+  }
+  return false;
+}
+
+// Helper: Send confirmation to the client who filled the enquiry form
+async function sendClientConfirmationEmail({ clientEmail, clientName, reason }) {
+  if (!transporter || !clientEmail) return false;
+
+  try {
+    const info = await transporter.sendMail({
+      from: `"1 Step More | Dt. Pragati Mishra" <${process.env.SMTP_USER}>`,
+      to: clientEmail,
+      subject: `Thank you for connecting with 1 Step More, ${clientName}! 🌱`,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FFFFFF; border-radius: 12px; overflow: hidden; border: 1px solid #E5E7EB; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+          <!-- Header Banner -->
+          <div style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%); padding: 32px 24px; text-align: center; color: #FFFFFF;">
+            <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">1 Step More</h1>
+            <p style="margin: 6px 0 0 0; font-size: 14px; opacity: 0.9;">Every Healthy Habit Begins With One Small Step</p>
+          </div>
+
+          <!-- Body Content -->
+          <div style="padding: 32px 24px; color: #374151; line-height: 1.6;">
+            <h2 style="color: #1F2937; font-size: 20px; margin-top: 0;">Hi ${clientName},</h2>
+            <p style="font-size: 15px;">
+              Thank you for reaching out to <strong>1 Step More</strong> regarding our <strong>${reason || 'Customized Wellness Program'}</strong>.
+            </p>
+            <p style="font-size: 15px;">
+              We have received your enquiry details. One of our certified nutritionists / wellness coaches will connect with you via phone / WhatsApp within <strong>24 hours</strong> to discuss your health targets and schedule your personal evaluation call.
+            </p>
+
+            <div style="background-color: #F3F4F6; border-left: 4px solid #2E7D32; padding: 16px; border-radius: 6px; margin: 24px 0;">
+              <p style="margin: 0; font-size: 14px; color: #4B5563;">
+                <em>"Wellness is not about extreme deprivation—it's about creating joyful, sustainable habits that fit seamlessly around your everyday life."</em>
+              </p>
+              <p style="margin: 8px 0 0 0; font-size: 13px; font-weight: 700; color: #2E7D32;">
+                — Dt. Pragati Mishra (Founder & Lead Nutritionist)
+              </p>
+            </div>
+
+            <p style="font-size: 14px; color: #6B7280;">
+              If you have any urgent questions, feel free to WhatsApp us directly at <a href="https://wa.me/918115660790" style="color: #2E7D32; font-weight: 600;">+91 8115660790</a>.
+            </p>
+
+            <div style="margin-top: 32px; text-align: center;">
+              <a href="https://www.onestepmore.in" style="background-color: #2E7D32; color: #FFFFFF; text-decoration: none; padding: 12px 28px; border-radius: 50px; font-weight: 700; font-size: 14px; display: inline-block;">
+                Explore Our Programs
+              </a>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div style="background-color: #F9FAFB; padding: 20px 24px; text-align: center; border-top: 1px solid #E5E7EB; font-size: 12px; color: #9CA3AF;">
+            <p style="margin: 0;">&copy; ${new Date().getFullYear()} 1 Step More. Gomti Nagar, Lucknow, UP, India.</p>
+          </div>
+        </div>
+      `
+    });
+    console.log(`[Email Sent to Client] ID: ${info.messageId} | Recipient: ${clientEmail}`);
+    return true;
+  } catch (err) {
+    console.error('[Client Email Error] Failed to send confirmation to client:', err.message);
   }
   return false;
 }
@@ -219,26 +282,72 @@ app.post('/api/contact', async (req, res) => {
       VALUES (?, ?, ?, ?, ?, ?)
     `, [name, email, phone, reason || 'General Inquiry', address || '', message || '']);
 
-    // Send instant email notification to onestepmore04@gmail.com
+    // 1. Send instant email notification to Business Owner / Admin
     sendNotificationEmail({
       subject: `🚨 New Consultation Enquiry: ${name} (${reason || 'Wellness'})`,
       htmlText: `
-        <h2>📋 New Client Consultation Enquiry</h2>
-        <p><strong>Client Name:</strong> ${name}</p>
-        <p><strong>Phone:</strong> <a href="tel:${phone}">${phone}</a> | <a href="https://wa.me/${phone.replace(/[^0-9]/g, '')}">WhatsApp</a></p>
-        <p><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
-        <p><strong>Goal / Reason:</strong> ${reason || 'General'}</p>
-        <p><strong>City / Address:</strong> ${address || 'N/A'}</p>
-        <p><strong>Message / Notes:</strong> ${message || 'N/A'}</p>
-        <hr/>
-        <p><a href="https://one-step-more.onrender.com/admin" style="background:#2E7D32;color:#fff;padding:8px 16px;text-decoration:none;border-radius:6px;">View All Leads in Admin Portal</a></p>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FFFFFF; border-radius: 10px; overflow: hidden; border: 1px solid #E5E7EB;">
+          <div style="background: #2E7D32; padding: 20px; color: #FFFFFF;">
+            <h2 style="margin: 0; font-size: 20px;">📋 New Client Consultation Enquiry</h2>
+            <p style="margin: 4px 0 0 0; font-size: 13px; opacity: 0.9;">Received via One Step More Website</p>
+          </div>
+          <div style="padding: 24px; color: #374151; font-size: 15px; line-height: 1.6;">
+            <p style="margin: 0 0 12px 0;"><strong>Client Name:</strong> ${name}</p>
+            <p style="margin: 0 0 12px 0;"><strong>Phone:</strong> <a href="tel:${phone}" style="color: #2E7D32; font-weight: 700;">${phone}</a> &bull; <a href="https://wa.me/${phone.replace(/[^0-9]/g, '')}" style="color: #10B981; font-weight: 700;">Chat on WhatsApp</a></p>
+            <p style="margin: 0 0 12px 0;"><strong>Email:</strong> <a href="mailto:${email}" style="color: #2E7D32;">${email}</a></p>
+            <p style="margin: 0 0 12px 0;"><strong>Goal / Reason:</strong> <span style="background: #E8F5E9; color: #2E7D32; padding: 3px 8px; border-radius: 4px; font-weight: 600;">${reason || 'General'}</span></p>
+            <p style="margin: 0 0 12px 0;"><strong>City / Address:</strong> ${address || 'N/A'}</p>
+            <div style="background-color: #F9FAFB; border-left: 3px solid #2E7D32; padding: 12px; margin: 16px 0; border-radius: 4px;">
+              <strong>Message / Notes:</strong><br/>
+              ${message || 'No additional message provided.'}
+            </div>
+            <div style="margin-top: 24px; text-align: center;">
+              <a href="https://one-step-more.onrender.com/admin" style="background-color: #2E7D32; color: #FFFFFF; text-decoration: none; padding: 10px 24px; border-radius: 6px; font-weight: 700; font-size: 14px; display: inline-block;">
+                View All Leads in Admin Portal &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
       `
-    }).catch(e => console.error(e));
+    }).catch(e => console.error('[Notification Trigger Error]', e));
+
+    // 2. Send instant welcome confirmation email to the Client
+    sendClientConfirmationEmail({
+      clientEmail: email,
+      clientName: name,
+      reason
+    }).catch(e => console.error('[Client Confirmation Trigger Error]', e));
 
     res.json({ success: true, message: 'Enquiry saved successfully', id: result.lastID });
   } catch (err) {
     console.error('Error recording contact inquiry:', err.message);
     res.status(500).json({ error: 'Server error saving inquiry' });
+  }
+});
+
+// Diagnostic helper: Check if SMTP email service is configured and connected
+app.get('/api/test-email', async (req, res) => {
+  if (!transporter) {
+    return res.status(503).json({
+      configured: false,
+      message: 'SMTP_USER and SMTP_PASS are not set in Render environment variables.',
+      instructions: 'Add SMTP_USER (your Gmail) and SMTP_PASS (16-character Google App Password) in Render Dashboard -> Environment.'
+    });
+  }
+  try {
+    await transporter.verify();
+    res.json({
+      configured: true,
+      sender: process.env.SMTP_USER,
+      recipient: process.env.NOTIFICATION_EMAIL || process.env.SMTP_USER,
+      message: 'Gmail SMTP connection verified successfully! Email alerts are ready and working.'
+    });
+  } catch (err) {
+    res.status(500).json({
+      configured: false,
+      error: err.message,
+      instructions: 'Make sure you generated a 16-character Google App Password (not your personal account password).'
+    });
   }
 });
 
