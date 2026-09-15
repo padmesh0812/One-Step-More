@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Scale, Heart, Droplet, Flame, ArrowRight, RefreshCw, Info, CheckCircle2 } from 'lucide-react';
+import { BMI_CONTENT } from '../../constants';
 import './BmiCalculator.css';
 
 const BmiCalculator = () => {
@@ -53,26 +54,26 @@ const BmiCalculator = () => {
     const minIdealKg = Number((18.5 * (hM * hM)).toFixed(1));
     const maxIdealKg = Number((24.9 * (hM * hM)).toFixed(1));
 
-    let cat = 'Normal Weight';
-    let col = '#2E7D32'; // brand green
-    let adv = 'Your BMI is within the healthy zone. Focus on balanced nutrition, functional yoga for strength, and sustainable lifestyle consistency.';
+    let cat = BMI_CONTENT.categories.healthy.name;
+    let col = BMI_CONTENT.categories.healthy.color;
+    let adv = BMI_CONTENT.categories.healthy.advice;
 
     if (calculatedBmi < 18.5) {
-      cat = 'Underweight';
-      col = '#0284C7';
-      adv = 'You are below the optimal weight range. We recommend a nutrient-dense meal plan with adequate healthy fats, complex carbs, and strength-building yoga flows.';
+      cat = BMI_CONTENT.categories.underweight.name;
+      col = BMI_CONTENT.categories.underweight.color;
+      adv = BMI_CONTENT.categories.underweight.advice;
     } else if (calculatedBmi >= 18.5 && calculatedBmi <= 24.9) {
-      cat = 'Healthy Weight';
-      col = '#2E7D32';
-      adv = 'Great job! Maintain your metabolic vitality with nutrient-dense meals and restorative alignment yoga.';
+      cat = BMI_CONTENT.categories.healthy.name;
+      col = BMI_CONTENT.categories.healthy.color;
+      adv = BMI_CONTENT.categories.healthy.advice;
     } else if (calculatedBmi >= 25 && calculatedBmi <= 29.9) {
-      cat = 'Overweight';
-      col = '#F57C00'; // brand orange
-      adv = 'You are slightly above your ideal weight. Our sustainable nutrition and live group yoga sessions can help you shed fat without starvation diets.';
+      cat = BMI_CONTENT.categories.overweight.name;
+      col = BMI_CONTENT.categories.overweight.color;
+      adv = BMI_CONTENT.categories.overweight.advice;
     } else {
-      cat = 'Obese Range';
-      col = '#DC2626';
-      adv = 'Personalized clinical nutrition and guided joint-friendly yoga will help reduce systemic inflammation and safely reset your metabolism.';
+      cat = BMI_CONTENT.categories.obese.name;
+      col = BMI_CONTENT.categories.obese.color;
+      adv = BMI_CONTENT.categories.obese.advice;
     }
 
     // Daily Water Intake estimation (approx 35ml per kg)
@@ -112,8 +113,8 @@ const BmiCalculator = () => {
             <Scale size={22} color="var(--primary)" />
           </div>
           <div>
-            <h3>Smart BMI & Health Calculator</h3>
-            <p>Instant body composition assessment & ideal targets</p>
+            <h3>{BMI_CONTENT.title}</h3>
+            <p>{BMI_CONTENT.subtitle}</p>
           </div>
         </div>
 
@@ -123,13 +124,13 @@ const BmiCalculator = () => {
             className={`bmi-unit-btn ${unit === 'metric' ? 'active' : ''}`}
             onClick={() => setUnit('metric')}
           >
-            Metric (cm, kg)
+            {BMI_CONTENT.units.metric}
           </button>
           <button 
             className={`bmi-unit-btn ${unit === 'imperial' ? 'active' : ''}`}
             onClick={() => setUnit('imperial')}
           >
-            Imperial (ft, lbs)
+            {BMI_CONTENT.units.imperial}
           </button>
         </div>
       </div>
@@ -137,28 +138,28 @@ const BmiCalculator = () => {
       <div className="bmi-form-grid">
         {/* Gender selector */}
         <div className="bmi-input-group">
-          <label className="bmi-label">Gender</label>
+          <label className="bmi-label">{BMI_CONTENT.labels.gender}</label>
           <div className="bmi-gender-toggle">
             <button
               type="button"
               className={`bmi-gender-btn ${gender === 'female' ? 'active' : ''}`}
               onClick={() => setGender('female')}
             >
-              👩 Female
+              {BMI_CONTENT.genders.female}
             </button>
             <button
               type="button"
               className={`bmi-gender-btn ${gender === 'male' ? 'active' : ''}`}
               onClick={() => setGender('male')}
             >
-              👨 Male
+              {BMI_CONTENT.genders.male}
             </button>
           </div>
         </div>
 
         {/* Age selector */}
         <div className="bmi-input-group">
-          <label className="bmi-label">Age (Years)</label>
+          <label className="bmi-label">{BMI_CONTENT.labels.age}</label>
           <input 
             type="number" 
             min="10" 
@@ -172,15 +173,15 @@ const BmiCalculator = () => {
         {/* Height Input */}
         <div className="bmi-input-group">
           <label className="bmi-label">
-            Height {unit === 'metric' ? '(cm)' : '(Feet & Inches)'}
+            {unit === 'metric' ? BMI_CONTENT.labels.heightMetric : BMI_CONTENT.labels.heightImperial}
           </label>
           {unit === 'metric' ? (
             <div className="bmi-range-input-wrap">
               <input 
                 type="number" 
                 min="100" 
-                max="240" 
-                value={heightCm} 
+                max="230" 
+                value={heightCm}
                 onChange={(e) => setHeightCm(Number(e.target.value))}
                 className="bmi-number-input" 
               />
@@ -188,34 +189,34 @@ const BmiCalculator = () => {
                 type="range" 
                 min="120" 
                 max="210" 
-                value={heightCm} 
+                value={heightCm}
                 onChange={(e) => setHeightCm(Number(e.target.value))}
                 className="bmi-slider" 
               />
             </div>
           ) : (
-            <div className="bmi-dual-input">
-              <div className="bmi-sub-input">
+            <div className="bmi-imperial-row">
+              <div className="bmi-imperial-item">
                 <input 
                   type="number" 
                   min="3" 
                   max="7" 
-                  value={heightFt} 
+                  value={heightFt}
                   onChange={(e) => setHeightFt(Number(e.target.value))}
                   className="bmi-number-input" 
                 />
-                <span>ft</span>
+                <span className="bmi-sublabel">ft</span>
               </div>
-              <div className="bmi-sub-input">
+              <div className="bmi-imperial-item">
                 <input 
                   type="number" 
                   min="0" 
                   max="11" 
-                  value={heightIn} 
+                  value={heightIn}
                   onChange={(e) => setHeightIn(Number(e.target.value))}
                   className="bmi-number-input" 
                 />
-                <span>in</span>
+                <span className="bmi-sublabel">in</span>
               </div>
             </div>
           )}
@@ -224,23 +225,23 @@ const BmiCalculator = () => {
         {/* Weight Input */}
         <div className="bmi-input-group">
           <label className="bmi-label">
-            Weight {unit === 'metric' ? '(kg)' : '(lbs)'}
+            {unit === 'metric' ? BMI_CONTENT.labels.weightMetric : BMI_CONTENT.labels.weightImperial}
           </label>
           {unit === 'metric' ? (
             <div className="bmi-range-input-wrap">
               <input 
                 type="number" 
                 min="30" 
-                max="200" 
-                value={weightKg} 
+                max="180" 
+                value={weightKg}
                 onChange={(e) => setWeightKg(Number(e.target.value))}
                 className="bmi-number-input" 
               />
               <input 
                 type="range" 
-                min="35" 
+                min="40" 
                 max="140" 
-                value={weightKg} 
+                value={weightKg}
                 onChange={(e) => setWeightKg(Number(e.target.value))}
                 className="bmi-slider" 
               />
@@ -251,7 +252,7 @@ const BmiCalculator = () => {
                 type="number" 
                 min="70" 
                 max="400" 
-                value={weightLbs} 
+                value={weightLbs}
                 onChange={(e) => setWeightLbs(Number(e.target.value))}
                 className="bmi-number-input" 
               />
@@ -259,7 +260,7 @@ const BmiCalculator = () => {
                 type="range" 
                 min="80" 
                 max="300" 
-                value={weightLbs} 
+                value={weightLbs}
                 onChange={(e) => setWeightLbs(Number(e.target.value))}
                 className="bmi-slider" 
               />
@@ -268,87 +269,94 @@ const BmiCalculator = () => {
         </div>
       </div>
 
-      {/* Results Output Display */}
-      <div className="bmi-results-box">
-        <div className="bmi-score-header">
-          <div>
-            <div className="bmi-score-label">Your BMI Score</div>
-            <div className="bmi-score-number" style={{ color: color }}>
+      {/* Results Box */}
+      <div className="bmi-results-box" style={{ borderColor: `${color}40` }}>
+        {/* Top Summary Row */}
+        <div className="bmi-score-row">
+          <div className="bmi-gauge-col">
+            <div className="bmi-val" style={{ color: color }}>
               {bmi}
             </div>
-          </div>
-          <div className="bmi-status-badge" style={{ backgroundColor: `${color}18`, color: color, borderColor: `${color}40` }}>
-            <span className="bmi-status-dot" style={{ backgroundColor: color }}></span>
-            {category}
-          </div>
-        </div>
-
-        {/* BMI Progress Bar Meter */}
-        <div className="bmi-meter-wrapper">
-          <div className="bmi-meter-bar">
-            <div className="meter-segment segment-under" title="Underweight (< 18.5)"></div>
-            <div className="meter-segment segment-normal" title="Normal (18.5 - 24.9)"></div>
-            <div className="meter-segment segment-over" title="Overweight (25 - 29.9)"></div>
-            <div className="meter-segment segment-obese" title="Obese (30+)"></div>
-            <div 
-              className="bmi-meter-pointer" 
-              style={{ left: `${gaugePercent}%`, borderColor: color }}
-            ></div>
-          </div>
-          <div className="bmi-meter-labels">
-            <span>18.5</span>
-            <span>25.0</span>
-            <span>30.0</span>
-          </div>
-        </div>
-
-        {/* Health Insights Badges */}
-        <div className="bmi-insights-grid">
-          <div className="bmi-insight-item">
-            <div className="bmi-insight-icon">
-              <Heart size={16} color="var(--primary)" />
-            </div>
-            <div>
-              <div className="bmi-insight-title">Ideal Weight Range</div>
-              <div className="bmi-insight-value">{idealWeightMin} &ndash; {idealWeightMax}</div>
-            </div>
+            <div className="bmi-score-tag">{BMI_CONTENT.labels.bmiScore}</div>
           </div>
 
-          <div className="bmi-insight-item">
-            <div className="bmi-insight-icon">
-              <Droplet size={16} color="#0284C7" />
-            </div>
-            <div>
-              <div className="bmi-insight-title">Daily Hydration</div>
-              <div className="bmi-insight-value">{dailyWater} Liters / day</div>
-            </div>
-          </div>
-
-          <div className="bmi-insight-item">
-            <div className="bmi-insight-icon">
-              <Flame size={16} color="var(--secondary)" />
-            </div>
-            <div>
-              <div className="bmi-insight-title">Daily Energy Need</div>
-              <div className="bmi-insight-value">~{dailyCalories} kcal</div>
+          <div className="bmi-category-col">
+            <span className="bmi-cat-badge" style={{ backgroundColor: `${color}18`, color: color, borderColor: `${color}40` }}>
+              {category}
+            </span>
+            <div className="bmi-ideal-row">
+              <Heart size={14} color="var(--primary)" />
+              <span>{BMI_CONTENT.labels.idealRange}: <strong>{idealWeightMin} – {idealWeightMax}</strong></span>
             </div>
           </div>
         </div>
 
-        <p className="bmi-advice-text">
-          <Info size={15} style={{ display: 'inline', verticalAlign: 'text-bottom', marginRight: '6px' }} />
-          {advice}
-        </p>
+        {/* Visual Progress Meter */}
+        <div className="bmi-meter-track">
+          <div className="bmi-meter-bar underweight"></div>
+          <div className="bmi-meter-bar normal"></div>
+          <div className="bmi-meter-bar overweight"></div>
+          <div className="bmi-meter-bar obese"></div>
+          <div 
+            className="bmi-meter-pointer" 
+            style={{ left: `${gaugePercent}%`, backgroundColor: color }}
+            title={`BMI: ${bmi}`}
+          />
+        </div>
+        <div className="bmi-meter-labels">
+          <span>&lt;18.5</span>
+          <span>18.5 - 24.9</span>
+          <span>25.0 - 29.9</span>
+          <span>30.0+</span>
+        </div>
 
-        <button
-          onClick={() => {
-            const prog = category === 'Healthy Weight' ? 'group-yoga' : 'diet';
-            navigate('/services', { state: { tab: prog } });
-          }}
-          className="btn btn-primary bmi-action-btn"
-        >
-          Explore Tailored Plans for Your BMI <ArrowRight size={16} />
-        </button>
+        {/* Secondary Metrics: Water & Calories */}
+        <div className="bmi-secondary-metrics">
+          <div className="bmi-metric-card">
+            <div className="metric-icon-wrap water">
+              <Droplet size={18} color="#0284C7" />
+            </div>
+            <div>
+              <div className="metric-lbl">{BMI_CONTENT.labels.waterTarget}</div>
+              <div className="metric-val">{dailyWater} {BMI_CONTENT.labels.litersPerDay}</div>
+            </div>
+          </div>
+
+          <div className="bmi-metric-card">
+            <div className="metric-icon-wrap flame">
+              <Flame size={18} color="#F57C00" />
+            </div>
+            <div>
+              <div className="metric-lbl">{BMI_CONTENT.labels.calorieTarget}</div>
+              <div className="metric-val">~{dailyCalories} {BMI_CONTENT.labels.kcalPerDay}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Personalized Clinical Advice */}
+        <div className="bmi-advice-box">
+          <div className="advice-header">
+            <Info size={15} color="var(--primary)" />
+            <span>{BMI_CONTENT.labels.lifestyleGuidance}</span>
+          </div>
+          <p className="advice-text">{advice}</p>
+        </div>
+
+        {/* CTAs */}
+        <div className="bmi-cta-row">
+          <button 
+            onClick={() => navigate('/services', { state: { tab: bmi >= 25 ? 'diet' : 'combo' } })} 
+            className="btn btn-primary bmi-action-btn"
+          >
+            {BMI_CONTENT.labels.getPlanBtn} <ArrowRight size={16} />
+          </button>
+          <button 
+            onClick={() => navigate('/contact')} 
+            className="btn btn-outline bmi-action-btn"
+          >
+            {BMI_CONTENT.labels.talkCoachBtn}
+          </button>
+        </div>
       </div>
     </div>
   );

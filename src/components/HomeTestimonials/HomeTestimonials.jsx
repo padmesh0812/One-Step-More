@@ -4,54 +4,8 @@ import {
   Star, Quote, CheckCircle2, Sparkles, ArrowRight, 
   TrendingDown, Award, ZoomIn, X 
 } from 'lucide-react';
+import { BRAND, TESTIMONIALS_HEADER, TESTIMONIALS_DATA, TESTIMONIALS_CTA } from '../../constants';
 import './HomeTestimonials.css';
-
-// Import client transformation images
-import client1Img from '../assets/images/testimonials/testimonial 1.webp';
-import client2Img from '../assets/images/testimonials/testimonial 2.webp';
-import client3Img from '../assets/images/testimonials/testimonial 3.webp';
-
-const TESTIMONIALS = [
-  {
-    id: 1,
-    name: "Pooja Sharma",
-    location: "Delhi NCR",
-    badge: "Week 0 ➔ Week 4 ➔ Week 8",
-    resultTag: "-8.5 kg & 4 Inches Waist Loss",
-    program: "Customized Weight Loss Program",
-    duration: "8 Weeks",
-    image: client1Img,
-    stars: 5,
-    quote: "Following Dt. Pragati's customized meal plan transformed my energy completely. No crash starving—just wholesome homemade Indian meals that my whole family could eat together. By week 8, my digestion was healed and I slipped back into my favorite sarees with pure confidence!",
-    highlights: ["Zero crash dieting", "Improved gut health & digestion", "Sustainable home-cooked food"]
-  },
-  {
-    id: 2,
-    name: "Vikram Rawat",
-    location: "Gurugram",
-    badge: "Lifestyle & Metabolic Reset",
-    resultTag: "-11 kg Fat Loss & High Stamina",
-    program: "Weight Loss & Lifestyle Coaching",
-    duration: "12 Weeks",
-    image: client2Img,
-    stars: 5,
-    quote: "As a busy professional, irregular working hours and late snacking had completely derailed my health and weight. Pragati ma'am crafted a realistic diet that didn't disrupt my hectic work schedule. Dropped 11 kgs sustainably—and my constant sluggishness and acidity simply vanished.",
-    highlights: ["High energy throughout workdays", "No expensive supplements", "Realistic habit design"]
-  },
-  {
-    id: 3,
-    name: "Sunita Maurya",
-    location: "Mumbai",
-    badge: "Size XXL ➔ Size L Transformation",
-    resultTag: "Dropped 2 Dress Sizes",
-    program: "Weight Loss & Inch Loss Program",
-    duration: "8 Weeks",
-    image: client3Img,
-    stars: 5,
-    quote: "I was stuck at Size XXL for more than 2 years despite trying random online crash diets. 1 Step More showed me how simple portion control, balanced macros, and daily routine tweaks create true magic. Going from XXL to L in just a few weeks without hunger was truly life-changing!",
-    highlights: ["Significant inch loss", "Boosted confidence & mobility", "Long-term weight maintenance"]
-  }
-];
 
 const HomeTestimonials = () => {
   const navigate = useNavigate();
@@ -63,19 +17,20 @@ const HomeTestimonials = () => {
         {/* Section Header */}
         <div className="section-header">
           <span className="section-tag">
-            <Sparkles size={14} className="tag-icon" /> REAL TRANSFORMATIONS, REAL RESULTS
+            <Sparkles size={14} className="tag-icon" /> {TESTIMONIALS_HEADER.tag}
           </span>
           <h2 className="section-title">
-            Stories of Lasting Change with <span className="brand-step">1 Step</span> <span className="brand-more">More</span>
+            {TESTIMONIALS_HEADER.titlePrefix}
+            <span className="brand-step">{BRAND.stepText}</span> <span className="brand-more">{BRAND.moreText}</span>
           </h2>
           <p className="section-description">
-            See how our clients enrolled in our personalized weight loss programs and unlocked remarkable physical and mental breakthroughs—using 100% home-cooked food, mindful habits, and zero crash starvation.
+            {TESTIMONIALS_HEADER.description}
           </p>
         </div>
 
         {/* Testimonials Grid */}
         <div className="home-testimonials-grid">
-          {TESTIMONIALS.map((item) => (
+          {TESTIMONIALS_DATA.map((item) => (
             <div key={item.id} className="transformation-card">
               {/* Image Preview with Hover Overlay */}
               <div 
@@ -150,58 +105,61 @@ const HomeTestimonials = () => {
         {/* Bottom CTA Banner */}
         <div className="testimonials-cta-banner">
           <div className="cta-banner-content">
-            <span className="cta-subtitle">READY TO WRITE YOUR OWN STORY?</span>
-            <h3 className="cta-title">Take Your First Step Towards Sustainable Weight Loss</h3>
+            <span className="cta-subtitle">{TESTIMONIALS_CTA.subtitle}</span>
+            <h3 className="cta-title">{TESTIMONIALS_CTA.title}</h3>
             <p className="cta-desc">
-              Get an individualized nutrition and routine roadmap curated by Dt. Pragati Mishra tailored to your body type, metabolism, and lifestyle.
+              {TESTIMONIALS_CTA.description}
             </p>
           </div>
           <div className="cta-banner-actions">
             <button 
-              onClick={() => navigate('/services', { state: { tab: 'diet' } })} 
-              className="btn btn-primary"
+              onClick={() => navigate('/services')} 
+              className="btn btn-secondary cta-btn-glow"
             >
-              Explore Weight Loss Plans <ArrowRight size={16} />
+              {TESTIMONIALS_CTA.primaryBtnText} <ArrowRight size={18} />
             </button>
             <button 
               onClick={() => navigate('/contact')} 
-              className="btn btn-outline"
+              className="btn btn-outline-white"
             >
-              Book Free Consultation
+              {TESTIMONIALS_CTA.outlineBtnText}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Full-Screen Image Lightbox Modal */}
+      {/* Lightbox Modal for Full Image Inspection */}
       {activeModalImage && (
-        <div className="testimonial-lightbox-backdrop" onClick={() => setActiveModalImage(null)}>
-          <div className="testimonial-lightbox-container" onClick={(e) => e.stopPropagation()}>
+        <div 
+          className="transformation-modal-overlay" 
+          onClick={() => setActiveModalImage(null)}
+        >
+          <div 
+            className="transformation-modal-box" 
+            onClick={(e) => e.stopPropagation()}
+          >
             <button 
-              className="lightbox-close-btn" 
+              className="modal-close-trigger" 
               onClick={() => setActiveModalImage(null)}
-              aria-label="Close Preview"
+              aria-label="Close transformation photo preview"
             >
-              <X size={22} />
+              <X size={20} />
             </button>
-            <div className="lightbox-image-holder">
+            <div className="modal-inner-img-wrap">
               <img 
                 src={activeModalImage.image} 
-                alt={`${activeModalImage.name} transformation`} 
-                className="lightbox-full-img"
+                alt={`${activeModalImage.name} transformation large preview`} 
+                className="modal-full-img"
               />
             </div>
-            <div className="lightbox-details">
-              <div className="lightbox-header-row">
-                <div>
-                  <h3 className="lightbox-client-name">{activeModalImage.name}</h3>
-                  <p className="lightbox-program">{activeModalImage.program} ({activeModalImage.duration})</p>
-                </div>
-                <div className="lightbox-result-badge">
-                  <TrendingDown size={16} /> {activeModalImage.resultTag}
-                </div>
+            <div className="modal-caption-bar">
+              <div className="modal-caption-left">
+                <h4>{activeModalImage.name} ({activeModalImage.location})</h4>
+                <p>{activeModalImage.program} &bull; {activeModalImage.duration}</p>
               </div>
-              <p className="lightbox-quote">"{activeModalImage.quote}"</p>
+              <div className="modal-caption-right">
+                <span className="modal-metric-badge">{activeModalImage.resultTag}</span>
+              </div>
             </div>
           </div>
         </div>

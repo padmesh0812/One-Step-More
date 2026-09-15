@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
+import { CONTACT_INFO } from '../../constants';
+import './WhatsAppWidget.css';
 
 const WhatsAppWidget = () => {
   const [isHovered, setIsHovered] = useState(false);
 
-  // Pre-filled WhatsApp message URL
-  const whatsappUrl = "https://wa.me/918115660790?text=Hi!%20I%20visited%20your%20website%20One%20Step%20More%20and%20want%20to%20learn%20more%20about%20your%20wellness%20programs.";
-
   return (
     <a 
-      href={whatsappUrl}
+      href={CONTACT_INFO.whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
       className="whatsapp-widget"

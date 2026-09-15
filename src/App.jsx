@@ -1,15 +1,7 @@
 import React, { useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import WhatsAppWidget from './components/WhatsAppWidget';
-import Home from './pages/Home';
-import About from './pages/About';
-import Services from './pages/Services';
-import Blog from './pages/Blog';
-import Contact from './pages/Contact';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import Enroll from './pages/Enroll';
+import { Navbar, Footer, WhatsAppWidget } from './components';
+import { Home, About, Services, Blog, Contact, PrivacyPolicy, Enroll } from './pages';
 
 // Scroll to top helper on route navigation
 const ScrollToTop = () => {

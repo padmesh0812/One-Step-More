@@ -1,26 +1,18 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Mail, Phone, MapPin, Instagram, Facebook, Youtube, Check, AlertCircle, ChevronDown } from 'lucide-react';
+import { 
+  CONTACT_HEADER_CONTENT, 
+  CONTACT_INFO_PANEL_CONTENT, 
+  CONTACT_FORM_CONTENT, 
+  CONTACT_VALIDATION_MESSAGES, 
+  CONTACT_MAP_CONTENT, 
+  CONTACT_FAQS, 
+  CONTACT_FAQS_HEADER,
+  CONTACT_INFO,
+  SOCIAL_LINKS
+} from '../../constants';
 import './Contact.css';
-
-const FAQS = [
-  {
-    q: "Is it safe to start yoga after a C-section or surgery?",
-    a: "Yes, but timing is crucial. For the first 6 weeks, we recommend only breathing techniques and light walking. Once you receive medical clearance, you can begin our gentle progressive postural yoga flows. Always inform your instructor about your health history."
-  },
-  {
-    q: "Do your nutritional meal plans support medical conditions?",
-    a: "Absolutely. All our meal guides are clinically designed and optimized for specific medical conditions including PCOD/PCOS, Thyroid disorders, Diabetes, High Blood Pressure, and pregnancy mineral requirements."
-  },
-  {
-    q: "What is your refund policy if the plan doesn't suit me?",
-    a: "We offer a 14-day hassle-free refund window. If you enroll in any plan and find that the exercises or meal guides don't match your routine, simply email our support for a full refund."
-  },
-  {
-    q: "How frequently will my diet plan change?",
-    a: "A new diet plan is customized and shared every week (7-day cycles) with zero repetitions, allowing you to build sustainable eating habits without getting bored."
-  }
-];
 
 const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
@@ -51,19 +43,19 @@ const Contact = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     const tempErrors = {};
-    if (!form.name.trim()) tempErrors.name = "Name is required.";
+    if (!form.name.trim()) tempErrors.name = CONTACT_VALIDATION_MESSAGES.name;
     if (!form.email.trim()) {
-      tempErrors.email = "Email is required.";
+      tempErrors.email = CONTACT_VALIDATION_MESSAGES.emailRequired;
     } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      tempErrors.email = "Please enter a valid email address.";
+      tempErrors.email = CONTACT_VALIDATION_MESSAGES.emailInvalid;
     }
     if (!form.phone.trim()) {
-      tempErrors.phone = "Phone number is required.";
+      tempErrors.phone = CONTACT_VALIDATION_MESSAGES.phoneRequired;
     } else if (!/^\+?[0-9\s-]{8,15}$/.test(form.phone.trim())) {
-      tempErrors.phone = "Please enter a valid phone number.";
+      tempErrors.phone = CONTACT_VALIDATION_MESSAGES.phoneInvalid;
     }
-    if (!form.reason) tempErrors.reason = "Please select a reason to contact.";
-    if (!form.address.trim()) tempErrors.address = "Address is required.";
+    if (!form.reason) tempErrors.reason = CONTACT_VALIDATION_MESSAGES.reason;
+    if (!form.address.trim()) tempErrors.address = CONTACT_VALIDATION_MESSAGES.address;
 
     if (Object.keys(tempErrors).length > 0) {
       setErrors(tempErrors);
@@ -72,7 +64,6 @@ const Contact = () => {
 
     setIsSubmitting(true);
     try {
-      // 1. Save to backend database and trigger email notification
       await fetch(`${API_BASE_URL}/api/contact`, {
         method: 'POST',
         headers: {
@@ -83,7 +74,6 @@ const Contact = () => {
       setSubmitted(true);
     } catch (err) {
       console.warn('Backend contact save error:', err);
-      // Still show thank you to user so experience is seamless
       setSubmitted(true);
     } finally {
       setIsSubmitting(false);
@@ -99,15 +89,15 @@ const Contact = () => {
       {/* Contact Section */}
       <section className="section container">
         <div className="section-header">
-          <h1>Connect With <span>Us</span></h1>
-          <p>Have questions about plans, pricing, or booking? Reach out directly. We are here to support your journey.</p>
+          <h1>{CONTACT_HEADER_CONTENT.titlePrefix}<span>{CONTACT_HEADER_CONTENT.titleHighlight}</span></h1>
+          <p>{CONTACT_HEADER_CONTENT.description}</p>
         </div>
 
         <div className="contact-grid">
           {/* Info Panel */}
           <div className="contact-info-panel">
-            <h3>Support Center</h3>
-            <p>Our dedicated wellness coaches and dietitians are available Monday through Saturday, 9 AM to 6 PM IST.</p>
+            <h3>{CONTACT_INFO_PANEL_CONTENT.title}</h3>
+            <p>{CONTACT_INFO_PANEL_CONTENT.description}</p>
 
             <div className="contact-details-list">
               <div className="contact-detail-card">
@@ -115,8 +105,8 @@ const Contact = () => {
                   <Mail size={20} />
                 </div>
                 <div className="contact-detail-text">
-                  <h4>Email Us</h4>
-                  <p>hello@onestepmore.com</p>
+                  <h4>{CONTACT_INFO_PANEL_CONTENT.emailTitle}</h4>
+                  <p>{CONTACT_INFO.email}</p>
                 </div>
               </div>
 
@@ -125,8 +115,8 @@ const Contact = () => {
                   <Phone size={20} />
                 </div>
                 <div className="contact-detail-text">
-                  <h4>Call / WhatsApp</h4>
-                  <p>+91 91404 88383</p>
+                  <h4>{CONTACT_INFO_PANEL_CONTENT.phoneTitle}</h4>
+                  <p>{CONTACT_INFO.phone}</p>
                 </div>
               </div>
 
@@ -135,21 +125,21 @@ const Contact = () => {
                   <MapPin size={20} />
                 </div>
                 <div className="contact-detail-text">
-                  <h4>Visit Office</h4>
-                  <p>Gomti Nagar, Lucknow, UP, India</p>
+                  <h4>{CONTACT_INFO_PANEL_CONTENT.officeTitle}</h4>
+                  <p>{CONTACT_INFO.address}</p>
                 </div>
               </div>
             </div>
 
-            <h4 className="contact-social-heading">Follow Our Community</h4>
+            <h4 className="contact-social-heading">{CONTACT_INFO_PANEL_CONTENT.socialHeading}</h4>
             <div className="social-links-row">
-              <a href="https://www.instagram.com/pragati8379?igsh=c3g4NHZ4bzVucjNu" target="_blank" rel="noreferrer" className="social-link-btn" aria-label="Instagram">
+              <a href={SOCIAL_LINKS.instagram.url} target="_blank" rel="noreferrer" className="social-link-btn" aria-label="Instagram">
                 <Instagram size={18} />
               </a>
-              <a href="https://www.facebook.com/share/1DGZYoWZdT/" target="_blank" rel="noreferrer" className="social-link-btn" aria-label="Facebook">
+              <a href={SOCIAL_LINKS.facebook.url} target="_blank" rel="noreferrer" className="social-link-btn" aria-label="Facebook">
                 <Facebook size={18} />
               </a>
-              <a href="https://youtube.com/@pragatimishra1941?si=-mK6NiLCwuWHnJYq" target="_blank" rel="noreferrer" className="social-link-btn" aria-label="Youtube">
+              <a href={SOCIAL_LINKS.youtube.url} target="_blank" rel="noreferrer" className="social-link-btn" aria-label="Youtube">
                 <Youtube size={18} />
               </a>
             </div>
@@ -162,26 +152,26 @@ const Contact = () => {
                 <div className="success-check-circle">
                   <Check size={40} />
                 </div>
-                <h4>Thank You!</h4>
-                <p className="contact-success-desc">We have successfully received your inquiry. One of our dedicated wellness coaches will contact you within 24 hours to schedule your consultation call.</p>
+                <h4>{CONTACT_FORM_CONTENT.successTitle}</h4>
+                <p className="contact-success-desc">{CONTACT_FORM_CONTENT.successDesc}</p>
                 <button onClick={() => setSubmitted(false)} className="btn btn-outline">
-                  Send Another Message
+                  {CONTACT_FORM_CONTENT.anotherMessageBtn}
                 </button>
               </div>
             ) : (
               <form onSubmit={handleFormSubmit}>
-                <h3>Enquiry Form</h3>
-                <p className="contact-form-subtitle">Fill out this enquiry form to connect with our expert dietitian or yoga trainer for a custom roadmap call.</p>
+                <h3>{CONTACT_FORM_CONTENT.title}</h3>
+                <p className="contact-form-subtitle">{CONTACT_FORM_CONTENT.subtitle}</p>
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label className="form-label" htmlFor="name">Your Name</label>
+                    <label className="form-label" htmlFor="name">{CONTACT_FORM_CONTENT.nameLabel}</label>
                     <input
                       type="text"
                       id="name"
                       name="name"
                       className="form-input"
-                      placeholder="e.g. Sarah Miller"
+                      placeholder={CONTACT_FORM_CONTENT.namePlaceholder}
                       value={form.name}
                       onChange={handleInput}
                     />
@@ -189,13 +179,13 @@ const Contact = () => {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label" htmlFor="email">Email Address</label>
+                    <label className="form-label" htmlFor="email">{CONTACT_FORM_CONTENT.emailLabel}</label>
                     <input
                       type="email"
                       id="email"
                       name="email"
                       className="form-input"
-                      placeholder="e.g. sarah@example.com"
+                      placeholder={CONTACT_FORM_CONTENT.emailPlaceholder}
                       value={form.email}
                       onChange={handleInput}
                     />
@@ -205,13 +195,13 @@ const Contact = () => {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label className="form-label" htmlFor="phone">Phone Number</label>
+                    <label className="form-label" htmlFor="phone">{CONTACT_FORM_CONTENT.phoneLabel}</label>
                     <input
                       type="text"
                       id="phone"
                       name="phone"
                       className="form-input"
-                      placeholder="e.g. +91 98765 43210"
+                      placeholder={CONTACT_FORM_CONTENT.phonePlaceholder}
                       value={form.phone}
                       onChange={handleInput}
                     />
@@ -219,7 +209,7 @@ const Contact = () => {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label" htmlFor="reason">Reason to Contact</label>
+                    <label className="form-label" htmlFor="reason">{CONTACT_FORM_CONTENT.reasonLabel}</label>
                     <select
                       id="reason"
                       name="reason"
@@ -227,26 +217,23 @@ const Contact = () => {
                       value={form.reason}
                       onChange={handleInput}
                     >
-                      <option value="">Select Reason / Program</option>
-                      <option value="diet">Customized Diet Program</option>
-                      <option value="child">Customized Child Nutrition</option>
-                      <option value="group-yoga">Yoga & Beyond (Group Sessions)</option>
-                      <option value="one-yoga">1:1 Live Personal Yoga</option>
-                      <option value="combo">Diet & Group Yoga Combo</option>
-                      <option value="general">General Inquiry</option>
+                      <option value="">{CONTACT_FORM_CONTENT.reasonPlaceholder}</option>
+                      {CONTACT_FORM_CONTENT.reasonOptions.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
                     </select>
                     {errors.reason && <div className="form-error-msg"><AlertCircle size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />{errors.reason}</div>}
                   </div>
                 </div>
 
                 <div className="form-group contact-mb-20">
-                  <label className="form-label" htmlFor="address">Your Address</label>
+                  <label className="form-label" htmlFor="address">{CONTACT_FORM_CONTENT.addressLabel}</label>
                   <input
                     type="text"
                     id="address"
                     name="address"
                     className="form-input"
-                    placeholder="e.g. Gomti Nagar, Lucknow, UP"
+                    placeholder={CONTACT_FORM_CONTENT.addressPlaceholder}
                     value={form.address}
                     onChange={handleInput}
                   />
@@ -254,20 +241,20 @@ const Contact = () => {
                 </div>
 
                 <div className="form-group contact-mb-30">
-                  <label className="form-label" htmlFor="message">Your Message (Optional)</label>
+                  <label className="form-label" htmlFor="message">{CONTACT_FORM_CONTENT.messageLabel}</label>
                   <textarea
                     id="message"
                     name="message"
                     rows="4"
                     className="form-input contact-textarea"
-                    placeholder="Tell us briefly about your fitness goals, medical history, or consultation requirements..."
+                    placeholder={CONTACT_FORM_CONTENT.messagePlaceholder}
                     value={form.message}
                     onChange={handleInput}
                   ></textarea>
                 </div>
 
                 <button type="submit" className="btn btn-primary contact-submit-btn" disabled={isSubmitting}>
-                  {isSubmitting ? 'Submitting...' : 'Submit Inquiry'}
+                  {isSubmitting ? CONTACT_FORM_CONTENT.submittingBtn : CONTACT_FORM_CONTENT.submitBtn}
                 </button>
               </form>
             )}
@@ -279,9 +266,9 @@ const Contact = () => {
       <section className="section contact-map-section">
         <div className="container">
           <div className="section-header contact-map-header">
-            <span className="section-tag">FIND US ON THE MAP</span>
-            <h2>How to Reach Us</h2>
-            <p>Our office is located in Gomti Nagar, Lucknow. Drop by for a physical consultation or posture check.</p>
+            <span className="section-tag">{CONTACT_MAP_CONTENT.tag}</span>
+            <h2>{CONTACT_MAP_CONTENT.title}</h2>
+            <p>{CONTACT_MAP_CONTENT.description}</p>
           </div>
           <div className="contact-map-wrapper">
             <iframe 
@@ -292,7 +279,7 @@ const Contact = () => {
               allowFullScreen="" 
               loading="lazy" 
               referrerPolicy="no-referrer-when-downgrade"
-              title="1 Step More Gomti Nagar Lucknow Office Map"
+              title={CONTACT_MAP_CONTENT.iframeTitle}
             ></iframe>
           </div>
         </div>
@@ -302,12 +289,12 @@ const Contact = () => {
       <section className="section contact-faq-section">
         <div className="container">
           <div className="section-header">
-            <h2>Frequently Asked Questions</h2>
-            <p>Read quick answers regarding exercise safety, meal planning, and coaching packages.</p>
+            <h2>{CONTACT_FAQS_HEADER.title}</h2>
+            <p>{CONTACT_FAQS_HEADER.description}</p>
           </div>
 
           <div className="faq-list">
-            {FAQS.map((faq, index) => (
+            {CONTACT_FAQS.map((faq, index) => (
               <div 
                 key={index} 
                 className={`faq-item ${activeFaq === index ? 'active' : ''}`}

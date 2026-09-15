@@ -1,119 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { Check, AlertCircle, ArrowLeft, Heart, Shield, CreditCard, Smartphone, CheckCircle, RefreshCw, ArrowRight } from 'lucide-react';
+import { Check, AlertCircle, ArrowLeft, Heart, Shield, CreditCard, CheckCircle, RefreshCw, ArrowRight } from 'lucide-react';
+import { 
+  BRAND,
+  PROGRAMS_DATA, 
+  BLOOD_GROUPS, 
+  ENROLL_STEPPER, 
+  ENROLL_HEADER_CONTENT, 
+  ENROLL_VALIDATION_MESSAGES, 
+  ENROLL_FORM_LABELS, 
+  ENROLL_PAYMENT_CONTENT, 
+  ENROLL_SUCCESS_CONTENT, 
+  ENROLL_SIDEBAR_CONTENT 
+} from '../../constants';
 import './Enroll.css';
-
-const PROGRAMS_LIST = [
-  {
-    id: 'diet',
-    title: "Customized Diet Program",
-    pricing: [
-      { weeks: 4, original: 3999, offer: 2500 },
-      { weeks: 8, original: 7900, offer: 4900 },
-      { weeks: 12, original: 11900, offer: 6500 },
-      { weeks: 24, original: 23900, offer: 9900 },
-      { weeks: 48, original: 47800, offer: 19900 }
-    ]
-  },
-  {
-    id: 'child',
-    title: "Customized Child Nutrition",
-    pricing: [
-      { weeks: 4, original: 2000, offer: 1500 },
-      { weeks: 8, original: 4000, offer: 2800 },
-      { weeks: 12, original: 6000, offer: 3900 },
-      { weeks: 24, original: 12000, offer: 6900 },
-      { weeks: 48, original: 24000, offer: 11900 }
-    ]
-  },
-  {
-    id: 'group-yoga',
-    title: "Yoga & Beyond (Group Sessions)",
-    pricing: [
-      { weeks: 4, original: 1999, offer: 999 },
-      { weeks: 8, original: 3999, offer: 1799 },
-      { weeks: 12, original: 5999, offer: 2499 },
-      { weeks: 24, original: 11999, offer: 4499 },
-      { weeks: 48, original: 23999, offer: 7999 }
-    ]
-  },
-  {
-    id: 'one-yoga',
-    title: "1:1 Live Personal Yoga",
-    pricing: [
-      { weeks: 4, original: 4999, offer: 2999 },
-      { weeks: 8, original: 9999, offer: 5499 },
-      { weeks: 12, original: 14999, offer: 7999 },
-      { weeks: 24, original: 29999, offer: 14999 },
-      { weeks: 48, original: 59999, offer: 27999 }
-    ]
-  },
-  {
-    id: 'combo',
-    title: "Diet & Group Yoga Combo",
-    pricing: [
-      { weeks: 4, original: 4499, offer: 2999 },
-      { weeks: 8, original: 8899, offer: 5999 },
-      { weeks: 12, original: 12499, offer: 7999 },
-      { weeks: 24, original: 21899, offer: 11999 },
-      { weeks: 48, original: 43899, offer: 21999 }
-    ]
-  },
-  {
-    id: 'gut-detox',
-    title: "10 Days Gut Cleaning Detox Plan",
-    pricing: [
-      { weeks: 1.4, days: 10, label: "10 Days Plan", original: 1499, offer: 699 }
-    ]
-  }
-];
-
-const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
-
-// Payment brand SVG icons
-const GPayLogo = () => (
-  <svg viewBox="0 0 100 40" height="22" style={{ display: 'block' }}>
-    <path d="M12.4 16.3c0-2.4 1.9-4.3 4.3-4.3 1.2 0 2.3.5 3 1.3l2.8-2.8c-1.5-1.6-3.7-2.6-5.8-2.6-4.6 0-8.3 3.7-8.3 8.3s3.7 8.3 8.3 8.3c2.2 0 4.3-1 5.8-2.6l-2.8-2.8c-.8.8-1.8 1.3-3 1.3-2.4-.1-4.3-2-4.3-4.4z" fill="#4285F4"/>
-    <path d="M26.2 8.3H22v16.1h4.2v-6.3h2.6c3.2 0 5.8-2.6 5.8-5.8s-2.6-5.8-5.8-5.8zm0 7.4H26v-3.2h2.2c1.2 0 2.2 1 2.2 2.2s-1 2.2-2.2 2.2z" fill="#EA4335"/>
-    <path d="M37.9 14.8c-2.4 0-4.3 1.9-4.3 4.3v5.4h4.2v-5.1c0-.8.6-1.4 1.4-1.4s1.4.6 1.4 1.4v5.1h4.2v-5.4c.1-2.4-1.8-4.3-4.3-4.3z" fill="#FBBC05"/>
-    <path d="M51.9 14.8c-2.1 0-3.9 1.5-4.2 3.5h8.4c-.3-2-2.1-3.5-4.2-3.5zm0-2.8c3.2 0 5.8 2.6 5.8 5.8v6.6h-4.2v-1.6c-1.1 1.3-2.8 2-4.6 2-3.2 0-5.8-2.6-5.8-5.8s2.6-5.8 5.8-5.8c1.8 0 3.5.7 4.6 2v-1c0-1.2-1-2.2-2.2-2.2c-.9 0-1.8.5-2.2 1.3l-3.3-1.8c1.3-2.1 3.5-3.3 5.9-3.3z" fill="#34A853"/>
-  </svg>
-);
-
-const PhonePeLogo = () => (
-  <svg viewBox="0 0 100 40" height="22" style={{ display: 'block' }}>
-    <rect width="100" height="40" rx="8" fill="#5f259f" />
-    <path d="M25 12h8v16h-8zm6 3c0-.6-.4-1-1-1s-1 .4-1 1v6c0 .6.4 1 1 1s1-.4 1-1z" fill="#fff" />
-    <circle cx="21" cy="20" r="3" fill="#fff" />
-    <text x="38" y="26" fill="#fff" style={{ fontFamily: 'sans-serif', fontWeight: 'bold', fontSize: '13px' }}>PhonePe</text>
-  </svg>
-);
-
-const BhimLogo = () => (
-  <svg viewBox="0 0 100 40" height="22" style={{ display: 'block' }}>
-    <path d="M10 28 L22 12 L35 12 L23 28 Z" fill="#FF9933" />
-    <path d="M27 28 L39 12 L43 12 L31 28 Z" fill="#000" />
-    <path d="M35 28 L47 12 L59 12 L47 28 Z" fill="#128807" />
-    <text x="50" y="26" fill="#003366" style={{ fontFamily: 'sans-serif', fontWeight: '800', fontSize: '12px', fontStyle: 'italic' }}>UPI</text>
-  </svg>
-);
-
-const PaytmLogo = () => (
-  <svg viewBox="0 0 100 40" height="22" style={{ display: 'block' }}>
-    <text x="10" y="26" fill="#00baf2" style={{ fontFamily: 'sans-serif', fontWeight: 'bold', fontSize: '20px' }}>Pay</text>
-    <text x="48" y="26" fill="#002e6e" style={{ fontFamily: 'sans-serif', fontWeight: 'bold', fontSize: '20px' }}>tm</text>
-  </svg>
-);
-
-const CardLogo = () => (
-  <svg viewBox="0 0 100 40" height="22" style={{ display: 'block' }}>
-    <rect x="5" y="8" width="40" height="24" rx="4" fill="#1A1F2C" />
-    <rect x="10" y="12" width="8" height="6" rx="1" fill="#FFD700" />
-    <text x="50" y="22" fill="#fff" style={{ fontFamily: 'sans-serif', fontWeight: 'bold', fontSize: '8px' }}>VISA</text>
-    <circle cx="78" cy="20" r="6" fill="#EB001B" opacity="0.9" />
-    <circle cx="86" cy="20" r="6" fill="#F79E1B" opacity="0.9" />
-  </svg>
-);
 
 const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
@@ -141,7 +41,7 @@ const Enroll = () => {
     });
 
     // Dynamic programs & pricing from database
-    const [programs, setPrograms] = useState(PROGRAMS_LIST);
+    const [programs, setPrograms] = useState(PROGRAMS_DATA);
     const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
     const [errors, setErrors] = useState({});
@@ -174,7 +74,7 @@ const Enroll = () => {
     };
 
     // Find pricing based on program selection
-    const selectedProgramData = programs.find(p => p.id === form.program) || programs[0] || PROGRAMS_LIST[0];
+    const selectedProgramData = programs.find(p => p.id === form.program) || programs[0] || PROGRAMS_DATA[0];
     const activePricing = selectedProgramData.pricing.find(pr => pr.weeks === Number(form.duration)) || selectedProgramData.pricing[2];
 
     const handleInput = (e) => {
@@ -202,26 +102,25 @@ const Enroll = () => {
     const handleDetailsSubmit = (e) => {
       e.preventDefault();
       const tempErrors = {};
-      if (!form.name.trim()) tempErrors.name = "Full name is required.";
+      if (!form.name.trim()) tempErrors.name = ENROLL_VALIDATION_MESSAGES.name;
       if (!form.email.trim()) {
-        tempErrors.email = "Email is required.";
+        tempErrors.email = ENROLL_VALIDATION_MESSAGES.emailRequired;
       } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-        tempErrors.email = "Enter a valid email.";
+        tempErrors.email = ENROLL_VALIDATION_MESSAGES.emailInvalid;
       }
       if (!form.phone.trim()) {
-        tempErrors.phone = "Phone number is required.";
+        tempErrors.phone = ENROLL_VALIDATION_MESSAGES.phoneRequired;
       } else if (!/^\+?[0-9\s-]{8,15}$/.test(form.phone.trim())) {
-        tempErrors.phone = "Enter a valid phone number.";
+        tempErrors.phone = ENROLL_VALIDATION_MESSAGES.phoneInvalid;
       }
-      if (!form.dob) tempErrors.dob = "Date of Birth is required.";
-      if (!form.bloodGroup) tempErrors.bloodGroup = "Select blood group.";
-      if (!form.weight.trim()) tempErrors.weight = "Weight is required.";
-      if (!form.height.trim()) tempErrors.height = "Height is required.";
-      if (!form.address.trim()) tempErrors.address = "Address is required.";
+      if (!form.dob) tempErrors.dob = ENROLL_VALIDATION_MESSAGES.dob;
+      if (!form.bloodGroup) tempErrors.bloodGroup = ENROLL_VALIDATION_MESSAGES.bloodGroup;
+      if (!form.weight.trim()) tempErrors.weight = ENROLL_VALIDATION_MESSAGES.weight;
+      if (!form.height.trim()) tempErrors.height = ENROLL_VALIDATION_MESSAGES.height;
+      if (!form.address.trim()) tempErrors.address = ENROLL_VALIDATION_MESSAGES.address;
 
       if (Object.keys(tempErrors).length > 0) {
         setErrors(tempErrors);
-        // Scroll to top of form
         window.scrollTo({ top: 150, behavior: 'smooth' });
         return;
       }
@@ -234,7 +133,6 @@ const Enroll = () => {
       setIsProcessingPayment(true);
 
       try {
-        // 1. Create order on the backend to dynamically calculate amount and key configuration securely
         const response = await fetch(`${API_BASE_URL}/api/create-order`, {
           method: 'POST',
           headers: {
@@ -260,14 +158,13 @@ const Enroll = () => {
           throw new Error(errData.error || 'Server rejected order creation request.');
         }
 
-        const orderData = await response.json(); // returns orderId, amount, currency, keyId
+        const orderData = await response.json();
 
-        // 2. Configure Razorpay Standard Checkout SDK popup options
         const options = {
           key: orderData.keyId,
           amount: orderData.amount,
           currency: orderData.currency,
-          name: "1 Step More",
+          name: BRAND.name,
           description: `Enrollment in ${selectedProgramData.title}`,
           order_id: orderData.orderId,
           prefill: {
@@ -282,7 +179,6 @@ const Enroll = () => {
             try {
               setIsProcessingPayment(true);
               
-              // 3. Post to backend node to verify signature of payment before confirming order
               const verifyResponse = await fetch(`${API_BASE_URL}/api/verify-payment`, {
                 method: 'POST',
                 headers: {
@@ -297,7 +193,7 @@ const Enroll = () => {
 
               const verifyData = await verifyResponse.json();
               if (verifyData.success) {
-                setStep(3); // Direct to payment success view
+                setStep(3);
               } else {
                 alert(verifyData.error || 'Razorpay Signature verification failed.');
               }
@@ -340,28 +236,25 @@ const Enroll = () => {
           </div>
 
           <div className="section-header enroll-header">
-            <h1>Complete Your <span>Enrollment</span></h1>
-            <p>Provide your biology parameters and secure checkout to lock in your personalized roadmap call.</p>
+            <h1>{ENROLL_HEADER_CONTENT.titlePrefix}<span>{ENROLL_HEADER_CONTENT.titleHighlight}</span></h1>
+            <p>{ENROLL_HEADER_CONTENT.description}</p>
           </div>
 
           {/* Stepper Progress Indicator */}
           <div className="enroll-stepper-wrapper">
-            <div className="enroll-step-container">
-              <div className={`enroll-step-number ${step >= 1 ? 'active' : ''}`}>1</div>
-              <span className={`enroll-step-label ${step === 1 ? 'active' : ''}`}>Biological Stats</span>
-            </div>
-            <div className={`enroll-step-line ${step >= 2 ? 'active' : ''}`}></div>
-            
-            <div className="enroll-step-container">
-              <div className={`enroll-step-number ${step >= 2 ? 'active' : ''}`}>2</div>
-              <span className={`enroll-step-label ${step === 2 ? 'active' : ''}`}>Secure Payment</span>
-            </div>
-            <div className={`enroll-step-line ${step === 3 ? 'active' : ''}`}></div>
-
-            <div className="enroll-step-container">
-              <div className={`enroll-step-number ${step === 3 ? 'active' : ''}`}><Check size={14} /></div>
-              <span className={`enroll-step-label ${step === 3 ? 'active' : ''}`}>Success</span>
-            </div>
+            {ENROLL_STEPPER.map((st, idx) => (
+              <React.Fragment key={st.step}>
+                <div className="enroll-step-container">
+                  <div className={`enroll-step-number ${step >= st.step ? 'active' : ''}`}>
+                    {st.step === 3 && step === 3 ? <Check size={14} /> : st.step}
+                  </div>
+                  <span className={`enroll-step-label ${step === st.step ? 'active' : ''}`}>{st.label}</span>
+                </div>
+                {idx < ENROLL_STEPPER.length - 1 && (
+                  <div className={`enroll-step-line ${step >= st.step + 1 ? 'active' : ''}`}></div>
+                )}
+              </React.Fragment>
+            ))}
           </div>
 
           {/* STEP 3: SUCCESS */}
@@ -370,22 +263,22 @@ const Enroll = () => {
               <div className="enroll-success-icon-circle">
                 <CheckCircle size={40} />
               </div>
-              <h2 className="enroll-success-title">Enrollment Confirmed!</h2>
+              <h2 className="enroll-success-title">{ENROLL_SUCCESS_CONTENT.title}</h2>
               <p className="enroll-success-desc">
                 Thank you, <strong>{form.name}</strong>. Your payment was successfully processed. We have locked in your slot for the <strong>{selectedProgramData.title} ({activePricing.label || `${form.duration} Weeks`})</strong>.
               </p>
               
               <div className="enroll-success-summary">
-                <div><strong>Biological Configuration:</strong> {form.age} Years &bull; Blood group {form.bloodGroup} &bull; Weight {form.weight} kg &bull; Height {form.height}</div>
-                <div><strong>Delivery Address:</strong> {form.address}</div>
-                <div><strong>Secured Gateway:</strong> Razorpay Secure Payment (Verified API Node)</div>
+                <div><strong>{ENROLL_SUCCESS_CONTENT.bioLabel}</strong> {form.age} Years &bull; Blood group {form.bloodGroup} &bull; Weight {form.weight} kg &bull; Height {form.height}</div>
+                <div><strong>{ENROLL_SUCCESS_CONTENT.addressLabel}</strong> {form.address}</div>
+                <div><strong>{ENROLL_SUCCESS_CONTENT.gatewayLabel}</strong> {ENROLL_SUCCESS_CONTENT.gatewayValue}</div>
                 <div className="enroll-success-total">
-                  Active Transaction Value: ₹{activePricing.offer.toLocaleString('en-IN')}/-
+                  {ENROLL_SUCCESS_CONTENT.activeValueLabel} ₹{activePricing.offer.toLocaleString('en-IN')}/-
                 </div>
               </div>
 
               <button onClick={() => navigate('/services')} className="btn btn-primary enroll-success-btn">
-                Return to Services
+                {ENROLL_SUCCESS_CONTENT.returnBtnText}
               </button>
             </div>
           )}
@@ -401,20 +294,20 @@ const Enroll = () => {
                 {step === 1 && (
                   <form onSubmit={handleDetailsSubmit} className="enroll-step-form">
                     <h3 className="enroll-form-title">
-                      Biological Stats & Contact Info
+                      {ENROLL_FORM_LABELS.step1Title}
                     </h3>
 
                     <div className="enroll-form-grid-vertical">
                       
                       {/* Name input */}
                       <div className="form-group">
-                        <label className="form-label" htmlFor="name">Full Name</label>
+                        <label className="form-label" htmlFor="name">{ENROLL_FORM_LABELS.name}</label>
                         <input
                           type="text"
                           id="name"
                           name="name"
                           className="form-input"
-                          placeholder="e.g. Sarah Miller"
+                          placeholder={ENROLL_FORM_LABELS.namePlaceholder}
                           value={form.name}
                           onChange={handleInput}
                         />
@@ -424,13 +317,13 @@ const Enroll = () => {
                       {/* Email & Phone */}
                       <div className="enroll-form-grid-half">
                         <div className="form-group">
-                          <label className="form-label" htmlFor="email">Email Address</label>
+                          <label className="form-label" htmlFor="email">{ENROLL_FORM_LABELS.email}</label>
                           <input
                             type="email"
                             id="email"
                             name="email"
                             className="form-input"
-                            placeholder="e.g. sarah@example.com"
+                            placeholder={ENROLL_FORM_LABELS.emailPlaceholder}
                             value={form.email}
                             onChange={handleInput}
                           />
@@ -438,13 +331,13 @@ const Enroll = () => {
                         </div>
 
                         <div className="form-group">
-                          <label className="form-label" htmlFor="phone">Phone Number</label>
+                          <label className="form-label" htmlFor="phone">{ENROLL_FORM_LABELS.phone}</label>
                           <input
                             type="text"
                             id="phone"
                             name="phone"
                             className="form-input"
-                            placeholder="e.g. +91 98765 43210"
+                            placeholder={ENROLL_FORM_LABELS.phonePlaceholder}
                             value={form.phone}
                             onChange={handleInput}
                           />
@@ -455,7 +348,7 @@ const Enroll = () => {
                       {/* Program choice override dropdowns */}
                       <div className="enroll-form-grid-asym">
                         <div className="form-group">
-                          <label className="form-label" htmlFor="program">Change Program Choice</label>
+                          <label className="form-label" htmlFor="program">{ENROLL_FORM_LABELS.program}</label>
                           <select
                             id="program"
                             name="program"
@@ -470,7 +363,7 @@ const Enroll = () => {
                         </div>
 
                         <div className="form-group">
-                          <label className="form-label" htmlFor="duration">Weeks Duration</label>
+                          <label className="form-label" htmlFor="duration">{ENROLL_FORM_LABELS.duration}</label>
                           <select
                             id="duration"
                             name="duration"
@@ -490,7 +383,7 @@ const Enroll = () => {
                       {/* DOB and automatic age calculation */}
                       <div className="enroll-form-grid-asym">
                         <div className="form-group">
-                          <label className="form-label" htmlFor="dob">Date of Birth</label>
+                          <label className="form-label" htmlFor="dob">{ENROLL_FORM_LABELS.dob}</label>
                           <input
                             type="date"
                             id="dob"
@@ -503,13 +396,13 @@ const Enroll = () => {
                         </div>
 
                         <div className="form-group">
-                          <label className="form-label" htmlFor="age">Calculated Age</label>
+                          <label className="form-label" htmlFor="age">{ENROLL_FORM_LABELS.age}</label>
                           <input
                             type="text"
                             id="age"
                             name="age"
                             className="form-input disabled-input"
-                            placeholder="Automatic"
+                            placeholder={ENROLL_FORM_LABELS.agePlaceholder}
                             readOnly
                             value={form.age ? `${form.age} Years` : ''}
                           />
@@ -519,7 +412,7 @@ const Enroll = () => {
                       {/* Stats details: Blood Group, Weight, Height */}
                       <div className="enroll-form-grid-thirds">
                         <div className="form-group">
-                          <label className="form-label" htmlFor="bloodGroup">Blood Group</label>
+                          <label className="form-label" htmlFor="bloodGroup">{ENROLL_FORM_LABELS.bloodGroup}</label>
                           <select
                             id="bloodGroup"
                             name="bloodGroup"
@@ -527,7 +420,7 @@ const Enroll = () => {
                             value={form.bloodGroup}
                             onChange={handleInput}
                           >
-                            <option value="">Select</option>
+                            <option value="">{ENROLL_FORM_LABELS.bloodGroupSelect}</option>
                             {BLOOD_GROUPS.map(bg => (
                               <option key={bg} value={bg}>{bg}</option>
                             ))}
@@ -536,13 +429,13 @@ const Enroll = () => {
                         </div>
 
                         <div className="form-group">
-                          <label className="form-label" htmlFor="weight">Weight (kg)</label>
+                          <label className="form-label" htmlFor="weight">{ENROLL_FORM_LABELS.weight}</label>
                           <input
                             type="text"
                             id="weight"
                             name="weight"
                             className="form-input"
-                            placeholder="e.g. 68"
+                            placeholder={ENROLL_FORM_LABELS.weightPlaceholder}
                             value={form.weight}
                             onChange={handleInput}
                           />
@@ -550,13 +443,13 @@ const Enroll = () => {
                         </div>
 
                         <div className="form-group">
-                          <label className="form-label" htmlFor="height">Height</label>
+                          <label className="form-label" htmlFor="height">{ENROLL_FORM_LABELS.height}</label>
                           <input
                             type="text"
                             id="height"
                             name="height"
                             className="form-input"
-                            placeholder="e.g. 5ft 4in or 165cm"
+                            placeholder={ENROLL_FORM_LABELS.heightPlaceholder}
                             value={form.height}
                             onChange={handleInput}
                           />
@@ -566,13 +459,13 @@ const Enroll = () => {
 
                       {/* Address */}
                       <div className="form-group">
-                        <label className="form-label" htmlFor="address">Your Physical Address</label>
+                        <label className="form-label" htmlFor="address">{ENROLL_FORM_LABELS.address}</label>
                         <input
                           type="text"
                           id="address"
                           name="address"
                           className="form-input"
-                          placeholder="e.g. Gomti Nagar, Lucknow, UP"
+                          placeholder={ENROLL_FORM_LABELS.addressPlaceholder}
                           value={form.address}
                           onChange={handleInput}
                         />
@@ -582,7 +475,7 @@ const Enroll = () => {
                     </div>
 
                     <button type="submit" className="btn btn-primary enroll-submit-btn">
-                      Proceed to Payment <ArrowRight size={16} />
+                      {ENROLL_FORM_LABELS.proceedToPayment} <ArrowRight size={16} />
                     </button>
                   </form>
                 )}
@@ -592,10 +485,10 @@ const Enroll = () => {
                   <form onSubmit={handlePaymentSubmit} className="enroll-payment-form">
                     <div>
                       <h3 className="enroll-payment-title">
-                        Review & Complete Payment
+                        {ENROLL_PAYMENT_CONTENT.title}
                       </h3>
                       <p className="enroll-payment-subtitle">
-                        You will be redirected to the secure Razorpay Checkout node to complete your transaction.
+                        {ENROLL_PAYMENT_CONTENT.subtitle}
                       </p>
                     </div>
 
@@ -603,7 +496,7 @@ const Enroll = () => {
                     <div className="enroll-summary-grid">
                       <div className="enroll-summary-card">
                         <h4 className="enroll-card-label">
-                          Billing Details
+                          {ENROLL_PAYMENT_CONTENT.billingDetailsTitle}
                         </h4>
                         <div className="enroll-card-details">
                           <div><strong>Name:</strong> {form.name}</div>
@@ -614,7 +507,7 @@ const Enroll = () => {
 
                       <div className="enroll-summary-card">
                         <h4 className="enroll-card-label">
-                          Biological Parameters
+                          {ENROLL_PAYMENT_CONTENT.bioParamsTitle}
                         </h4>
                         <div className="enroll-card-details">
                           {form.age} Years &bull; Blood group {form.bloodGroup} &bull; Weight {form.weight} kg &bull; Height {form.height}
@@ -626,8 +519,8 @@ const Enroll = () => {
                     <div className="enroll-security-card">
                       <Shield size={36} color="var(--primary)" />
                       <div className="enroll-security-text">
-                        <strong>100% Encrypted Transactions</strong>
-                        <div className="desc">Payments are securely routed via 128-bit SSL encrypted connection through the official Razorpay node.</div>
+                        <strong>{ENROLL_PAYMENT_CONTENT.securityTitle}</strong>
+                        <div className="desc">{ENROLL_PAYMENT_CONTENT.securityDescription}</div>
                       </div>
                     </div>
 
@@ -639,11 +532,11 @@ const Enroll = () => {
                     >
                       {isProcessingPayment ? (
                         <>
-                          <RefreshCw className="spin-animation" size={16} /> Connecting Secure Node...
+                          <RefreshCw className="spin-animation" size={16} /> {ENROLL_PAYMENT_CONTENT.connectingNode}
                         </>
                       ) : (
                         <>
-                          <CreditCard size={18} /> Pay Securely ₹{activePricing.offer.toLocaleString('en-IN')}/-
+                          <CreditCard size={18} /> {ENROLL_PAYMENT_CONTENT.paySecurely} ₹{activePricing.offer.toLocaleString('en-IN')}/-
                         </>
                       )}
                     </button>
@@ -656,17 +549,17 @@ const Enroll = () => {
               <div className="enroll-sidebar">
                 <div>
                   <h4 className="enroll-sidebar-title">
-                    Chosen Pricing Details
+                    {ENROLL_SIDEBAR_CONTENT.title}
                   </h4>
                   <p className="enroll-sidebar-subtitle">
-                    Calculated based on your selection.
+                    {ENROLL_SIDEBAR_CONTENT.subtitle}
                   </p>
                 </div>
 
                 {/* Package Details Box */}
                 <div className="enroll-package-box">
                   <span className="enroll-package-label">
-                    Selected Program & Term
+                    {ENROLL_SIDEBAR_CONTENT.programTermLabel}
                   </span>
                   <h4 className="enroll-package-title">
                     {selectedProgramData.title}
@@ -679,26 +572,26 @@ const Enroll = () => {
                 {/* Pricing Box */}
                 <div className="enroll-pricing-box">
                   <div className="enroll-pricing-row">
-                    <span>Original Price:</span>
+                    <span>{ENROLL_SIDEBAR_CONTENT.originalPrice}</span>
                     <span>₹{activePricing.original.toLocaleString('en-IN')}/-</span>
                   </div>
                   <div className="enroll-pricing-row-main">
-                    <span>Offer Price:</span>
+                    <span>{ENROLL_SIDEBAR_CONTENT.offerPrice}</span>
                     <span className="enroll-pricing-value">₹{activePricing.offer.toLocaleString('en-IN')}/-</span>
                   </div>
                   <div className="enroll-savings-badge">
-                    You Save: ₹{(activePricing.original - activePricing.offer).toLocaleString('en-IN')}/- ({Math.round(((activePricing.original - activePricing.offer) / activePricing.original) * 100)}% Off)
+                    {ENROLL_SIDEBAR_CONTENT.youSave} ₹{(activePricing.original - activePricing.offer).toLocaleString('en-IN')}/- ({Math.round(((activePricing.original - activePricing.offer) / activePricing.original) * 100)}% Off)
                   </div>
                 </div>
 
                 <div className="enroll-protection-section">
                   <div className="enroll-protection-line">
                     <Shield size={16} color="var(--primary)" />
-                    <span>14-day refund protection applies automatically.</span>
+                    <span>{ENROLL_SIDEBAR_CONTENT.guarantees[0]}</span>
                   </div>
                   <div className="enroll-protection-line">
                     <Heart size={16} color="var(--secondary)" />
-                    <span>Personalized dietitian review every 7 days.</span>
+                    <span>{ENROLL_SIDEBAR_CONTENT.guarantees[1]}</span>
                   </div>
                 </div>
               </div>
@@ -712,13 +605,13 @@ const Enroll = () => {
     return (
       <div className="enroll-error-main">
         <div className="enroll-error-box">
-          <h2>Enrollment Module Rendering Error</h2>
-          <p>We caught a JavaScript routing or reference error during compilation rendering. Diagnostics trace details:</p>
+          <h2>Enrollment Module Error</h2>
+          <p>We caught an error. Diagnostics trace details:</p>
           <pre className="enroll-error-stack">
             {err.stack || err.toString()}
           </pre>
           <Link to="/services" className="enroll-error-link">
-            Return to Services Tab
+            Return to Services
           </Link>
         </div>
       </div>
