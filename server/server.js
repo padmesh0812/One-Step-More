@@ -310,8 +310,12 @@ if (!razorpay) {
   console.warn('⚠️ RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET is not set in environment. Set them in your deployment dashboard to enable payments.');
 }
 
+import mongoose from 'mongoose';
+
+let dbConnectionError = null;
 // Connect to MongoDB Atlas on startup
 connectDB().catch(err => {
+  dbConnectionError = err.message;
   console.error('Fatal: Failed to connect to MongoDB Atlas on launch:', err.message);
 });
 
@@ -321,7 +325,17 @@ app.get('/', (req, res) => {
     status: 'ok',
     service: 'One Step More Backend API',
     database: 'MongoDB Atlas',
+    readyState: mongoose.connection.readyState,
     uptime: process.uptime()
+  });
+});
+
+app.get('/api/db-debug', (req, res) => {
+  res.json({
+    readyState: mongoose.connection.readyState,
+    status: ['disconnected', 'connected', 'connecting', 'disconnecting'][mongoose.connection.readyState] || 'unknown',
+    error: dbConnectionError,
+    uriConfigured: Boolean(process.env.MONGODB_URI)
   });
 });
 
@@ -332,7 +346,7 @@ app.get('/api/plans', async (req, res) => {
     res.json(plans);
   } catch (err) {
     console.error('Error fetching plans:', err.message);
-    res.status(500).json({ error: 'Server error fetching plans' });
+    res.status(500).json({ error: 'Server error fetching plans', details: err.message });
   }
 });
 
