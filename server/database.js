@@ -1,50 +1,64 @@
-import sqlite3 from 'sqlite3';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
+import 'dotenv/config';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const dbPath = join(__dirname, 'database.sqlite');
+// Default connection string fallback if MONGODB_URI not explicitly passed
+const MONGODB_URI = (
+  process.env.MONGODB_URI ||
+  'mongodb+srv://onestepmore04_db_user:mhA7PxqfAOcdEmOp@cluster0.nz4rnds.mongodb.net/onestepmore?retryWrites=true&w=majority&appName=Cluster0'
+).trim();
 
-// Initialize database connection
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('Error opening database:', err.message);
-  } else {
-    console.log('Connected to the SQLite database at:', dbPath);
-    initTables();
-  }
+// 1. Program / Plan Schema
+const planSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  title: { type: String, required: true },
+  pricing: [
+    {
+      weeks: Number,
+      days: Number,
+      label: String,
+      original: Number,
+      offer: Number
+    }
+  ]
+}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
+
+// 2. Order Schema (Enrollments & Razorpay transactions)
+const orderSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  phone: { type: String, required: true },
+  program_id: { type: String, required: true },
+  duration: { type: Number, required: true },
+  amount: { type: Number, required: true },
+  status: { type: String, default: 'pending', enum: ['pending', 'paid', 'failed'] },
+  razorpay_order_id: { type: String, required: true, unique: true },
+  razorpay_payment_id: { type: String, default: '' },
+  blood_group: { type: String, default: '' },
+  weight: { type: String, default: '' },
+  height: { type: String, default: '' },
+  dob: { type: String, default: '' },
+  age: { type: Number },
+  address: { type: String, default: '' },
+  created_at: { type: Date, default: Date.now }
 });
 
-// Wrap DB calls in Promises for cleaner async/await usage
-export const dbRun = (query, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.run(query, params, function (err) {
-      if (err) reject(err);
-      else resolve(this);
-    });
-  });
-};
+// 3. Inquiry Schema (Consultation leads & contact inquiries)
+const inquirySchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  phone: { type: String, required: true },
+  reason: { type: String, default: 'General Inquiry' },
+  address: { type: String, default: '' },
+  message: { type: String, default: '' },
+  created_at: { type: Date, default: Date.now }
+});
 
-export const dbGet = (query, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.get(query, params, (err, row) => {
-      if (err) reject(err);
-      else resolve(row);
-    });
-  });
-};
+export const Plan = mongoose.models.Plan || mongoose.model('Plan', planSchema);
+export const Order = mongoose.models.Order || mongoose.model('Order', orderSchema);
+export const Inquiry = mongoose.models.Inquiry || mongoose.model('Inquiry', inquirySchema);
 
-export const dbAll = (query, params = []) => {
-  return new Promise((resolve, reject) => {
-    db.all(query, params, (err, rows) => {
-      if (err) reject(err);
-      else resolve(rows);
-    });
-  });
-};
-
-// Default program and pricing data to seed
-const DEFAULT_PROGRAMS = [
+// Default programs and pricing data to seed
+export const DEFAULT_PROGRAMS = [
   {
     id: 'diet',
     title: "Customized Diet Program",
@@ -109,69 +123,28 @@ const DEFAULT_PROGRAMS = [
   }
 ];
 
-async function initTables() {
+// Initialize and connect to MongoDB Atlas
+export async function connectDB() {
   try {
-    // Create plans table
-    await dbRun(`
-      CREATE TABLE IF NOT EXISTS plans (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        pricing TEXT NOT NULL
-      )
-    `);
-
-    // Create orders table
-    await dbRun(`
-      CREATE TABLE IF NOT EXISTS orders (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        email TEXT NOT NULL,
-        phone TEXT NOT NULL,
-        program_id TEXT NOT NULL,
-        duration INTEGER NOT NULL,
-        amount REAL NOT NULL,
-        status TEXT DEFAULT 'pending',
-        razorpay_order_id TEXT UNIQUE NOT NULL,
-        razorpay_payment_id TEXT,
-        blood_group TEXT,
-        weight TEXT,
-        height TEXT,
-        dob TEXT,
-        age INTEGER,
-        address TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
-    // Create inquiries table for contact/consultation leads
-    await dbRun(`
-      CREATE TABLE IF NOT EXISTS inquiries (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        email TEXT NOT NULL,
-        phone TEXT NOT NULL,
-        reason TEXT,
-        address TEXT,
-        message TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
-    // Check if plans need to be seeded
-    const row = await dbGet('SELECT COUNT(*) as count FROM plans');
-    if (row.count === 0) {
-      console.log('Seeding initial plans into database...');
-      for (const p of DEFAULT_PROGRAMS) {
-        await dbRun(
-          'INSERT INTO plans (id, title, pricing) VALUES (?, ?, ?)',
-          [p.id, p.title, JSON.stringify(p.pricing)]
-        );
-      }
-      console.log('Seeding completed successfully!');
+    if (mongoose.connection.readyState >= 1) {
+      return mongoose.connection;
     }
+
+    console.log('Connecting to MongoDB Atlas at:', MONGODB_URI.replace(/:([^:@]{4})[^:@]*@/, ':****@'));
+    await mongoose.connect(MONGODB_URI);
+    console.log('✅ Connected to MongoDB Atlas! Database:', mongoose.connection.name);
+
+    // Auto-seed plans if collection is empty
+    const planCount = await Plan.countDocuments();
+    if (planCount === 0) {
+      console.log('Seeding initial plans into MongoDB Atlas...');
+      await Plan.insertMany(DEFAULT_PROGRAMS);
+      console.log('✅ Initial plans seeded successfully!');
+    }
+
+    return mongoose.connection;
   } catch (err) {
-    console.error('Database initialization error:', err.message);
+    console.error('❌ MongoDB Atlas Connection Error:', err.message);
+    throw err;
   }
 }
-
-export default db;
