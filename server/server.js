@@ -104,6 +104,128 @@ async function sendClientConfirmationEmail({ clientEmail, clientName, reason }) 
   return false;
 }
 
+// Helper: Send branded payment confirmation and welcome email to enrolled client
+async function sendClientPaymentSuccessEmail({ clientEmail, clientName, programId, duration, amount, paymentId, orderId }) {
+  if (!transporter || !clientEmail) return false;
+
+  try {
+    const info = await transporter.sendMail({
+      from: `"1 Step More | Dt. Pragati Mishra" <${process.env.SMTP_USER}>`,
+      to: clientEmail,
+      subject: `🎉 Enrollment Confirmed: Welcome to 1 Step More, ${clientName}!`,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 620px; margin: 0 auto; background-color: #FFFFFF; border-radius: 12px; overflow: hidden; border: 1px solid #E5E7EB; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+          
+          <!-- Brand Header -->
+          <div style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%); padding: 36px 28px; text-align: center; color: #FFFFFF;">
+            <span style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Payment Confirmed</span>
+            <h1 style="margin: 10px 0 4px 0; font-size: 26px; font-weight: 800;">1 Step More</h1>
+            <p style="margin: 0; font-size: 13px; opacity: 0.9;">Diet • Yoga • Holistic Lifestyle Coaching</p>
+          </div>
+
+          <!-- Body -->
+          <div style="padding: 32px 28px; color: #374151; line-height: 1.6;">
+            <h2 style="color: #1F2937; font-size: 20px; margin-top: 0;">Welcome aboard, ${clientName}! 🌱</h2>
+            <p style="font-size: 15px; margin-bottom: 20px;">
+              We have successfully received your payment and locked in your slot for the <strong>${programId.toUpperCase()} Transformation Program (${duration} Weeks)</strong>.
+            </p>
+
+            <!-- Receipt Box -->
+            <div style="background-color: #F8FAF8; border: 1.5px solid #E2EFE2; border-radius: 10px; padding: 20px; margin: 24px 0;">
+              <h3 style="margin: 0 0 14px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: #2E7D32;">Payment Summary</h3>
+              <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                <tr>
+                  <td style="padding: 6px 0; color: #6B7280;">Amount Paid:</td>
+                  <td style="padding: 6px 0; font-weight: 700; text-align: right; color: #2E7D32;">₹${Number(amount).toLocaleString('en-IN')}/-</td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 0; color: #6B7280;">Payment ID:</td>
+                  <td style="padding: 6px 0; font-family: monospace; font-size: 13px; text-align: right; color: #1F2937;">${paymentId}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 0; color: #6B7280;">Order ID:</td>
+                  <td style="padding: 6px 0; font-family: monospace; font-size: 13px; text-align: right; color: #6B7280;">${orderId}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 6px 0; color: #6B7280;">Status:</td>
+                  <td style="padding: 6px 0; font-weight: 700; text-align: right; color: #2E7D32;">PAID IN FULL</td>
+                </tr>
+              </table>
+            </div>
+
+            <!-- What to Expect Next -->
+            <h3 style="color: #1F2937; font-size: 16px; margin: 24px 0 12px 0;">What happens next?</h3>
+            <ol style="margin: 0; padding-left: 20px; font-size: 14px; color: #4B5563; line-height: 1.8;">
+              <li>Our senior clinical nutritionist will connect with you via Phone or WhatsApp within <strong>24 hours</strong>.</li>
+              <li>We will review your dietary preferences, lifestyle routine, and health parameters.</li>
+              <li>Your personalized weekly nutrition guide, habit protocol, and yoga schedule will be shared directly with you.</li>
+            </ol>
+
+            <div style="background-color: #F3F4F6; border-left: 4px solid #2E7D32; padding: 14px 16px; border-radius: 6px; margin: 24px 0;">
+              <p style="margin: 0; font-size: 13.5px; color: #4B5563;">
+                <em>"Every healthy habit begins with one small step. You have taken that step today—and we are committed to walking with you till you achieve your dream fitness."</em>
+              </p>
+              <p style="margin: 6px 0 0 0; font-size: 13px; font-weight: 700; color: #2E7D32;">
+                — Dt. Pragati Mishra (Founder & Lead Coach)
+              </p>
+            </div>
+
+            <p style="font-size: 13.5px; color: #6B7280;">
+              Need any immediate assistance? WhatsApp us directly at <a href="https://wa.me/918115660790" style="color: #2E7D32; font-weight: 600;">+91 8115660790</a> or write to <a href="mailto:hello@onestepmore.in" style="color: #2E7D32;">hello@onestepmore.in</a>.
+            </p>
+          </div>
+
+          <!-- Footer -->
+          <div style="background-color: #F9FAFB; padding: 20px 28px; text-align: center; border-top: 1px solid #E5E7EB; font-size: 12px; color: #9CA3AF;">
+            <p style="margin: 0 0 4px 0;">&copy; ${new Date().getFullYear()} 1 Step More Health & Wellness Clinic.</p>
+            <p style="margin: 0;">Gomti Nagar, Lucknow, UP, India &bull; <a href="https://www.onestepmore.in" style="color: #9CA3AF; text-decoration: underline;">www.onestepmore.in</a></p>
+          </div>
+        </div>
+      `
+    });
+    console.log(`[Client Payment Email Sent] ID: ${info.messageId} | Recipient: ${clientEmail}`);
+    return true;
+  } catch (err) {
+    console.error('[Client Payment Email Error] Failed to send receipt to client:', err.message);
+  }
+  return false;
+}
+
+// Helper: Send SMS confirmation to client's phone if SMS provider configured
+async function sendClientPaymentSms({ phone, name, programId, amount, paymentId }) {
+  const cleanPhone = phone?.replace(/[^0-9]/g, '');
+  if (!cleanPhone) return false;
+
+  const smsText = `Hi ${name}, your enrollment in 1 Step More (${programId}) for Rs.${amount} is confirmed! Payment ID: ${paymentId}. Our team will call you within 24h. Query: 8115660790`;
+
+  // Fast2SMS Gateway integration hook
+  if (process.env.FAST2SMS_API_KEY) {
+    try {
+      const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
+        method: 'POST',
+        headers: {
+          'authorization': process.env.FAST2SMS_API_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          route: 'q',
+          message: smsText,
+          language: 'english',
+          numbers: cleanPhone
+        })
+      });
+      const data = await response.json();
+      console.log(`[SMS Sent via Fast2SMS] To: ${cleanPhone}`, data);
+      return true;
+    } catch (err) {
+      console.error('[SMS Error] Fast2SMS dispatch failed:', err.message);
+    }
+  } else {
+    console.log(`[SMS Ready] Provider not yet active in env. SMS message to ${cleanPhone}: "${smsText}"`);
+  }
+  return false;
+}
+
 app.use(cors());
 app.use(express.json());
 
@@ -232,23 +354,46 @@ app.post('/api/verify-payment', async (req, res) => {
         ['paid', razorpay_payment_id, razorpay_order_id]
       );
 
-      // Send email alert for paid enrollment
+      // Send email alerts and client confirmation for paid enrollment
       dbGet('SELECT * FROM orders WHERE razorpay_order_id = ?', [razorpay_order_id])
         .then(orderInfo => {
+          if (!orderInfo) return;
+
+          // 1. Alert to Business Owner / Admin
           sendNotificationEmail({
-            subject: `💰 Payment Received: ₹${orderInfo?.amount || ''} from ${orderInfo?.name || 'Customer'}`,
+            subject: `💰 Payment Received: ₹${orderInfo.amount || ''} from ${orderInfo.name || 'Customer'}`,
             htmlText: `
               <h2>🎉 New Paid Enrollment Received!</h2>
-              <p><strong>Customer:</strong> ${orderInfo?.name || '-'}</p>
-              <p><strong>Phone:</strong> <a href="tel:${orderInfo?.phone}">${orderInfo?.phone || '-'}</a></p>
-              <p><strong>Email:</strong> ${orderInfo?.email || '-'}</p>
-              <p><strong>Program:</strong> ${orderInfo?.program_id || '-'} (${orderInfo?.duration || '-'} Weeks)</p>
-              <p><strong>Amount:</strong> ₹${orderInfo?.amount || '-'}</p>
+              <p><strong>Customer:</strong> ${orderInfo.name || '-'}</p>
+              <p><strong>Phone:</strong> <a href="tel:${orderInfo.phone}">${orderInfo.phone || '-'}</a> &bull; <a href="https://wa.me/${(orderInfo.phone || '').replace(/[^0-9]/g, '')}">WhatsApp</a></p>
+              <p><strong>Email:</strong> ${orderInfo.email || '-'}</p>
+              <p><strong>Program:</strong> ${orderInfo.program_id || '-'} (${orderInfo.duration || '-'} Weeks)</p>
+              <p><strong>Amount:</strong> ₹${orderInfo.amount || '-'}</p>
               <p><strong>Payment ID:</strong> ${razorpay_payment_id}</p>
               <p><strong>Order ID:</strong> ${razorpay_order_id}</p>
               <hr/>
               <p><a href="https://one-step-more.onrender.com/admin" style="background:#2E7D32;color:#fff;padding:8px 16px;text-decoration:none;border-radius:6px;">Open Admin Dashboard</a></p>
             `
+          });
+
+          // 2. Branded Confirmation & Receipt Email to Client
+          sendClientPaymentSuccessEmail({
+            clientEmail: orderInfo.email,
+            clientName: orderInfo.name,
+            programId: orderInfo.program_id,
+            duration: orderInfo.duration,
+            amount: orderInfo.amount,
+            paymentId: razorpay_payment_id,
+            orderId: razorpay_order_id
+          });
+
+          // 3. SMS Notification to Client Phone
+          sendClientPaymentSms({
+            phone: orderInfo.phone,
+            name: orderInfo.name,
+            programId: orderInfo.program_id,
+            amount: orderInfo.amount,
+            paymentId: razorpay_payment_id
           });
         })
         .catch(err => console.error('Error fetching order for email:', err));
