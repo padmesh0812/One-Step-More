@@ -126,12 +126,14 @@ export const DEFAULT_PROGRAMS = [
 // Initialize and connect to MongoDB Atlas
 export async function connectDB() {
   try {
-    if (mongoose.connection.readyState >= 1) {
+    if (mongoose.connection.readyState === 1) {
       return mongoose.connection;
     }
 
-    console.log('Connecting to MongoDB Atlas at:', MONGODB_URI.replace(/:([^:@]{4})[^:@]*@/, ':****@'));
-    await mongoose.connect(MONGODB_URI);
+    console.log('Connecting to MongoDB Atlas...');
+    await mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of hanging
+    });
     console.log('✅ Connected to MongoDB Atlas! Database:', mongoose.connection.name);
 
     // Auto-seed plans if collection is empty
