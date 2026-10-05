@@ -298,6 +298,18 @@ async function sendClientPaymentSms({ phone, name, programId, amount, paymentId 
 app.use(cors());
 app.use(express.json());
 
+// Auto-reconnect to MongoDB Atlas if connection dropped or started before whitelist was active
+app.use(async (req, res, next) => {
+  if (mongoose.connection.readyState !== 1) {
+    try {
+      await connectDB();
+    } catch (err) {
+      // Allow next() so debug/health endpoints can report status
+    }
+  }
+  next();
+});
+
 // Initialize Razorpay SDK safely
 const razorpay = (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET)
   ? new Razorpay({
