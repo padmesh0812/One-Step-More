@@ -3,6 +3,7 @@ import cors from 'cors';
 import crypto from 'crypto';
 import Razorpay from 'razorpay';
 import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import 'dotenv/config';
 import { dbGet, dbRun, dbAll } from './database.js';
 import { renderAdminHtml } from './adminDashboard.js';
@@ -10,7 +11,11 @@ import { renderAdminHtml } from './adminDashboard.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Setup Nodemailer transporter with port 465 SSL (required for Render cloud compatibility)
+// Initialize Resend HTTPS email service (Bypasses Render cloud port restrictions via Port 443)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const resendSender = process.env.RESEND_FROM_EMAIL || '1 Step More <onboarding@resend.dev>';
+
+// Setup Nodemailer transporter with port 465 SSL (as secondary / local fallback)
 const transporter = (process.env.SMTP_USER && process.env.SMTP_PASS) ? nodemailer.createTransport({
   host: 'smtp.gmail.com',
   port: 465,
@@ -21,10 +26,29 @@ const transporter = (process.env.SMTP_USER && process.env.SMTP_PASS) ? nodemaile
   }
 }) : null;
 
-// Helper: Send alert to business owner / admin
+// Helper: Send alert to business owner / admin (Prefers Resend HTTPS, falls back to SMTP)
 async function sendNotificationEmail({ subject, htmlText }) {
   const targetEmail = process.env.NOTIFICATION_EMAIL || process.env.SMTP_USER || 'onestepmore04@gmail.com';
   
+  if (resend) {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: resendSender,
+        to: targetEmail,
+        subject,
+        html: htmlText
+      });
+      if (error) {
+        console.error('[Admin Email Error via Resend]', error);
+      } else {
+        console.log(`[Admin Email Sent via Resend] ID: ${data?.id} | Recipient: ${targetEmail}`);
+        return true;
+      }
+    } catch (err) {
+      console.error('[Admin Email Exception via Resend]', err.message);
+    }
+  }
+
   if (transporter) {
     try {
       const info = await transporter.sendMail({
@@ -33,75 +57,96 @@ async function sendNotificationEmail({ subject, htmlText }) {
         subject,
         html: htmlText
       });
-      console.log(`[Email Sent to Admin] ID: ${info.messageId} | Recipient: ${targetEmail}`);
+      console.log(`[Email Sent to Admin via SMTP] ID: ${info.messageId} | Recipient: ${targetEmail}`);
       return true;
     } catch (err) {
-      console.error('[Admin Email Error] Failed to send via Nodemailer:', err.message);
+      console.error('[Admin Email Error via SMTP]:', err.message);
     }
-  } else {
-    console.log(`[Email Notice] SMTP not configured. Recipient: ${targetEmail} | Subject: ${subject}`);
+  } else if (!resend) {
+    console.log(`[Email Notice] Neither Resend nor SMTP configured. Recipient: ${targetEmail} | Subject: ${subject}`);
   }
   return false;
 }
 
 // Helper: Send confirmation to the client who filled the enquiry form
 async function sendClientConfirmationEmail({ clientEmail, clientName, reason }) {
-  if (!transporter || !clientEmail) return false;
+  if (!clientEmail) return false;
 
-  try {
-    const info = await transporter.sendMail({
-      from: `"1 Step More | Dt. Pragati Mishra" <${process.env.SMTP_USER}>`,
-      to: clientEmail,
-      subject: `Thank you for connecting with 1 Step More, ${clientName}! 🌱`,
-      html: `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FFFFFF; border-radius: 12px; overflow: hidden; border: 1px solid #E5E7EB; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-          <!-- Header Banner -->
-          <div style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%); padding: 32px 24px; text-align: center; color: #FFFFFF;">
-            <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">1 Step More</h1>
-            <p style="margin: 6px 0 0 0; font-size: 14px; opacity: 0.9;">Every Healthy Habit Begins With One Small Step</p>
-          </div>
+  const emailHtml = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #FFFFFF; border-radius: 12px; overflow: hidden; border: 1px solid #E5E7EB; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+      <!-- Header Banner -->
+      <div style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%); padding: 32px 24px; text-align: center; color: #FFFFFF;">
+        <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">1 Step More</h1>
+        <p style="margin: 6px 0 0 0; font-size: 14px; opacity: 0.9;">Every Healthy Habit Begins With One Small Step</p>
+      </div>
 
-          <!-- Body Content -->
-          <div style="padding: 32px 24px; color: #374151; line-height: 1.6;">
-            <h2 style="color: #1F2937; font-size: 20px; margin-top: 0;">Hi ${clientName},</h2>
-            <p style="font-size: 15px;">
-              Thank you for reaching out to <strong>1 Step More</strong> regarding our <strong>${reason || 'Customized Wellness Program'}</strong>.
-            </p>
-            <p style="font-size: 15px;">
-              We have received your enquiry details. One of our certified nutritionists / wellness coaches will connect with you via phone / WhatsApp within <strong>24 hours</strong> to discuss your health targets and schedule your personal evaluation call.
-            </p>
+      <!-- Body Content -->
+      <div style="padding: 32px 24px; color: #374151; line-height: 1.6;">
+        <h2 style="color: #1F2937; font-size: 20px; margin-top: 0;">Hi ${clientName},</h2>
+        <p style="font-size: 15px;">
+          Thank you for reaching out to <strong>1 Step More</strong> regarding our <strong>${reason || 'Customized Wellness Program'}</strong>.
+        </p>
+        <p style="font-size: 15px;">
+          We have received your enquiry details. One of our certified nutritionists / wellness coaches will connect with you via phone / WhatsApp within <strong>24 hours</strong> to discuss your health targets and schedule your personal evaluation call.
+        </p>
 
-            <div style="background-color: #F3F4F6; border-left: 4px solid #2E7D32; padding: 16px; border-radius: 6px; margin: 24px 0;">
-              <p style="margin: 0; font-size: 14px; color: #4B5563;">
-                <em>"Wellness is not about extreme deprivation—it's about creating joyful, sustainable habits that fit seamlessly around your everyday life."</em>
-              </p>
-              <p style="margin: 8px 0 0 0; font-size: 13px; font-weight: 700; color: #2E7D32;">
-                — Dt. Pragati Mishra (Founder & Lead Nutritionist)
-              </p>
-            </div>
-
-            <p style="font-size: 14px; color: #6B7280;">
-              If you have any urgent questions, feel free to WhatsApp us directly at <a href="https://wa.me/918115660790" style="color: #2E7D32; font-weight: 600;">+91 8115660790</a>.
-            </p>
-
-            <div style="margin-top: 32px; text-align: center;">
-              <a href="https://www.onestepmore.in" style="background-color: #2E7D32; color: #FFFFFF; text-decoration: none; padding: 12px 28px; border-radius: 50px; font-weight: 700; font-size: 14px; display: inline-block;">
-                Explore Our Programs
-              </a>
-            </div>
-          </div>
-
-          <!-- Footer -->
-          <div style="background-color: #F9FAFB; padding: 20px 24px; text-align: center; border-top: 1px solid #E5E7EB; font-size: 12px; color: #9CA3AF;">
-            <p style="margin: 0;">&copy; ${new Date().getFullYear()} 1 Step More. Gomti Nagar, Lucknow, UP, India.</p>
-          </div>
+        <div style="background-color: #F3F4F6; border-left: 4px solid #2E7D32; padding: 16px; border-radius: 6px; margin: 24px 0;">
+          <p style="margin: 0; font-size: 14px; color: #4B5563;">
+            <em>"Wellness is not about extreme deprivation—it's about creating joyful, sustainable habits that fit seamlessly around your everyday life."</em>
+          </p>
+          <p style="margin: 8px 0 0 0; font-size: 13px; font-weight: 700; color: #2E7D32;">
+            — Dt. Pragati Mishra (Founder & Lead Nutritionist)
+          </p>
         </div>
-      `
-    });
-    console.log(`[Email Sent to Client] ID: ${info.messageId} | Recipient: ${clientEmail}`);
-    return true;
-  } catch (err) {
-    console.error('[Client Email Error] Failed to send confirmation to client:', err.message);
+
+        <p style="font-size: 14px; color: #6B7280;">
+          If you have any urgent questions, feel free to WhatsApp us directly at <a href="https://wa.me/918115660790" style="color: #2E7D32; font-weight: 600;">+91 8115660790</a>.
+        </p>
+
+        <div style="margin-top: 32px; text-align: center;">
+          <a href="https://www.onestepmore.in" style="background-color: #2E7D32; color: #FFFFFF; text-decoration: none; padding: 12px 28px; border-radius: 50px; font-weight: 700; font-size: 14px; display: inline-block;">
+            Explore Our Programs
+          </a>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="background-color: #F9FAFB; padding: 20px 24px; text-align: center; border-top: 1px solid #E5E7EB; font-size: 12px; color: #9CA3AF;">
+        <p style="margin: 0;">&copy; ${new Date().getFullYear()} 1 Step More. Gomti Nagar, Lucknow, UP, India.</p>
+      </div>
+    </div>
+  `;
+
+  if (resend) {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: resendSender,
+        to: clientEmail,
+        subject: `Thank you for connecting with 1 Step More, ${clientName}! 🌱`,
+        html: emailHtml
+      });
+      if (!error) {
+        console.log(`[Client Email Sent via Resend] ID: ${data?.id} | Recipient: ${clientEmail}`);
+        return true;
+      }
+    } catch (err) {
+      console.warn('[Resend Client Email Warning]', err.message);
+    }
+  }
+
+  if (transporter) {
+    try {
+      const info = await transporter.sendMail({
+        from: `"1 Step More | Dt. Pragati Mishra" <${process.env.SMTP_USER}>`,
+        to: clientEmail,
+        subject: `Thank you for connecting with 1 Step More, ${clientName}! 🌱`,
+        html: emailHtml
+      });
+      console.log(`[Email Sent to Client via SMTP] ID: ${info.messageId} | Recipient: ${clientEmail}`);
+      return true;
+    } catch (err) {
+      console.error('[Client Email Error via SMTP]:', err.message);
+    }
   }
   return false;
 }
@@ -472,30 +517,80 @@ app.post('/api/contact', async (req, res) => {
   }
 });
 
-// Diagnostic helper: Check if SMTP email service is configured and connected
+// Diagnostic helper: Check if email service (Resend HTTPS or SMTP) is configured and working
 app.get('/api/test-email', async (req, res) => {
-  if (!transporter) {
-    return res.status(503).json({
-      configured: false,
-      message: 'SMTP_USER and SMTP_PASS are not set in Render environment variables.',
-      instructions: 'Add SMTP_USER (your Gmail) and SMTP_PASS (16-character Google App Password) in Render Dashboard -> Environment.'
-    });
+  const targetEmail = process.env.NOTIFICATION_EMAIL || process.env.SMTP_USER || 'onestepmore04@gmail.com';
+
+  // 1. Prioritize Resend over HTTPS (Port 443 - 100% works on Render)
+  if (resend) {
+    try {
+      const { data, error } = await resend.emails.send({
+        from: resendSender,
+        to: targetEmail,
+        subject: '🚀 Resend Live Activation Test - 1 Step More',
+        html: `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 580px; margin: 0 auto; background: #FFFFFF; border-radius: 12px; border: 1.5px solid #2E7D32; overflow: hidden; box-shadow: 0 4px 15px rgba(46,125,50,0.1);">
+            <div style="background: #2E7D32; padding: 24px; color: #FFFFFF; text-align: center;">
+              <h2 style="margin: 0; font-size: 22px;">🎉 Resend HTTPS Email System Active!</h2>
+              <p style="margin: 6px 0 0 0; font-size: 13px; opacity: 0.9;">1 Step More Cloud Notification Node</p>
+            </div>
+            <div style="padding: 24px; color: #374151; font-size: 14px; line-height: 1.6;">
+              <p>Your server on Render is now successfully sending emails via HTTPS (Port 443) with zero firewall restrictions.</p>
+              <ul style="padding-left: 20px; color: #4B5563;">
+                <li><strong>Provider:</strong> Resend REST API (HTTPS)</li>
+                <li><strong>Recipient:</strong> ${targetEmail}</li>
+                <li><strong>Timestamp:</strong> ${new Date().toISOString()}</li>
+              </ul>
+              <div style="background: #E8F5E9; padding: 12px; border-radius: 6px; color: #1B5E20; font-weight: 600; text-align: center;">
+                All website consultation leads & payment receipts are ready to deliver!
+              </div>
+            </div>
+          </div>
+        `
+      });
+
+      if (error) {
+        return res.status(500).json({ configured: false, provider: 'Resend', error });
+      }
+
+      return res.json({
+        configured: true,
+        provider: 'Resend (HTTPS Port 443)',
+        recipient: targetEmail,
+        messageId: data?.id,
+        message: `Resend test email delivered successfully to ${targetEmail}!`
+      });
+    } catch (err) {
+      return res.status(500).json({ configured: false, provider: 'Resend', error: err.message });
+    }
   }
-  try {
-    await transporter.verify();
-    res.json({
-      configured: true,
-      sender: process.env.SMTP_USER,
-      recipient: process.env.NOTIFICATION_EMAIL || process.env.SMTP_USER,
-      message: 'Gmail SMTP connection verified successfully! Email alerts are ready and working.'
-    });
-  } catch (err) {
-    res.status(500).json({
-      configured: false,
-      error: err.message,
-      instructions: 'Make sure you generated a 16-character Google App Password (not your personal account password).'
-    });
+
+  // 2. Secondary fallback: SMTP
+  if (transporter) {
+    try {
+      await transporter.verify();
+      return res.json({
+        configured: true,
+        provider: 'Gmail SMTP',
+        sender: process.env.SMTP_USER,
+        recipient: targetEmail,
+        message: 'Gmail SMTP connection verified successfully!'
+      });
+    } catch (err) {
+      return res.status(500).json({
+        configured: false,
+        provider: 'Gmail SMTP',
+        error: err.message,
+        instructions: 'Render blocks raw SMTP ports. Add RESEND_API_KEY to your Render Environment to use HTTPS email delivery.'
+      });
+    }
   }
+
+  return res.status(503).json({
+    configured: false,
+    message: 'Neither RESEND_API_KEY nor SMTP is configured.',
+    instructions: 'Add RESEND_API_KEY in Render Dashboard -> Environment.'
+  });
 });
 
 // 5. Get all inquiries in JSON
