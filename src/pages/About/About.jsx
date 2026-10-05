@@ -110,6 +110,8 @@ const About = () => {
                       src={slide.image} 
                       alt={slide.title} 
                       className="carousel-img" 
+                      loading={index === 0 ? "eager" : "lazy"}
+                      decoding="async"
                     />
                     <div className="carousel-overlay">
                       <span className="carousel-badge">{slide.badge}</span>
@@ -166,6 +168,8 @@ const About = () => {
                   src={ABOUT_STORY_CONTENT.founderPortrait.image} 
                   alt={ABOUT_STORY_CONTENT.founderPortrait.alt} 
                   className="founder-portrait-img"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="founder-floating-badge">
                   <Heart size={14} fill="var(--primary)" color="var(--primary)" /> {ABOUT_STORY_CONTENT.founderPortrait.badge}

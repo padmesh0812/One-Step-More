@@ -105,7 +105,13 @@ const Blog = () => {
         <div className="blog-grid">
           {filteredPosts.map((post) => (
             <div key={post.id} className="blog-card" onClick={() => setSelectedPost(post)}>
-              <img src={post.image} alt={post.title} className="blog-card-img" />
+              <img 
+                src={post.image} 
+                alt={post.title} 
+                className="blog-card-img" 
+                loading="lazy"
+                decoding="async"
+              />
               <div className="blog-card-content">
                 <div className="blog-card-meta">
                   <span className="blog-card-tag">{post.category}</span>
@@ -146,6 +152,7 @@ const Blog = () => {
                 src={selectedPost.image} 
                 alt={selectedPost.title} 
                 style={{ width: '100%', height: '300px', objectFit: 'cover', borderRadius: 'var(--radius-sm)', marginBottom: '24px' }} 
+                decoding="async"
               />
               {renderPostContent(selectedPost)}
             </div>
@@ -163,7 +170,13 @@ const Blog = () => {
 
           <div className="recipe-container">
             <div className="recipe-image-box">
-              <img src={BLOG_RECIPE_CONTENT.image} alt={BLOG_RECIPE_CONTENT.title} className="recipe-img" />
+              <img 
+                src={BLOG_RECIPE_CONTENT.image} 
+                alt={BLOG_RECIPE_CONTENT.title} 
+                className="recipe-img" 
+                loading="lazy"
+                decoding="async"
+              />
               <span className="recipe-badge">{BLOG_RECIPE_CONTENT.badge}</span>
             </div>
             

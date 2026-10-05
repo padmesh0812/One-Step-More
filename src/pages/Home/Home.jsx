@@ -63,6 +63,9 @@ const Home = () => {
                 src={HERO_CONTENT.image} 
                 alt={HERO_CONTENT.imageAlt} 
                 className="hero-image"
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
               />
             </div>
           </div>
@@ -191,6 +194,8 @@ const Home = () => {
               <img 
                 src={HERO_CONTENT.image ? "/assets/images/founder/founder.webp" : ""} 
                 alt={`${FOUNDER_SECTION_CONTENT.name} - ${FOUNDER_SECTION_CONTENT.role}`}
+                loading="lazy"
+                decoding="async"
               />
               <div className="experience-card">
                 <h3>{FOUNDER_SECTION_CONTENT.statsCount}</h3>

@@ -43,6 +43,7 @@ const HomeTestimonials = () => {
                   alt={`${item.name} weight loss transformation`} 
                   className="transformation-img"
                   loading="lazy"
+                  decoding="async"
                 />
                 <div className="image-badge-pill">
                   <Award size={13} /> {item.badge}
@@ -150,6 +151,7 @@ const HomeTestimonials = () => {
                 src={activeModalImage.image} 
                 alt={`${activeModalImage.name} transformation large preview`} 
                 className="modal-full-img"
+                decoding="async"
               />
             </div>
             <div className="modal-caption-bar">

@@ -110,6 +110,8 @@ const Services = () => {
                     src={activeProgram.image}
                     alt={activeProgram.title}
                     className="showcase-main-img"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="showcase-img-badge">
                     {activeProgram.badge}

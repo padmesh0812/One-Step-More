@@ -27,20 +27,24 @@
   - Dynamic client-side vector PDF generation using `jspdf`.
   - Lazy-loaded chunking to maintain lightning-fast page speed.
   - Comprehensive clinical receipt with OSM Receipt No, Provider info, Candidate bio, Razorpay Order & Payment ID, itemized fees, discount scholarship, digital verification stamp, and Dt. Pragati Mishra's signature seal.
-  - Instant one-click PDF download on Step 3 (Success Screen).
+- [x] **Frontend Image Lazy Loading & Async Decoding**:
+  - Implemented `loading="lazy"` and `decoding="async"` across all off-screen images (`Services.jsx`, `Blog.jsx`, `About.jsx`, `HomeTestimonials.jsx`, `Footer.jsx`, and Founder sections).
+  - Maintained `loading="eager"` with `fetchPriority="high"` on the above-the-fold Hero image for optimal Largest Contentful Paint (LCP).
 
 ---
 
 ## Pending Tasks (Roadmap)
 
-1. ⏳ **MongoDB Atlas Migration** *(PENDING - On hold until owner Gmail login)*:
+1. ⏳ **Email & SMS Notifications** *(ON HOLD - Awaiting Google App Password)*:
+   - Generate 16-char App Password for `onestepmore04@gmail.com`.
+   - Set `SMTP_USER` & `SMTP_PASS` in Render to enable instant inquiry & payment alerts.
+   - Client email confirmation on payment & SMS integration.
+
+2. ⏳ **MongoDB Atlas Migration** *(PENDING - On hold until owner Gmail login)*:
    - Create free MongoDB Atlas cluster using the official `onestepmore` Gmail.
    - Replace local SQLite with MongoDB (Mongoose / native driver).
    - Ensure inquiries and orders permanently persist across Render restarts.
    - Update `/admin` dashboard to fetch from MongoDB.
 
-2. ⏳ **Cloudinary + AVIF + Lazy Loading Optimization** *(PENDING)*:
-   - Create free Cloudinary account (under official Gmail).
-   - Upload heavy images (transformations, carousel, banners) to Cloudinary.
-   - Deliver with `/f_auto,q_auto/` for automatic AVIF generation.
-   - Apply `loading="lazy"` across all off-screen image components.
+3. ⏳ **Cloudinary CDN Optimization** *(PENDING)*:
+   - Upload heavy assets to Cloudinary with `/f_auto,q_auto/` for automatic AVIF generation.

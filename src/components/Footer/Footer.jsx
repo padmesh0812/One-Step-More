@@ -92,6 +92,8 @@ const Footer = () => {
                 src={BRAND.logoPng}
                 alt={`${BRAND.name} Logo`}
                 className="footer-logo"
+                loading="lazy"
+                decoding="async"
               />
               <span className="brand-name footer-brand-name">
                 <span className="brand-step">{BRAND.stepText}</span> <span className="brand-more">{BRAND.moreText}</span>

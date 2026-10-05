@@ -24,6 +24,8 @@ const Navbar = () => {
               src={BRAND.logoUrl} 
               alt={`${BRAND.name} Logo`} 
               className="navbar-logo-img" 
+              loading="eager"
+              decoding="async"
             />
             <span className="brand-name">
               <span className="brand-step">{BRAND.stepText}</span> <span className="brand-more">{BRAND.moreText}</span>
