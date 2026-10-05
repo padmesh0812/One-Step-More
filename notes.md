@@ -31,13 +31,13 @@
   - Implemented `loading="lazy"` and `decoding="async"` across all off-screen images (`Services.jsx`, `Blog.jsx`, `About.jsx`, `HomeTestimonials.jsx`, `Footer.jsx`, and Founder sections).
   - Maintained `loading="eager"` with `fetchPriority="high"` on the above-the-fold Hero image for optimal Largest Contentful Paint (LCP).
 
-- [x] **Email & SMS Notifications System**:
-  - Google App Password verified and working for `onestepmore04@gmail.com`.
-  - Configured locally in `server/.env`.
-  - Automated Admin Alert: Sends consultation form leads & payment alerts to `onestepmore04@gmail.com`.
+- [x] **Email & SMS Notifications System (Resend HTTPS API)**:
+  - Resend HTTPS REST API integrated into `server.js` (Bypasses Render cloud firewall port blocks).
+  - Configured locally in `server/.env` with key `re_gjZWgams_...`.
+  - Automated Admin Alert: Sends consultation leads & payment notifications to `onestepmore04@gmail.com`.
   - Automated Client Receipt: Sends welcome email with full transaction summary & next steps to candidate.
   - SMS Notification Hook: Integrated Fast2SMS / carrier dispatch hook in `server.js`.
-  - Next step for live: Add `SMTP_USER` & `SMTP_PASS` in Render Environment Settings.
+  - Live configuration: Add `RESEND_API_KEY` & `RESEND_FROM_EMAIL` in Render Environment Settings.
 
 ---
 
