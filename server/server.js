@@ -10,9 +10,11 @@ import { renderAdminHtml } from './adminDashboard.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Setup Nodemailer transporter if credentials provided
+// Setup Nodemailer transporter with port 465 SSL (required for Render cloud compatibility)
 const transporter = (process.env.SMTP_USER && process.env.SMTP_PASS) ? nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 465,
+  secure: true,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS.replace(/\s+/g, '') // remove spaces from 16-char app password if any
