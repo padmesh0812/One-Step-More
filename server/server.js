@@ -12,8 +12,9 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Initialize Resend HTTPS email service (Bypasses Render cloud port restrictions via Port 443)
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-const resendSender = process.env.RESEND_FROM_EMAIL || '1 Step More <onboarding@resend.dev>';
+const resendApiKey = (process.env.RESEND_API_KEY || '').trim();
+const resend = resendApiKey ? new Resend(resendApiKey) : null;
+const resendSender = (process.env.RESEND_FROM_EMAIL || '1 Step More <onboarding@resend.dev>').trim();
 
 // Setup Nodemailer transporter with port 465 SSL (as secondary / local fallback)
 const transporter = (process.env.SMTP_USER && process.env.SMTP_PASS) ? nodemailer.createTransport({
