@@ -552,8 +552,65 @@
   font-weight: 700;
 }
 
+.enroll-receipt-code {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #E8F5E9;
+  color: #1B5E20;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.enroll-success-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+@media (min-width: 576px) {
+  .enroll-success-actions {
+    flex-direction: row;
+    justify-content: center;
+    gap: 14px;
+  }
+}
+
+.enroll-download-invoice-btn {
+  background: #FFFFFF;
+  color: var(--primary, #2E7D32);
+  border: 1.5px solid var(--primary, #2E7D32);
+  padding: 10px 22px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(46, 125, 50, 0.08);
+}
+
+.enroll-download-invoice-btn:hover {
+  background: #E8F5E9;
+  color: #1B5E20;
+  border-color: #1B5E20;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(46, 125, 50, 0.16);
+}
+
+.enroll-download-invoice-btn.loading {
+  opacity: 0.75;
+  cursor: wait;
+}
+
 .enroll-success-btn {
-  min-width: 200px;
+  min-width: 180px;
   padding: 10px 24px;
   border-radius: 50px;
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { Check, AlertCircle, ArrowLeft, Heart, Shield, CreditCard, CheckCircle, RefreshCw, ArrowRight } from 'lucide-react';
+import { Check, AlertCircle, ArrowLeft, Heart, Shield, CreditCard, CheckCircle, RefreshCw, ArrowRight, Download, FileText } from 'lucide-react';
 import { 
   BRAND,
   PROGRAMS_DATA, 
@@ -23,6 +23,8 @@ const Enroll = () => {
 
     // Steps: 1 = Biological Details, 2 = Payment details, 3 = Success
     const [step, setStep] = useState(1);
+    const [paymentReceipt, setPaymentReceipt] = useState(null);
+    const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
     
     // Initialize form states
     const [form, setForm] = useState({
@@ -192,6 +194,16 @@ const Enroll = () => {
 
               const verifyData = await verifyResponse.json();
               if (verifyData.success) {
+                setPaymentReceipt({
+                  paymentId: paymentResponse.razorpay_payment_id,
+                  orderId: paymentResponse.razorpay_order_id,
+                  date: new Date().toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                  }),
+                  amount: activePricing.offer
+                });
                 setStep(3);
               } else {
                 alert(verifyData.error || 'Razorpay Signature verification failed.');
@@ -217,6 +229,24 @@ const Enroll = () => {
         console.error('Razorpay Order API creation failed:', err);
         alert(err.message || 'Payment server is offline or unreachable. Please try again later.');
         setIsProcessingPayment(false);
+      }
+    };
+
+    const handleDownloadInvoice = async () => {
+      try {
+        setIsGeneratingPdf(true);
+        const { generateInvoicePdf } = await import('../../utils/generateInvoicePdf');
+        generateInvoicePdf({
+          form,
+          pricing: activePricing,
+          program: selectedProgramData,
+          paymentReceipt
+        });
+      } catch (err) {
+        console.error('Invoice PDF generation failed:', err);
+        alert('Failed to generate receipt PDF. Please try again.');
+      } finally {
+        setTimeout(() => setIsGeneratingPdf(false), 600);
       }
     };
 
@@ -269,16 +299,40 @@ const Enroll = () => {
               
               <div className="enroll-success-summary">
                 <div><strong>{ENROLL_SUCCESS_CONTENT.bioLabel}</strong> {form.age} Years &bull; Blood group {form.bloodGroup} &bull; Weight {form.weight} kg &bull; Height {form.height}</div>
-                <div><strong>{ENROLL_SUCCESS_CONTENT.addressLabel}</strong> {form.address}</div>
+                <div><strong>{ENROLL_SUCCESS_CONTENT.addressLabel}</strong> {form.address || 'Online Consultation'}</div>
                 <div><strong>{ENROLL_SUCCESS_CONTENT.gatewayLabel}</strong> {ENROLL_SUCCESS_CONTENT.gatewayValue}</div>
+                {paymentReceipt?.paymentId && (
+                  <div><strong>Payment ID:</strong> <span className="enroll-receipt-code">{paymentReceipt.paymentId}</span></div>
+                )}
+                {paymentReceipt?.orderId && (
+                  <div><strong>Order ID:</strong> <span className="enroll-receipt-code">{paymentReceipt.orderId}</span></div>
+                )}
                 <div className="enroll-success-total">
                   {ENROLL_SUCCESS_CONTENT.activeValueLabel} ₹{activePricing.offer.toLocaleString('en-IN')}/-
                 </div>
               </div>
 
-              <button onClick={() => navigate('/services')} className="btn btn-primary enroll-success-btn">
-                {ENROLL_SUCCESS_CONTENT.returnBtnText}
-              </button>
+              {/* Action Buttons: Download PDF and Continue */}
+              <div className="enroll-success-actions">
+                <button 
+                  onClick={handleDownloadInvoice} 
+                  className={`btn enroll-download-invoice-btn ${isGeneratingPdf ? 'loading' : ''}`}
+                  disabled={isGeneratingPdf}
+                >
+                  {isGeneratingPdf ? (
+                    <>
+                      <RefreshCw className="spin-animation" size={17} /> Preparing Receipt...
+                    </>
+                  ) : (
+                    <>
+                      <Download size={18} /> Download Tax Invoice / Receipt (PDF)
+                    </>
+                  )}
+                </button>
+                <button onClick={() => navigate('/services')} className="btn btn-primary enroll-success-btn">
+                  {ENROLL_SUCCESS_CONTENT.returnBtnText}
+                </button>
+              </div>
             </div>
           )}
 
