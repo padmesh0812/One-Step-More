@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Salad, Flower2, HeartPulse, Leaf, Check } from 'lucide-react';
-import { WellnessQuiz, BmiCalculator, HomeTestimonials } from '../../components';
+import { HomeTestimonials } from '../../components';
+
+// Lazy-load below-the-fold interactive widgets to reduce initial JS execution
+const WellnessQuiz = lazy(() => import('../../components/WellnessQuiz'));
+const BmiCalculator = lazy(() => import('../../components/BmiCalculator'));
 import { 
   BRAND,
   HERO_CONTENT, 
@@ -114,12 +118,27 @@ const Home = () => {
         </div>
 
         <div className="quiz-bmi-split-grid">
-          <div className="tools-grid-col">
-            <WellnessQuiz />
-          </div>
-          <div className="tools-grid-col">
-            <BmiCalculator />
-          </div>
+          <Suspense fallback={
+            <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
+              <div style={{
+                width: '32px',
+                height: '32px',
+                margin: '0 auto 12px auto',
+                border: '3px solid rgba(46, 125, 50, 0.15)',
+                borderTopColor: 'var(--primary)',
+                borderRadius: '50%',
+                animation: 'spin 0.8s linear infinite'
+              }} />
+              <span>Loading interactive health tools...</span>
+            </div>
+          }>
+            <div className="tools-grid-col">
+              <WellnessQuiz />
+            </div>
+            <div className="tools-grid-col">
+              <BmiCalculator />
+            </div>
+          </Suspense>
         </div>
       </section>
 
