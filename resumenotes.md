@@ -21,11 +21,14 @@
   - All consultation inquiries and enrollment orders now persist permanently in the cloud across server restarts and hard refreshes.
   - Reset test data to clean zero state for production launch.
 
-- [x] **Email & SMS Notifications System (Resend HTTPS API)**:
+- [x] **Email & SMS Notifications System (Resend HTTPS API & Custom Domain Verified)**:
   - Switched from raw SMTP to Resend HTTPS REST API (bypassing Render cloud port restrictions).
-  - Verified live delivery of consultation leads to `onestepmore04@gmail.com`.
+  - Verified and connected custom branded domain `onestepmore.in` via Cloudflare DNS.
+  - Configured sender address to `1 Step More <hello@onestepmore.in>`.
+  - Full end-to-end client email delivery verified for all client addresses without sandbox restrictions.
   - Automatic branded confirmation email dispatched to clients upon filling enquiry form.
   - Automatic payment receipt and welcome email dispatched to client upon course enrollment.
+  - Admin alert emails dispatched to `onestepmore04@gmail.com`.
   - Diagnostic test endpoint active at `/api/test-email`.
 
 - [x] **Razorpay Payment Gateway Integration & Testing**:
@@ -49,17 +52,10 @@
 1. 💳 **Razorpay Live Mode Activation (When ready for real customer payments)**:
    - Complete KYC and business verification on [Razorpay Dashboard](https://dashboard.razorpay.com/).
    - Generate Live API Keys (`rzp_live_...`).
-   - Update `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` in Render Dashboard -> Environment.
+   - Update `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET` in Render Dashboard -> Environment and local `.env`.
 
-2. ✉️ **Custom Domain Email Sending with Resend (Optional - Brand Polishing)**:
-   - Currently, emails send from `onboarding@resend.dev` to `onestepmore04@gmail.com`.
-   - To send from your branded address (e.g., `care@onestepmore.in` or `hello@onestepmore.in`) to any client email without restrictions:
-     - Go to Resend Dashboard -> Domains -> Add Domain `onestepmore.in`.
-     - Add the 3 provided DNS TXT/MX records to your Cloudflare DNS table.
-     - Update `RESEND_FROM_EMAIL=1 Step More <care@onestepmore.in>` in Render.
-
-3. 🖼️ **Asset & CDN Optimization (Optional)**:
+2. 🖼️ **Asset & CDN Optimization (Optional)**:
    - Connect Cloudinary or Cloudflare Images to serve modern AVIF/WebP responsive formats.
 
-4. 📊 **Analytics & Meta Pixel (Optional)**:
+3. 📊 **Analytics & Meta Pixel (Optional)**:
    - Add Google Analytics 4 (GA4) or Meta Pixel for marketing / conversion tracking.
