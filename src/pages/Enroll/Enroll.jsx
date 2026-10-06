@@ -128,12 +128,30 @@ const Enroll = () => {
       setStep(2);
     };
 
+    // Helper: Dynamically load Razorpay SDK on-demand
+    const loadRazorpayScript = () => {
+      return new Promise((resolve) => {
+        if (window.Razorpay) return resolve(true);
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.async = true;
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
+      });
+    };
+
     // Process secure checkout with Razorpay
     const handlePaymentSubmit = async (e) => {
       e.preventDefault();
       setIsProcessingPayment(true);
 
       try {
+        const isSdkReady = await loadRazorpayScript();
+        if (!isSdkReady) {
+          throw new Error('Failed to load secure Razorpay gateway. Please check your internet connection.');
+        }
+
         const response = await fetch(`${API_BASE_URL}/api/create-order`, {
           method: 'POST',
           headers: {
