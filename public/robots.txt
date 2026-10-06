@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+
+# XML Sitemap
+Sitemap: https://www.onestepmore.in/sitemap.xml
